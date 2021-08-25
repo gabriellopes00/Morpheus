@@ -1,0 +1,20 @@
+# Dependabot setup
+version: 2
+
+updates:
+
+  # Github Actions versions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci:"
+
+  # Go pacakges versions
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore:"
