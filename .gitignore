@@ -13,3 +13,10 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Environment variables
+.env
+*.pem
+
+# Jetbrains IDEs
+.idea
