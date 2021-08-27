@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  postgresql:
+    container_name: accounts_db
+    image: postgres:13.4-alpine3.14
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: accounts
+      POSTGRES_PASSWORD: accountspg
+      POSTGRES_DB: accountsdb
+    networks:
+      - accounts
+
+  api:
+    container_name: accounts_api
+    depends_on:
+      - postgresql
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    networks:
+      - accounts
+    ports:
+      - '5590:5590'
+
+networks:
+  accounts:
+    driver: bridge
+
+volumes:
+  dbdata:
