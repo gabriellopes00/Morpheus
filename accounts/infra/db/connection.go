@@ -8,9 +8,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type PostgresDb struct{}
+type postgresDb struct{}
 
-func (pg *PostgresDb) Connect() (*sql.DB, error) {
+func NewPostgresDb() *postgresDb {
+	return &postgresDb{}
+}
+
+func (pg *postgresDb) Connect() (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		env.DB_HOST,

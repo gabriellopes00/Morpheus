@@ -2,9 +2,13 @@ package infra
 
 import "golang.org/x/crypto/bcrypt"
 
-type BcryptHasher struct{}
+type bcryptHasher struct{}
 
-func (b *BcryptHasher) GenHash(payload string) (string, error) {
+func NewBcryptHasher() *bcryptHasher {
+	return &bcryptHasher{}
+}
+
+func (b *bcryptHasher) GenHash(payload string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(payload), bcrypt.DefaultCost)
 	return string(hash), err
 }

@@ -2,9 +2,13 @@ package infra
 
 import "github.com/gofrs/uuid"
 
-type UUIDGenerator struct{}
+type uuidGenerator struct{}
 
-func (u *UUIDGenerator) Generate() (string, error) {
+func NewUUIDGenerator() *uuidGenerator {
+	return &uuidGenerator{}
+}
+
+func (u *uuidGenerator) Generate() (string, error) {
 	result, err := uuid.NewV4()
 	if err != nil {
 		return "", nil

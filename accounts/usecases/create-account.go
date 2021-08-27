@@ -7,20 +7,32 @@ import (
 	"time"
 )
 
-type CreateAccount struct {
+var (
+	ErrEmailAlerayInUse = errors.New("Email already in use")
+)
+
+type createAccount struct {
 	UUIDGenerator ports.UUIDGenerator
 	Hasher        ports.Hasher
 	Repository    ports.Repository
 }
 
-func (c *CreateAccount) Create(account entities.Account) (*entities.Account, error) {
+func NewCreateAccount(UUIDGenerator ports.UUIDGenerator, Hasher ports.Hasher, Repository ports.Repository) *createAccount {
+	return &createAccount{
+		UUIDGenerator: UUIDGenerator,
+		Hasher:        Hasher,
+		Repository:    Repository,
+	}
+}
+
+func (c *createAccount) Create(account entities.Account) (*entities.Account, error) {
 	existing, err := c.Repository.Exists(account.Email)
 	if err != nil {
 		return nil, err
 	}
 
 	if existing {
-		return nil, errors.New("Email already in use")
+		return nil, ErrEmailAlerayInUse
 	}
 
 	uuid, err := c.UUIDGenerator.Generate()
