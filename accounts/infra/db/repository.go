@@ -1,7 +1,7 @@
 package db
 
 import (
-	"accounts/entities"
+	"accounts/domain/entities"
 	"database/sql"
 )
 

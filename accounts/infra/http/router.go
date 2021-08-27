@@ -1,10 +1,10 @@
 package http
 
 import (
+	"accounts/application"
 	"accounts/infra/crypto"
 	"accounts/infra/db"
 	"accounts/infra/http/handlers"
-	"accounts/usecases"
 	"database/sql"
 	"net/http"
 
@@ -17,7 +17,7 @@ func SetupGinRouter(router *gin.Engine, connection *sql.DB) {
 	})
 
 	createAccountHandler := handlers.NewCreateAccountHandler(
-		usecases.NewCreateAccount(
+		application.NewCreateAccount(
 			crypto.NewUUIDGenerator(),
 			crypto.NewBcryptHasher(),
 			db.NewPgAccountRepository(connection),

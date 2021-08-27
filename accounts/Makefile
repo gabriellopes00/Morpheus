@@ -44,7 +44,8 @@ server:
 	@go run cmd/api/main.go
 
 build:
-	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+	@rm -rf ./bin/app && \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
 	go build -o ./bin/app -ldflags="-s -w" ./cmd/api/main.go
 
 .PHONY: pgdown pgup test install server build composeup composedown migrateup migratedown migrategen

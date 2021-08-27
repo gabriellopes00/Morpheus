@@ -1,6 +1,6 @@
 package ports
 
-import "accounts/entities"
+import "accounts/domain/entities"
 
 type Repository interface {
 	Create(account *entities.Account) error

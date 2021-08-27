@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"accounts/entities"
-	"accounts/usecases"
+	"accounts/application"
+	"accounts/domain/entities"
+	"accounts/domain/usecases"
 	"errors"
 	"net/http"
 
@@ -10,10 +11,10 @@ import (
 )
 
 type createAccountHandler struct {
-	CreateAccount entities.CreateAccount
+	CreateAccount usecases.CreateAccount
 }
 
-func NewCreateAccountHandler(createAccount entities.CreateAccount) *createAccountHandler {
+func NewCreateAccountHandler(createAccount usecases.CreateAccount) *createAccountHandler {
 	return &createAccountHandler{
 		CreateAccount: createAccount,
 	}
@@ -29,7 +30,7 @@ func (h *createAccountHandler) Create(c *gin.Context) {
 
 	account, err := h.CreateAccount.Create(params)
 	if err != nil {
-		if errors.Is(err, usecases.ErrEmailAlerayInUse) {
+		if errors.Is(err, application.ErrEmailAlerayInUse) {
 			c.String(http.StatusConflict, err.Error())
 		} else {
 			c.AbortWithError(http.StatusInternalServerError, err)
