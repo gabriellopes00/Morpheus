@@ -1,39 +1,24 @@
 package main
 
 import (
-	"accounts/entities"
-	"accounts/infra"
 	"accounts/infra/db"
-	"accounts/usecases"
-	"fmt"
+	"accounts/infra/http"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	connection := db.NewPostgresDb()
+	postgres := db.NewPostgresDb()
 
-	database, err := connection.Connect()
+	connection, err := postgres.Connect()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	defer database.Close()
+	defer connection.Close()
 
-	usecase := usecases.NewCreateAccount(
-		infra.NewUUIDGenerator(),
-		infra.NewBcryptHasher(),
-		db.NewPgAccountRepository(database),
-	)
-
-	account, err := usecase.Create(entities.Account{
-		Name:      "Gabriel Luís Lopes",
-		Email:     "gabriellopes00@gmail.com",
-		Password:  "my_passwd_123",
-		AvatarUrl: "https://avatars.githubusercontent.com/u/69465943?v=4",
-	})
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	fmt.Println(*account)
+	router := gin.Default()
+	http.SetupGinRouter(router, connection)
+	router.Run(":7765")
 }

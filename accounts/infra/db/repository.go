@@ -44,13 +44,9 @@ func (r *pgAccountRepository) Exists(email string) (bool, error) {
 
 	err = stm.QueryRow(email).Scan(&accountId)
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 
-	if accountId != "" {
-		return true, nil
-	}
-
-	return false, nil
+	return true, nil
 
 }
