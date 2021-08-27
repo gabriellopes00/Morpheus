@@ -10,9 +10,8 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: accounts
       POSTGRES_PASSWORD: accountspg
-      POSTGRES_DB: accountsdb
+      POSTGRES_DB: accounts
     networks:
       - accounts
 
@@ -20,14 +19,11 @@ services:
     container_name: accounts_api
     depends_on:
       - postgresql
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file: .env
+    build: .
     networks:
       - accounts
     ports:
-      - '5590:5590'
+      - '7765:7765'
 
 networks:
   accounts:
