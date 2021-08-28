@@ -1,6 +1,7 @@
 # load environment variables
 include .env
-$(eval export $(shell cat .env | sed 's/#.*//g' | xargs))
+VARS:=$(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' .env )
+$(foreach v,$(VARS),$(eval $(shell echo export $(v)="$($(v))")))
 
 pgup:
 	@docker run -d \
