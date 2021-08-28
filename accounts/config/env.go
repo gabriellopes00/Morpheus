@@ -22,6 +22,12 @@ var (
 	TOKEN_EXPIRATION_TIME = 0
 
 	PORT = 0
+
+	RABBITMQ_HOST  = ""
+	RABBITMQ_USER  = ""
+	RABBITMQ_PASS  = ""
+	RABBITMQ_PORT  = 0
+	RABBITMQ_VHOST = ""
 )
 
 func init() {
@@ -49,6 +55,15 @@ func init() {
 	TOKEN_PRIVATE_KEY = os.Getenv("TOKEN_PRIVATE_KEY")
 	TOKEN_PUBLIC_KEY = os.Getenv("TOKEN_PUBLIC_KEY")
 	TOKEN_EXPIRATION_TIME, err = strconv.Atoi(os.Getenv("TOKEN_EXPIRATION_TIME"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	RABBITMQ_HOST = os.Getenv("RABBITMQ_HOST")
+	RABBITMQ_USER = os.Getenv("RABBITMQ_USER")
+	RABBITMQ_PASS = os.Getenv("RABBITMQ_PASS")
+	RABBITMQ_VHOST = os.Getenv("RABBITMQ_VHOST")
+	RABBITMQ_PORT, err = strconv.Atoi(os.Getenv("RABBITMQ_PORT"))
 	if err != nil {
 		log.Fatalln(err)
 	}

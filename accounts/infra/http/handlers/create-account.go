@@ -4,6 +4,8 @@ import (
 	"accounts/application"
 	"accounts/domain/entities"
 	"accounts/domain/usecases"
+	"accounts/ports"
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -12,12 +14,19 @@ import (
 
 type createAccountHandler struct {
 	CreateAccount usecases.CreateAccount
+	MessageQueue  ports.MessageQueue
 }
 
-func NewCreateAccountHandler(createAccount usecases.CreateAccount) *createAccountHandler {
+func NewCreateAccountHandler(
+	createAccount usecases.CreateAccount,
+	messageQueue ports.MessageQueue,
+) *createAccountHandler {
+
 	return &createAccountHandler{
 		CreateAccount: createAccount,
+		MessageQueue:  messageQueue,
 	}
+
 }
 
 func (h *createAccountHandler) Create(c *gin.Context) {
@@ -37,6 +46,16 @@ func (h *createAccountHandler) Create(c *gin.Context) {
 		}
 
 		return
+	}
+
+	payload, err := json.Marshal(account)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+	}
+
+	err = h.MessageQueue.SendMessage([]byte(payload))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
 	}
 
 	c.JSON(http.StatusCreated, account)

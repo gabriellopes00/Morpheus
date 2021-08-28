@@ -5,6 +5,7 @@ import (
 	"accounts/infra/crypto"
 	"accounts/infra/db"
 	"accounts/infra/http/handlers"
+	"accounts/infra/queue"
 	"database/sql"
 	"net/http"
 
@@ -12,17 +13,18 @@ import (
 )
 
 func SetupGinRouter(router *gin.Engine, connection *sql.DB) {
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "ok")
-	})
-
 	createAccountHandler := handlers.NewCreateAccountHandler(
 		application.NewCreateAccount(
 			crypto.NewUUIDGenerator(),
 			crypto.NewBcryptHasher(),
 			db.NewPgAccountRepository(connection),
 		),
+		queue.NewRabbitMQ(),
 	)
+
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "ok")
+	})
 
 	router.POST("/accounts", createAccountHandler.Create)
 }
