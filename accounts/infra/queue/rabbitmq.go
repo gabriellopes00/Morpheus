@@ -3,6 +3,7 @@ package queue
 import (
 	env "accounts/config"
 	"fmt"
+	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -12,10 +13,17 @@ type rabbitMQ struct {
 }
 
 func NewRabbitMQ() *rabbitMQ {
-	return &rabbitMQ{}
+	channel, err := connect()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return &rabbitMQ{
+		Channel: channel,
+	}
 }
 
-func (r *rabbitMQ) Connect() error {
+func connect() (*amqp.Channel, error) {
 	dsn := fmt.Sprintf(
 		"amqp://%s:%s@%s:%d%s",
 		env.RABBITMQ_USER,
@@ -27,17 +35,30 @@ func (r *rabbitMQ) Connect() error {
 
 	conn, err := amqp.Dial(dsn)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	channel, err := conn.Channel()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	r.Channel = channel
+	err = channel.ExchangeDeclare("accounts_ex", amqp.ExchangeDirect, true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	_, err = channel.QueueDeclare("account_created", true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = channel.QueueBind("account_created", "", "accounts_ex", false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return channel, nil
 }
 
 func (r *rabbitMQ) SendMessage(payload []byte) error {
@@ -49,6 +70,7 @@ func (r *rabbitMQ) SendMessage(payload []byte) error {
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        []byte(payload),
+			Timestamp:   time.Now().Local(),
 		})
 
 	return err

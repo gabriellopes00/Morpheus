@@ -10,27 +10,29 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: accountspg
-      POSTGRES_DB: accounts
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     networks:
       - accounts
 
   rabbitmq:
-    image: "rabbitmq:3-management"
-    hostname: "rabbitmq"
+    image: rabbitmq:3-management
     environment:
-      RABBITMQ_ERLANG_COOKIE: "83da6479156341769d743dc1f9c7ba98"
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "rabbitmq"
-      RABBITMQ_DEFAULT_VHOST: "/"
+      RABBITMQ_ERLANG_COOKIE: 83da6479156341769d743dc1f9c7ba98
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - '15672:15672'
+      - '5672:5672'
+    networks: 
+      - accounts
 
   api:
     container_name: accounts_api
     depends_on:
       - postgresql
+      - rabbitmq
     build: .
     networks:
       - accounts
