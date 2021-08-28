@@ -10,18 +10,20 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
     networks:
       - accounts
 
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:3-management
+    restart: always    
     environment:
       RABBITMQ_ERLANG_COOKIE: 83da6479156341769d743dc1f9c7ba98
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
+      RABBITMQ_DEFAULT_USER: $RABBITMQ_USER
+      RABBITMQ_DEFAULT_PASS: $RABBITMQ_PASS
+      RABBITMQ_DEFAULT_VHOST: $RABBITMQ_VHOST
     ports:
       - '15672:15672'
       - '5672:5672'
@@ -37,7 +39,7 @@ services:
     networks:
       - accounts
     ports:
-      - '7765:7765'
+      - '$PORT:$PORT'
 
 networks:
   accounts:
