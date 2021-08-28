@@ -14,7 +14,7 @@ func NewPgAccountRepository(db *sql.DB) *pgAccountRepository {
 }
 
 func (r *pgAccountRepository) Create(account *entities.Account) error {
-	stm, err := r.Db.Prepare("INSERT INTO accounts VALUES ($1, $2, $3, $4, $5)")
+	stm, err := r.Db.Prepare("INSERT INTO accounts VALUES ($1, $2, $3, $4, $5, $6)")
 	if err != nil {
 		return err
 	}
@@ -25,6 +25,7 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 		account.Id,
 		account.Name,
 		account.Email,
+		account.Password,
 		account.AvatarUrl,
 		account.CreatedAt,
 	)
