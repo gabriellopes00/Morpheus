@@ -1,9 +1,10 @@
 package main
 
 import (
-	env "accounts/config"
-	"accounts/infra/db"
-	"accounts/infra/http"
+	"accounts/adapters/db"
+	"accounts/adapters/http"
+	"accounts/adapters/queue"
+	"accounts/config/env"
 	"fmt"
 	"log"
 
@@ -12,15 +13,19 @@ import (
 
 func main() {
 	postgres := db.NewPostgresDb()
-
-	connection, err := postgres.Connect()
+	dbConn, err := postgres.Connect()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	defer connection.Close()
+	defer dbConn.Close()
+
+	queueConn, err := queue.NewQueueConnection().Connect()
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	router := gin.Default()
-	http.SetupGinRouter(router, connection)
+	http.SetupRouter(router, dbConn, queueConn)
 	router.Run(fmt.Sprintf(":%d", env.PORT))
 }

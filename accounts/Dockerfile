@@ -15,7 +15,7 @@ FROM alpine:3.14
 
 WORKDIR /usr/src/morpheus/accounts
 
-COPY --from=builder /go/src/morpheus/accounts/bin/app .
+COPY --from=builder /go/src/morpheus/accounts/app .
 COPY .env .
 
 EXPOSE 7765
