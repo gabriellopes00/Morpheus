@@ -1,6 +1,7 @@
-package config
+package env
 
 import (
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -14,6 +15,7 @@ var (
 	DB_PORT      = 0
 	DB_HOST      = ""
 	DB_NAME      = ""
+	DB_DRIVER    = ""
 	DB_SSL_MODE  = ""
 	DB_TIME_ZONE = ""
 
@@ -30,10 +32,12 @@ var (
 	RABBITMQ_VHOST = ""
 )
 
+var ErrLoadingEnvVars = errors.New("error on loading environment variables")
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(ErrLoadingEnvVars)
 	}
 
 	PORT, err = strconv.Atoi(os.Getenv("PORT"))
@@ -45,6 +49,7 @@ func init() {
 	DB_PASS = os.Getenv("DB_PASS")
 	DB_HOST = os.Getenv("DB_HOST")
 	DB_NAME = os.Getenv("DB_NAME")
+	DB_DRIVER = os.Getenv("DB_DRIVER")
 	DB_SSL_MODE = os.Getenv("DB_SSL_MODE")
 	DB_TIME_ZONE = os.Getenv("DB_TIME_ZONE")
 	DB_PORT, err = strconv.Atoi(os.Getenv("DB_PORT"))
