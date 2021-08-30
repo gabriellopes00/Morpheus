@@ -32,4 +32,5 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 	})
 
 	router.POST("/accounts", accountHandler.Create)
+	router.POST("/signin", accountHandler.Auth)
 }

@@ -1,19 +1,19 @@
 version: '3.9'
 
 services:
-  postgresql:
-    container_name: accounts_db
-    image: postgres:13.4-alpine3.14
-    restart: always
-    volumes:
-      - dbdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_PASSWORD: $DB_PASS
-      POSTGRES_DB: $DB_NAME
-    networks:
-      - accounts
+#  postgresql:
+    #container_name: accounts_db
+    #image: postgres:13.4-alpine3.14
+    #restart: always
+    #volumes:
+      #- dbdata:/var/lib/postgresql/data
+    #ports:
+      #- '5432:5432'
+    #environment:
+      #POSTGRES_PASSWORD: $DB_PASS
+      #POSTGRES_DB: $DB_NAME
+    #networks:
+      #- accounts
 
   rabbitmq:
     container_name: rabbitmq
@@ -27,23 +27,23 @@ services:
     ports:
       - '15672:15672'
       - '5672:5672'
-    networks: 
-      - accounts
+ #   networks: 
+      #- accounts
 
-  api:
-    container_name: accounts_api
-    depends_on:
-      - postgresql
-      - rabbitmq
-    build: .
-    networks:
-      - accounts
-    ports:
-      - '$PORT:$PORT'
+  #api:
+    #container_name: accounts_api
+    #depends_on:
+      #- postgresql
+      #- rabbitmq
+    #build: .
+    #networks:
+      #- accounts
+    #ports:
+      #- '$PORT:$PORT'
 
-networks:
-  accounts:
-    driver: bridge
+#networks:
+  #accounts:
+    #driver: bridge
 
-volumes:
-  dbdata:
+#volumes:
+  #dbdata:

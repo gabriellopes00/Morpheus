@@ -2,9 +2,11 @@ package usecases
 
 import (
 	"accounts/application/ports"
+	"accounts/config/env"
 	"accounts/domain"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -51,4 +53,35 @@ func (c *accountUsecase) Create(account domain.Account) (*domain.Account, error)
 	}
 
 	return &account, nil
+}
+
+func (u *accountUsecase) Auth(data domain.AuthCredentials) (string, error) {
+	account, err := u.Repository.FindByEmail(data.Email)
+	if err != nil {
+		return "", err
+	}
+
+	if account == nil {
+		return "", domain.ErrUnregisteredEmail
+	}
+
+	claims := jwt.MapClaims{}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+
+	claims["authorized"] = true
+	claims["accountId"] = account.Id
+	claims["id"] = id.String()
+	claims["exp"] = time.Now().Add(time.Minute * time.Duration(env.TOKEN_EXPIRATION_TIME)).Local()
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString([]byte(env.TOKEN_KEY))
+	if err != nil {
+		return "", err
+	}
+
+	return signed, nil
 }

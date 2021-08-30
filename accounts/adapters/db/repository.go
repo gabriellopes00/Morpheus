@@ -3,6 +3,7 @@ package db
 import (
 	"accounts/domain"
 	"database/sql"
+	"log"
 )
 
 type pgAccountRepository struct {
@@ -51,5 +52,31 @@ func (r *pgAccountRepository) Exists(email string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error) {
+	stm, err := r.Db.Prepare("SELECT * FROM accounts WHERE email=$1")
+	if err != nil {
+		return nil, err
+	}
+
+	defer stm.Close()
+
+	var account domain.Account
+
+	err = stm.QueryRow(email).Scan(
+		&account.Id,
+		&account.Name,
+		&account.Email,
+		&account.Password,
+		&account.AvatarUrl,
+		&account.CreatedAt,
+	)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+
+	return &account, nil
 
 }

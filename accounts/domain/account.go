@@ -15,11 +15,18 @@ type Account struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
+type AuthCredentials struct {
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
 var (
 	ErrEmailAlreadyInUse = errors.New("email already in use")
+	ErrUnregisteredEmail = errors.New("unregistered email")
 )
 
 // Account usecases
 type AccountUsecase interface {
 	Create(data Account) (*Account, error)
+	Auth(data AuthCredentials) (string, error)
 }

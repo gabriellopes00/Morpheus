@@ -19,8 +19,7 @@ var (
 	DB_SSL_MODE  = ""
 	DB_TIME_ZONE = ""
 
-	TOKEN_PUBLIC_KEY      = ""
-	TOKEN_PRIVATE_KEY     = ""
+	TOKEN_KEY             = ""
 	TOKEN_EXPIRATION_TIME = 0
 
 	PORT = 0
@@ -57,8 +56,7 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	TOKEN_PRIVATE_KEY = os.Getenv("TOKEN_PRIVATE_KEY")
-	TOKEN_PUBLIC_KEY = os.Getenv("TOKEN_PUBLIC_KEY")
+	TOKEN_KEY = os.Getenv("TOKEN_KEY")
 	TOKEN_EXPIRATION_TIME, err = strconv.Atoi(os.Getenv("TOKEN_EXPIRATION_TIME"))
 	if err != nil {
 		log.Fatalln(err)
