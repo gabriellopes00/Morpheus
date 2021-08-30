@@ -7,13 +7,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type queueConnection struct{}
-
-func NewQueueConnection() *queueConnection {
-	return &queueConnection{}
-}
-
-func (r *queueConnection) Connect() (*amqp.Channel, error) {
+func NewRabbitMQConnection() (*amqp.Channel, error) {
 	dsn := fmt.Sprintf(
 		"amqp://%s:%s@%s:%d%s",
 		env.RABBITMQ_USER,
