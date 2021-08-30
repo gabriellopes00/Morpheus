@@ -19,7 +19,7 @@ var (
 	ErrEmailAlreadyInUse = errors.New("email already in use")
 )
 
-// Create account usecase
-type CreateAccount interface {
+// Account usecases
+type AccountUsecase interface {
 	Create(data Account) (*Account, error)
 }
