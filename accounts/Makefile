@@ -22,18 +22,18 @@ composedown:
 
 migrateup:
 	@migrate \
-	-path ./adapters/db/migrations \
+	-path ./infra/db/migrations \
 	-database "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSL_MODE)"  \
 	-verbose up
 
 migratedown:
 	@migrate \
-	-path ./adapters/db/migrations \
+	-path ./infra/db/migrations \
 	-database "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSL_MODE)"  \
 	-verbose down
 
 migrategen:
-	@migrate create -ext sql -dir adapters/db/migrations create-accounts-table
+	@migrate create -ext sql -dir ./infra/db/migrations create-accounts-table
 
 test:
 	@go test -v -cover ./...

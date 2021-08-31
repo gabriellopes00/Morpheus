@@ -16,11 +16,9 @@ import (
 
 func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 
-	// init repository
+	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
-
 	jwtEncrypter := encrypter.NewJwtEncrypter()
-
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 
 	// init usecases
@@ -28,7 +26,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
 
 	// init handlers
-	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ)
+	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)
 	authHandler := handlers.NewAuthHandler(authAccount)
 
 	// setup middlewares

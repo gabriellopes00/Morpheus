@@ -13,25 +13,27 @@ import (
 
 type createAccountHandler struct {
 	Usecase      domain.CreateAccount
+	Encrypter    interfaces.Encrypter
 	MessageQueue interfaces.MessageQueue
 }
 
-func NewCreateAccountHandler(usecase domain.CreateAccount, messageQueue interfaces.MessageQueue) *createAccountHandler {
+func NewCreateAccountHandler(
+	usecase domain.CreateAccount,
+	messageQueue interfaces.MessageQueue,
+	encrypter interfaces.Encrypter,
+) *createAccountHandler {
 	return &createAccountHandler{
 		Usecase:      usecase,
 		MessageQueue: messageQueue,
+		Encrypter:    encrypter,
 	}
 }
-
-var (
-	ErrInternalServer = errors.New("unexpected internal server error")
-)
 
 func (h *createAccountHandler) Create(c echo.Context) error {
 	var params domain.Account
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.String(http.StatusBadRequest, ErrInvalidRequest.Error())
 	}
 
 	account, err := h.Usecase.Create(params)
@@ -62,5 +64,16 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusCreated, account)
+	authToken, err := h.Encrypter.Encrypt(account)
+	if err != nil {
+		return c.JSON(
+			http.StatusInternalServerError,
+			map[string]string{"error": ErrInternalServer.Error()},
+		)
+	}
+
+	return c.JSON(
+		http.StatusCreated,
+		map[string]interface{}{"account": account, "auth_token": authToken},
+	)
 }

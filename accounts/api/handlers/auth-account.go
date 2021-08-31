@@ -4,7 +4,6 @@ import (
 	"accounts/domain"
 	"accounts/usecases"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +19,7 @@ func NewAuthHandler(usecase domain.AuthAccount) *authHandler {
 	}
 }
 
-func (a *authHandler) Auth(c echo.Context) error {
+func (h *authHandler) Auth(c echo.Context) error {
 
 	var params struct {
 		Email    string `json:"email"`
@@ -31,12 +30,11 @@ func (a *authHandler) Auth(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	authToken, err := a.Usecase.Auth(params.Email, params.Password)
+	authToken, err := h.Usecase.Auth(params.Email, params.Password)
 	if err != nil {
 		if errors.Is(err, usecases.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
-			log.Println(err)
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{"error": ErrInternalServer.Error()},
@@ -44,5 +42,5 @@ func (a *authHandler) Auth(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"auth_token": authToken})
+	return c.JSON(http.StatusOK, map[string]string{"auth_token": authToken})
 }
