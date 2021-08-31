@@ -1,0 +1,6 @@
+*
+.*
+!src/
+!.env
+!package.json
+!yarn.lock

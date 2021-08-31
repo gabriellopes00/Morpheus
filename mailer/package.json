@@ -1,0 +1,30 @@
+{
+  "name": "mailer",
+  "version": "1.0.0",
+  "description": "Email sender micro-service for Morpheus app",
+  "main": "src/app/app.js",
+  "author": "Gabriel Luís Lopes <gabrielluislopes00@gmail.com>",
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "rimraf dist/ && tsc --skipLibCheck",
+    "start": "node dist/app/app.js",
+    "dev": "tsnd  --respawn --transpile-only --ignore-watch node_modules --clear --exit-child --rs --no-notify src/app/app.ts"
+  },
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "dotenv": "^10.0.0",
+    "nodemailer": "^6.6.3"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.8.2",
+    "@types/node": "^16.7.9",
+    "@types/nodemailer": "^6.4.4",
+    "rimraf": "^3.0.2",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.2"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  }
+}
