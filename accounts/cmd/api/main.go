@@ -1,10 +1,10 @@
 package main
 
 import (
-	"accounts/adapters/db"
-	"accounts/adapters/queue"
-	"accounts/adapters/server"
 	"accounts/config/env"
+	"accounts/infra/db"
+	"accounts/infra/queue"
+	"accounts/api"
 	"context"
 	"fmt"
 	"log"
@@ -48,7 +48,7 @@ func main() {
 	}()
 
 	e := echo.New()
-	server.SetupServer(e, database, rabbitmq)
+	api.SetupServer(e, database, rabbitmq)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
 			logger.Fatal(err.Error())
