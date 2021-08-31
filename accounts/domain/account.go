@@ -1,9 +1,6 @@
 package domain
 
-import (
-	"errors"
-	"time"
-)
+import "time"
 
 // Account entity
 type Account struct {
@@ -15,18 +12,24 @@ type Account struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
-type AuthCredentials struct {
-	Email    string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
+// Account usecases
+
+type CreateAccount interface {
+	Create(data Account) (*Account, error)
 }
 
-var (
-	ErrEmailAlreadyInUse = errors.New("email already in use")
-	ErrUnregisteredEmail = errors.New("unregistered email")
-)
+type AuthAccount interface {
+	Auth(email, password string) (string, error)
+}
 
-// Account usecases
-type AccountUsecase interface {
-	Create(data Account) (*Account, error)
-	Auth(data AuthCredentials) (string, error)
+type DeleteAccount interface {
+	Delete(accountId string) error
+}
+
+type UpdateAccount interface {
+	Update(accountId string, data Account) (*Account, error)
+}
+
+type GetAccount interface {
+	GetById(accountId string) (*Account, error)
 }
