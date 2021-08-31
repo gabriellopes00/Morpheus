@@ -6,6 +6,10 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func NewPostgresDb() (*sql.DB, error) {
@@ -31,4 +35,22 @@ func NewPostgresDb() (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func AutoMigrate(db *sql.DB) error {
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
+	migration, err := migrate.NewWithDatabaseInstance("file://infra/db/migrations", env.DB_NAME, driver)
+	if err != nil {
+		return err
+	}
+
+	if err = migration.Up(); err != nil {
+		return err
+	}
+
+	return nil
 }

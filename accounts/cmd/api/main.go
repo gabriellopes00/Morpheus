@@ -1,10 +1,10 @@
 package main
 
 import (
+	"accounts/api"
 	"accounts/config/env"
 	"accounts/infra/db"
 	"accounts/infra/queue"
-	"accounts/api"
 	"context"
 	"fmt"
 	"log"
@@ -26,6 +26,11 @@ func main() {
 	defer logger.Sync()
 
 	database, err := db.NewPostgresDb()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	err = db.AutoMigrate(database)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
