@@ -18,7 +18,7 @@ composeup:
 	@docker-compose up --build -d
 
 composedown:
-	@docker-compose down
+	@docker-compose down -v
 
 migrategen:
 	@migrate create -ext sql -dir ./infra/db/migrations migration_name

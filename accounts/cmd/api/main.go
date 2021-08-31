@@ -32,7 +32,7 @@ func main() {
 
 	err = db.AutoMigrate(database)
 	if err != nil {
-		logger.Fatal(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	defer func() {

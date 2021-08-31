@@ -10,10 +10,10 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: $DB_PASS
-      POSTGRES_DB: $DB_NAME
+      POSTGRES_PASSWORD: morpheus
+      POSTGRES_DB: accounts
     networks:
-      - accounts
+      - morpheus
 
   rabbitmq:
     container_name: rabbitmq
@@ -21,31 +21,38 @@ services:
     restart: always    
     environment:
       RABBITMQ_ERLANG_COOKIE: 83da6479156341769d743dc1f9c7ba98
-      RABBITMQ_DEFAULT_USER: $RABBITMQ_USER
-      RABBITMQ_DEFAULT_PASS: $RABBITMQ_PASS
-      RABBITMQ_DEFAULT_VHOST: $RABBITMQ_VHOST
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+      RABBITMQ_DEFAULT_VHOST: /
     ports:
       - '15672:15672'
       - '5672:5672'
     networks: 
-      - accounts
+      - morpheus
 
-  api:
-    container_name: accounts_api
+  accounts:
+    container_name: accounts
+    restart: always
     depends_on:
       - postgresql
       - rabbitmq
-    build: .
-    environment:
-      DB_HOST: postgresql
-      RABBITMQ_DEFAULT_HOST: rabbitmq
+    build: ./accounts/
     networks:
-      - accounts
+      - morpheus
     ports:
-      - '$PORT:$PORT'
+      - '7765:7765'
+
+  mailer:
+    container_name: mailer
+    restart: always
+    depends_on:
+      - rabbitmq
+    build: ./mailer/
+    networks:
+      - morpheus
 
 networks:
-  accounts:
+  morpheus:
     driver: bridge
 
 volumes:
