@@ -13,10 +13,12 @@
   "dependencies": {
     "amqplib": "^0.8.0",
     "dotenv": "^10.0.0",
+    "handlebars": "^4.7.7",
     "nodemailer": "^6.6.3"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.2",
+    "@types/handlebars": "^4.1.0",
     "@types/node": "^16.7.9",
     "@types/nodemailer": "^6.4.4",
     "rimraf": "^3.0.2",
