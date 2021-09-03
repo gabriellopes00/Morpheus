@@ -2,6 +2,7 @@ package api
 
 import (
 	"accounts/api/handlers"
+	"accounts/api/middlewares"
 	"accounts/infra/db"
 	"accounts/infra/encrypter"
 	"accounts/infra/queue"
@@ -24,10 +25,15 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 	// init usecases
 	createAccount := usecases.NewCreateAccount(accountRepo)
 	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
+	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)
 	authHandler := handlers.NewAuthHandler(authAccount)
+	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)
+
+	// init middlewares
+	authMiddleware := middlewares.NewAuthMiddleware(jwtEncrypter)
 
 	// setup middlewares
 	router.Use(middleware.CORS())
@@ -49,5 +55,5 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 	router.POST("/signin", authHandler.Auth)
 	router.PUT("/accounts", createAccountHandler.Create)
 	router.GET("/accounts/:id", createAccountHandler.Create)
-	router.DELETE("/accounts/:id", createAccountHandler.Create)
+	router.DELETE("/accounts", deleteAccountHandler.Delete, authMiddleware.Auth)
 }

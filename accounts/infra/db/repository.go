@@ -3,7 +3,7 @@ package db
 import (
 	"accounts/domain"
 	"database/sql"
-	"log"
+	"fmt"
 )
 
 type pgAccountRepository struct {
@@ -73,10 +73,47 @@ func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error)
 		&account.CreatedAt,
 	)
 	if err != nil {
-		log.Println(err)
 		return nil, nil
 	}
 
 	return &account, nil
+
+}
+
+func (r *pgAccountRepository) ExistsId(param string) (bool, error) {
+	stm, err := r.Db.Prepare("SELECT id FROM accounts WHERE id=$1")
+	if err != nil {
+		return false, err
+	}
+
+	defer stm.Close()
+
+	var accountId string
+
+	err = stm.QueryRow(param).Scan(&accountId)
+	if err != nil {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (r *pgAccountRepository) Delete(id string) error {
+	stm, err := r.Db.Prepare("DELETE FROM accounts WHERE id=$1")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	defer stm.Close()
+
+	_, err = stm.Exec(id)
+	if err != nil {
+		fmt.Println(err)
+
+		return err
+	}
+
+	return nil
 
 }

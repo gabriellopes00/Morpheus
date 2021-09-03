@@ -16,15 +16,15 @@ func NewRabbitMQ(connection *amqp.Channel) *rabbitMQ {
 	}
 }
 
-func (r *rabbitMQ) SendMessage(payload []byte) error {
+func (r *rabbitMQ) SendMessage(queue string, payload []byte) error {
 	err := r.Channel.Publish(
 		"accounts_ex",
-		"",
+		queue,
 		false,
 		false,
 		amqp.Publishing{
 			ContentType: "application/json",
-			Body:        []byte(payload),
+			Body:        payload,
 			Timestamp:   time.Now().Local(),
 		})
 

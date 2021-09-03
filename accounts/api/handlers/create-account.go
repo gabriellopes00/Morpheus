@@ -56,7 +56,7 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 		)
 	}
 
-	err = h.MessageQueue.SendMessage([]byte(payload))
+	err = h.MessageQueue.SendMessage(interfaces.QueueAccountCreated, []byte(payload))
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

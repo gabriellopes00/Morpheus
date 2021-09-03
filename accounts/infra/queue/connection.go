@@ -2,6 +2,7 @@ package queue
 
 import (
 	"accounts/config/env"
+	"accounts/interfaces"
 	"fmt"
 
 	"github.com/streadway/amqp"
@@ -37,7 +38,27 @@ func NewRabbitMQConnection() (*amqp.Channel, error) {
 		return nil, err
 	}
 
-	err = channel.QueueBind("account_created", "", "accounts_ex", false, nil)
+	_, err = channel.QueueDeclare("account_deleted", true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = channel.QueueDeclare("account_updated", true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = channel.QueueBind("account_created", interfaces.QueueAccountCreated, "accounts_ex", false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = channel.QueueBind("account_deleted", interfaces.QueueAccountDeleted, "accounts_ex", false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = channel.QueueBind("account_updated", interfaces.QueueAccountUpdated, "accounts_ex", false, nil)
 	if err != nil {
 		return nil, err
 	}

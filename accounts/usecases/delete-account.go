@@ -1,54 +1,38 @@
 package usecases
 
-// import (
-// 	"accounts/domain"
-// 	"accounts/ports"
-// 	"time"
+import (
+	"accounts/interfaces"
+	"errors"
+)
 
-// 	"github.com/gofrs/uuid"
-// 	"golang.org/x/crypto/bcrypt"
-// )
+type deleteUsecase struct {
+	Repository interfaces.Repository
+}
 
-// type accountUsecase struct {
-// 	Repository ports.Repository
-// }
+func NewDeleteUsecase(Repository interfaces.Repository) *deleteUsecase {
+	return &deleteUsecase{
+		Repository: Repository,
+	}
+}
 
-// func NewAccountUsecase(Repository ports.Repository) *accountUsecase {
-// 	return &accountUsecase{
-// 		Repository: Repository,
-// 	}
-// }
+var (
+	ErrIdNotFound = errors.New("id not found")
+)
 
-// func (c *accountUsecase) Create(account domain.Account) (*domain.Account, error) {
-// 	existingAccount, err := c.Repository.Exists(account.Email)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (u *deleteUsecase) Delete(accountId string) error {
+	existingAccount, err := u.Repository.ExistsId(accountId)
+	if err != nil {
+		return err
+	}
 
-// 	if existingAccount {
-// 		return nil, domain.ErrEmailAlreadyInUse
-// 	}
+	if !existingAccount {
+		return ErrIdNotFound
+	}
 
-// 	id, err := uuid.NewV4()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	err = u.Repository.Delete(accountId)
+	if err != nil {
+		return err
+	}
 
-// 	account.Id = id.String()
-
-// 	hash, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	account.Password = string(hash)
-
-// 	account.CreatedAt = time.Now().Local()
-
-// 	err = c.Repository.Create(&account)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &account, nil
-// }
+	return nil
+}
