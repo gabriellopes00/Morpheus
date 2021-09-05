@@ -2,19 +2,40 @@
 version: 2
 
 updates:
-
-  # Github Actions versions
+  # Github Actions updates
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     commit-message:
-      prefix: "ci:"
+      prefix: 'ci:'
 
-  # Go pacakges versions
+  # Go packages updates
   - package-ecosystem: gomod
-    directory: /
+    directory: /accounts
     schedule:
       interval: weekly
     commit-message:
-      prefix: "chore:"
+      prefix: 'chore:'
+
+  - package-ecosystem: gomod
+    directory: /events
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'chore:'
+
+  - package-ecosystem: gomod
+    directory: /tickets
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'chore:'
+
+    # Npm packages updates
+  - package-ecosystem: npm
+    directory: /mailer
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'chore:'
