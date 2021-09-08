@@ -6,7 +6,7 @@ require (
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo/v4 v4.5.0
-	github.com/lib/pq v1.10.2
+	github.com/lib/pq v1.10.3
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 )
