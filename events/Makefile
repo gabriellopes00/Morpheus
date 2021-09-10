@@ -35,6 +35,6 @@ server:
 build:
 	@rm -rf ./app && \
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
-	go build -o ./app -ldflags="-s -w" ./cmd/api/main.go
+	go build -o ./app -ldflags="-s -w" ./cmd/server.go
 
 .PHONY: pgdown pgup test install server build composeup composedown
