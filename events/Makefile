@@ -20,6 +20,9 @@ composeup:
 composedown:
 	@docker-compose down -v
 
+migrategen:
+	@migrate create -ext sql -dir ./framework/db/migrations create_account
+
 test:
 	@go test -v -cover ./...
 
