@@ -5,14 +5,14 @@ $(foreach v,$(VARS),$(eval $(shell echo export $(v)="$($(v))")))
 
 pgup:
 	@docker run -d \
-	--name tickets_db \
+	--name events_db \
 	-e POSTGRES_PASSWORD=$(DB_PASS) \
 	-e POSTGRES_DB=$(DB_NAME) \
 	-p $(DB_PORT):$(DB_PORT) \
   postgres
 
 pgdown:
-	@docker stop tickets_db
+	@docker stop events_db
 
 composeup:
 	@docker-compose up --build -d
@@ -30,7 +30,7 @@ install:
 	@go get ./...
 
 server:
-	@go run cmd/api/main.go
+	@go run cmd/server.go
 
 build:
 	@rm -rf ./app && \

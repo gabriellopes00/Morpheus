@@ -12,4 +12,5 @@ require (
 require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
+	github.com/streadway/amqp v1.0.0
 )

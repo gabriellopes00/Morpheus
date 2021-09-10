@@ -1,19 +1,19 @@
 version: '3.9'
 
 services:
-  postgresql:
-    container_name: accounts_db
-    image: postgres:13.4-alpine3.14
-    restart: always
-    volumes:
-      - dbdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_PASSWORD: morpheus
-      POSTGRES_DB: accounts
-    networks:
-      - morpheus
+#  postgresql:
+    #container_name: accounts_db
+    #image: postgres:13.4-alpine3.14
+    #restart: always
+    #volumes:
+      #- dbdata:/var/lib/postgresql/data
+    #ports:
+      #- '5432:5432'
+    #environment:
+      #POSTGRES_PASSWORD: morpheus
+      #POSTGRES_DB: accounts
+    #networks:
+      #- morpheus
 
   rabbitmq:
     container_name: rabbitmq
@@ -27,33 +27,33 @@ services:
     ports:
       - '15672:15672'
       - '5672:5672'
-    networks: 
-      - morpheus
+ #   networks: 
+      #- morpheus
 
-  accounts:
-    container_name: accounts
-    restart: always
-    depends_on:
-      - postgresql
-      - rabbitmq
-    build: ./accounts/
-    networks:
-      - morpheus
-    ports:
-      - '7765:7765'
+  #accounts:
+    #container_name: accounts
+    #restart: always
+    #depends_on:
+      #- postgresql
+      #- rabbitmq
+    #build: ./accounts/
+    #networks:
+      #- morpheus
+    #ports:
+      #- '7765:7765'
 
-  mailer:
-    container_name: mailer
-    restart: always
-    depends_on:
-      - rabbitmq
-    build: ./mailer/
-    networks:
-      - morpheus
+  #mailer:
+    #container_name: mailer
+    #restart: always
+    #depends_on:
+      #- rabbitmq
+    #build: ./mailer/
+    #networks:
+      #- morpheus
 
-networks:
-  morpheus:
-    driver: bridge
+#networks:
+  #morpheus:
+    #driver: bridge
 
-volumes:
-  dbdata:
+#volumes:
+  #dbdata:
