@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import 'module-alias/register'
-import { Mailer } from '../services/mail/mailer'
-import { Queue } from '../services/queue/queue'
+import { Mailer } from './mail/mailer'
+import { Queue } from './queue/queue'
 
 const mailer = new Mailer()
 

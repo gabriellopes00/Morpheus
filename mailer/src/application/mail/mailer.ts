@@ -1,4 +1,4 @@
-import { Account } from '@/entities/account'
+import { Account } from '@/domain/account'
 import { readFile } from 'fs'
 import { compile } from 'handlebars'
 import { createTransport } from 'nodemailer'

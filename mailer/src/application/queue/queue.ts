@@ -1,5 +1,5 @@
 import amqp from 'amqplib/callback_api'
-import { Account } from '@/entities/account'
+import { Account } from '@/domain/account'
 import { Mailer } from '../mail/mailer'
 
 const { RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_VHOST, RABBITMQ_HOST, RABBITMQ_PASS } = process.env
