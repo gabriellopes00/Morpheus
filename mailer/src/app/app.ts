@@ -1,18 +1,16 @@
 import 'dotenv/config'
+import 'module-alias/register'
 import { Mailer } from '../services/mail/mailer'
-import { Queue } from '../services/queue/queue';
+import { Queue } from '../services/queue/queue'
 
 const mailer = new Mailer()
 
 ;(async () => {
   try {
-
     const queue = new Queue(mailer)
     await queue.consume()
-
   } catch (error) {
     console.error(error)
     process.exit(1)
   }
-
 })()
