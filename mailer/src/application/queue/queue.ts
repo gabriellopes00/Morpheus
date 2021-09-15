@@ -13,17 +13,28 @@ const connectionOptions: amqp.Options.Connect = {
 }
 
 export class Queue {
+  private conn: amqp.Connection = null
+
   constructor(private readonly mailer: Mailer) {}
 
+  public async connect(): Promise<Error> {
+    amqp.connect(connectionOptions, (err, connection) => {
+      if (err) return err
+      this.conn = connection
+    })
+
+    return null
+  }
+
   public async consume(): Promise<void> {
-    amqp.connect(connectionOptions, (err, conn) => {
+    if (this.conn === null) throw new Error('Amqp connection unavailable')
+
+    this.conn.createChannel((err, ch) => {
       if (err) throw err
 
-      conn.createChannel((err, ch) => {
-        if (err) throw err
+      const queues = ['account_created', 'account_deleted']
 
-        const queue = 'account_created'
-
+      for (const queue of queues) {
         ch.assertQueue(queue, { durable: true })
         ch.prefetch(1)
 
@@ -31,11 +42,19 @@ export class Queue {
           queue,
           async msg => {
             const account: Account = JSON.parse(msg.content.toString())
-            this.mailer.sendWelcomeEmail(account)
+
+            switch (queue) {
+              case 'account_created':
+                this.mailer.sendWelcomeEmail(account)
+                break
+
+              default:
+                break
+            }
           },
           { noAck: true }
         )
-      })
+      }
     })
   }
 }
