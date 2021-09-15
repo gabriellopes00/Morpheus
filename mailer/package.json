@@ -6,7 +6,7 @@
   "author": "Gabriel Luís Lopes <gabrielluislopes00@gmail.com>",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "rimraf dist/ && tsc --skipLibCheck",
+    "build": "rimraf dist/ && tsc --skipLibCheck && cp -r src/services/mail/templates/ dist/services/mail/templates/",
     "start": "node dist/app/app.js",
     "dev": "tsnd  --respawn --transpile-only --ignore-watch node_modules --clear --exit-child --rs --no-notify src/app/app.ts"
   },
