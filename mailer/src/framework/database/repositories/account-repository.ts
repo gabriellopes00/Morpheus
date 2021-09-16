@@ -9,9 +9,8 @@ export class PgAccountRepository implements AccountRepository {
     await repository.save(repository.create(data))
   }
 
-  public async findByEmail(email: string): Promise<Account> {
+  public async delete(accountId: string): Promise<void> {
     const repository = getRepository(AccountEntity)
-    const { id, name, email: _email, created_at } = await repository.findOne({ where: { email } })
-    return null
+    await repository.delete(accountId)
   }
 }
