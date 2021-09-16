@@ -1,13 +1,14 @@
 import { Entity } from '@/shared/entity'
 
 export interface AccountData {
+  id: string
   name: string
   email: string
 }
 
 export class Account extends Entity<AccountData> {
-  constructor(data: AccountData, id: string) {
-    super(data, id)
+  constructor(data: AccountData) {
+    super(data, data.id)
   }
 
   get name() {

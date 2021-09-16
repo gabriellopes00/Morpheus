@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm'
 import { AccountEntity } from '../entities/account'
 
 export class PgAccountRepository implements AccountRepository {
-  public async create(data: Account): Promise<void> {
+  public async save(data: Account): Promise<void> {
     const repository = getRepository(AccountEntity)
     await repository.save(repository.create(data))
   }
