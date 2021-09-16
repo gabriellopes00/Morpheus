@@ -25,6 +25,7 @@ export class Mailer {
 
       console.log('a')
       await this.transporter.sendMail({
+        sender: 'gabriellopes@morpheus.io',
         from: 'gabriellopes@morpheus.io',
         to: account.email,
         subject: 'Welcome to Morpheus',
