@@ -5,7 +5,7 @@ const { REDIS_PORT, REDIS_HOST, REDIS_PASSWORD } = process.env
 
 export class BullMailQueue implements MailQueue {
   private readonly queue = new Queue<() => Promise<void>>('mail-queue', {
-    defaultJobOptions: { attempts: 5, backoff: 1000 * 60 * 5 },
+    defaultJobOptions: { attempts: 5, backoff: 1000 * 60 },
     redis: {
       port: Number(REDIS_PORT),
       host: REDIS_HOST,
@@ -17,7 +17,7 @@ export class BullMailQueue implements MailQueue {
     await this.queue.add(process, { removeOnComplete: true })
   }
 
-  public async process(): Promise<void> {
+  public process(): void {
     this.queue.process(async (job, done) => {
       try {
         await job.data()
@@ -28,7 +28,7 @@ export class BullMailQueue implements MailQueue {
     })
   }
 
-  public handleFailedJobs(err: Error): void {
+  public handleFailedJobs(): void {
     this.queue.on('failed', async (job, err) => {
       console.error(`Job id: ${job.id} failed with error: ${err.message}`)
     })
