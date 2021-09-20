@@ -1,3 +1,12 @@
+export interface EmailProviderProps {
+  sender: string
+  from: string
+  to: string
+  subject: string
+  text: string
+  html: string
+}
+
 export interface EmailProvider {
-  sendMail(from: string, to: string, subject: string, text: string, html: string): Promise<void>
+  sendMail(props: EmailProviderProps): Promise<void>
 }

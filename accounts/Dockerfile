@@ -2,10 +2,15 @@ FROM golang:1.17.0-alpine3.14 AS builder
 
 WORKDIR /go/src/morpheus/accounts
 
-COPY . .
+COPY go.* ./
+COPY Makefile .
+COPY .env .
 
 RUN apk add --no-cache make
-RUN make install && make build
+RUN make install 
+
+COPY . .
+RUN make build
 
 FROM alpine:3.14
 

@@ -1,4 +1,6 @@
+import { AccountData } from '@/domain/account'
+
 export interface MailQueue {
-  addProcess(process: () => Promise<void>): Promise<void>
-  process(): void
+  addProcess(data: AccountData): Promise<void>
+  process(): Promise<void>
 }

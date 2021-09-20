@@ -6,9 +6,9 @@
   "author": "Gabriel Luís Lopes <gabrielluislopes00@gmail.com>",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "rimraf dist/ && tsc --skipLibCheck && cp -r src/services/mail/templates/ dist/services/mail/templates/",
-    "start": "node dist/app/app.js",
-    "dev": "tsnd  --respawn --transpile-only --ignore-watch node_modules --clear --exit-child --rs --no-notify src/app/app.ts",
+    "build": "rimraf dist/ && tsc --skipLibCheck && cp -r src/application/mail/templates/ dist/application/mail/templates/",
+    "start": "node dist/main/app.js",
+    "dev": "tsnd  --respawn --transpile-only --ignore-watch node_modules --clear --exit-child --rs --no-notify src/main/app.ts",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "orm": "node ./node_modules/typeorm/cli.js"
   },

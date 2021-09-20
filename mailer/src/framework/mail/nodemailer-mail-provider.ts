@@ -1,4 +1,4 @@
-import { EmailProvider } from '@/ports/email-provider'
+import { EmailProvider, EmailProviderProps } from '@/ports/email-provider'
 import { createTransport } from 'nodemailer'
 import { MailOptions } from 'nodemailer/lib/json-transport'
 
@@ -8,26 +8,17 @@ export class NodemailerMailProvider implements EmailProvider {
   private readonly transporter = createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT),
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS
-    }
+    auth: { user: SMTP_USER, pass: SMTP_PASS }
   })
 
-  public async sendMail(
-    from: string,
-    to: string,
-    subject: string,
-    text: string,
-    html: string
-  ): Promise<void> {
+  public async sendMail(props: EmailProviderProps): Promise<void> {
     const mailOptions: MailOptions = {
-      sender: from,
-      from,
-      to,
-      subject,
-      text,
-      html,
+      sender: props.sender,
+      from: props.from,
+      to: props.to,
+      subject: props.subject,
+      text: props.text,
+      html: props.html,
       encoding: 'utf-8'
     }
 
