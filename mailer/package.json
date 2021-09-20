@@ -13,6 +13,8 @@
     "orm": "node ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
+    "@sentry/node": "^6.13.1",
+    "@sentry/tracing": "^6.13.1",
     "amqplib": "^0.8.0",
     "bull": "^3.29.2",
     "dotenv": "^10.0.0",

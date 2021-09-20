@@ -4,6 +4,7 @@ import { Mailer } from '../application/mail/mailer'
 import { MessageQueue } from '../application/message-queue/message-queue'
 import { BullMailQueue } from '../framework/mail-queue/bull-mail-queue'
 import { NodemailerMailProvider } from '../framework/mail/nodemailer-mail-provider'
+// import { Sentry } from '../framework/utils/sentry'
 ;(async () => {
   try {
     const mailer = new Mailer(new NodemailerMailProvider())
@@ -17,6 +18,7 @@ import { NodemailerMailProvider } from '../framework/mail/nodemailer-mail-provid
     mailQueue.handleFailedJobs()
     await mailQueue.process()
   } catch (error) {
+    // Sentry.captureException(error)
     console.error(error)
     process.exit(1)
   }
