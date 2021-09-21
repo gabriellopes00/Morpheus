@@ -1,7 +1,7 @@
 import { AccountData } from '@/domain/account'
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm'
 
-@Entity('account')
+@Entity('accounts')
 export class AccountEntity implements AccountData {
   @PrimaryColumn()
   public id: string
@@ -12,6 +12,6 @@ export class AccountEntity implements AccountData {
   @Column()
   public email: string
 
-  @CreateDateColumn()
-  public created_at: Date
+  @CreateDateColumn({ name: 'created_at' })
+  public createdAt: Date
 }

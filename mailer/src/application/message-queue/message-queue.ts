@@ -1,6 +1,8 @@
 import { AccountData } from '@/domain/account'
 import { MailQueue } from '@/ports/mail-queue'
 import amqp from 'amqplib'
+import { DeleteAccount } from '../accounts/delete-account'
+import { SaveAccount } from '../accounts/save-account'
 
 const { RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_VHOST, RABBITMQ_HOST, RABBITMQ_PASS } = process.env
 
@@ -16,7 +18,11 @@ export class MessageQueue {
   private conn: amqp.Connection = null
   private readonly queues = ['account_created', 'account_deleted']
 
-  constructor(private readonly mailQueue: MailQueue) {}
+  constructor(
+    private readonly mailQueue: MailQueue,
+    private readonly saveAccount: SaveAccount,
+    private readonly deleteAccount: DeleteAccount
+  ) {}
 
   public async connect(): Promise<void> {
     this.conn = await amqp.connect(connectionOptions)
@@ -39,7 +45,13 @@ export class MessageQueue {
 
     switch (queue) {
       case 'account_created':
-        this.mailQueue.addProcess(account)
+        await this.mailQueue.addProcess(account)
+        await this.saveAccount.save(account)
+        break
+
+      case 'account_deleted':
+        await this.mailQueue.addProcess(account)
+        await this.deleteAccount.delete(account.id)
         break
 
       default:

@@ -1,10 +1,11 @@
 module.exports = {
-  type: process.env.DB_DRIVER,
+  type: 'postgres',
   url: process.env.DB_URL,
-  timezone: process.env.DB_TIME_ZONE,
+  // ssl: { rejectUnauthorized: false },
   synchronize: false,
   logging: false,
-  migrations: [__dirname + '/src/framework/database/migrations/*.ts'],
-  entities: [__dirname + '/src/framework/database/models/*.ts'],
+
+  migrations: [__dirname + '/dist/framework/database/migrations/*.js'],
+  entities: [__dirname + '/dist/framework/database/entities/*.js'],
   cli: { migrationsDir: __dirname + '/src/framework/database/migrations/' }
 }
