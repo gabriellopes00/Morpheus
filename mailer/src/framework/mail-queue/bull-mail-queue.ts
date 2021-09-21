@@ -2,7 +2,7 @@ import { Mailer } from '@/application/mail/mailer'
 import { AccountData } from '@/domain/account'
 import { MailQueue } from '@/ports/mail-queue'
 import Queue from 'bull'
-// import { Sentry } from '../utils/sentry'
+import { Sentry } from '../utils/sentry'
 
 const { REDIS_PORT, REDIS_HOST } = process.env
 
@@ -37,8 +37,8 @@ export class BullMailQueue implements MailQueue {
 
   public handleFailedJobs(): void {
     this.queue.on('failed', async (job, err) => {
-      // Sentry.captureMessage(`Job id: ${job.id} failed with error: ${err.message}`)
-      // Sentry.captureException(err)
+      Sentry.captureMessage(`Job id: ${job.id} failed with error: ${err.message}`)
+      Sentry.captureException(err)
     })
 
     this.queue.on('completed', async (job, _) => {
