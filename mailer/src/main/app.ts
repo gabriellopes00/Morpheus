@@ -12,6 +12,7 @@ import { Sentry } from '../framework/utils/sentry'
 
     // start consuming message queue
     const queue = new MessageQueue(mailQueue)
+    await queue.connect()
     await queue.consume()
 
     // start processing email submissions

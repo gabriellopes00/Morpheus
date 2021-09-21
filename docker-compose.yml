@@ -54,7 +54,7 @@ services:
   redis:
     image: redis:6.2-alpine
     container_name: redis
-    command: redis-server #--requirepass redis
+    command: redis-server
     ports:
      - 6379:6379
     environment:
