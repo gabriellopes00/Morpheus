@@ -1,7 +1,11 @@
 module.exports = {
   type: 'postgres',
-  url: process.env.DB_URL,
-  // ssl: { rejectUnauthorized: false },
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false },
   synchronize: false,
   logging: false,
 
