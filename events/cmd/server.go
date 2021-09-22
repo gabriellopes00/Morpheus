@@ -8,7 +8,6 @@ import (
 	"events/framework/queue/handlers"
 	"fmt"
 	"log"
-	"os"
 )
 
 func main() {
@@ -23,22 +22,14 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
-	defer func() {
-		if err := database.Close(); err != nil {
-			log.Fatal(err.Error())
-		}
-	}()
+	defer database.Close()
 
 	rabbitmq, err := queue.NewRabbitMQConnection()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	defer func() {
-		if err := rabbitmq.Close(); err != nil {
-			log.Fatal(err.Error())
-		}
-	}()
+	defer rabbitmq.Close()
 
 	in := make(chan []byte)
 
@@ -52,7 +43,4 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	fmt.Println("app finished")
-	os.Exit(0)
 }

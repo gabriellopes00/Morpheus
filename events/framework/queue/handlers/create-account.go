@@ -11,14 +11,14 @@ type createAccounthandler struct {
 	Usecase usecases.CreateAccount
 }
 
-func NewCreateAccountHandler(chann <-chan []byte, usecase usecases.CreateAccount) *createAccounthandler {
+func NewCreateAccountHandler(channel <-chan []byte, usecase usecases.CreateAccount) *createAccounthandler {
 	return &createAccounthandler{
-		Channel: chann,
+		Channel: channel,
 		Usecase: usecase,
 	}
 }
 
-func (h createAccounthandler) Create() error {
+func (h *createAccounthandler) Create() error {
 	var data struct {
 		Id string `json:"id,omitempty"`
 	}

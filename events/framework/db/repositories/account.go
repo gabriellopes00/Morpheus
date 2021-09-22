@@ -19,6 +19,8 @@ func NewPgAccountRepository(connection *sql.DB) *pgAccountRepository {
 }
 
 func (repo *pgAccountRepository) Create(account *entities.Account) error {
+	println("account.Id from repo")
+	println(account.Id)
 	stm, err := repo.Db.Prepare("INSERT INTO accounts VALUES ($1)")
 	if err != nil {
 		return err

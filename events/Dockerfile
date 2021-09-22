@@ -20,5 +20,5 @@ COPY --from=builder /go/src/morpheus/events/app .
 COPY .env .
 COPY ./framework/db/migrations/*.sql ./framework/db/migrations/
 
-EXPOSE 7765
+EXPOSE 4422
 ENTRYPOINT /usr/src/morpheus/events/app

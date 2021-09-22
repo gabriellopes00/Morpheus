@@ -22,7 +22,7 @@ func Consume(queue string, ch *amqp.Channel, in chan<- []byte) {
 		panic(err.Error())
 	}
 
-	msgs, err := ch.Consume(q.Name, "account_created", true, false, false, false, nil)
+	msgs, err := ch.Consume(q.Name, "events", true, false, false, false, nil)
 
 	if err != nil {
 		panic(err.Error())
