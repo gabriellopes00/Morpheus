@@ -28,7 +28,7 @@ func NewRabbitMQConnection() (*amqp.Channel, error) {
 		return nil, err
 	}
 
-	err = channel.ExchangeDeclare("accounts_ex", amqp.ExchangeDirect, true, false, false, false, nil)
+	err = channel.ExchangeDeclare("accounts_ex", amqp.ExchangeFanout, true, false, false, false, nil)
 	if err != nil {
 		return nil, err
 	}
