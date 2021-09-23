@@ -33,7 +33,7 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 	var params domain.Account
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.String(http.StatusBadRequest, ErrInvalidRequest.Error())
+		return c.String(http.StatusUnprocessableEntity, "invalid request params")
 	}
 
 	account, err := h.Usecase.Create(params)
@@ -43,8 +43,7 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 		} else {
 			return c.JSON(
 				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()},
-			)
+				map[string]string{"error": "unexpected internal server error"})
 		}
 	}
 
@@ -52,24 +51,21 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+			map[string]string{"error": "unexpected internal server error"})
 	}
 
 	err = h.MessageQueue.SendMessage(interfaces.QueueAccountCreated, []byte(payload))
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+			map[string]string{"error": "unexpected internal server error"})
 	}
 
 	authToken, err := h.Encrypter.Encrypt(account)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+			map[string]string{"error": "unexpected internal server error"})
 	}
 
 	return c.JSON(

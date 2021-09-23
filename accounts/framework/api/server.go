@@ -53,7 +53,6 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 
 	router.POST("/accounts", createAccountHandler.Create)
 	router.POST("/signin", authHandler.Auth)
-	router.PUT("/accounts", createAccountHandler.Create)
 	router.GET("/accounts/:id", createAccountHandler.Create)
-	router.DELETE("/accounts", deleteAccountHandler.Delete, authMiddleware.Auth)
+	router.DELETE("/accounts/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
 }
