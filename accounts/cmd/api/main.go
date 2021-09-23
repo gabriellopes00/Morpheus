@@ -1,10 +1,10 @@
 package main
 
 import (
-	"accounts/api"
 	"accounts/config/env"
-	"accounts/infra/db"
-	"accounts/infra/queue"
+	"accounts/framework/api"
+	"accounts/framework/db"
+	"accounts/framework/queue"
 	"context"
 	"fmt"
 	"log"

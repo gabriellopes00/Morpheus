@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	usecases "accounts/application"
 	"accounts/domain"
 	"accounts/interfaces"
-	"accounts/usecases"
 	"encoding/json"
 	"errors"
 	"net/http"

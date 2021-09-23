@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"accounts/infra/encrypter"
+	"accounts/framework/encrypter"
 	"accounts/interfaces"
 	"errors"
 	"net/http"
