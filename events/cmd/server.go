@@ -31,15 +31,26 @@ func main() {
 
 	defer rabbitmq.Close()
 
-	in := make(chan []byte)
+	in_create := make(chan []byte)
+	in_delete := make(chan []byte)
 
-	queue.Consume("account_created_events", rabbitmq, in)
+	queue.Consume("account_created_events", rabbitmq, in_create)
+	queue.Consume("account_deleted_events", rabbitmq, in_delete)
 
 	repo := repositories.NewPgAccountRepository(database)
-	u := application.CreateAccountUsecase{Repository: repo}
+	create := application.CreateAccountUsecase{Repository: repo}
+	delete := application.DeleteAccountUsecase{Repository: repo}
 
-	h := handlers.NewCreateAccountHandler(in, u)
-	err = h.Create()
+	go func() {
+		createHandler := handlers.NewCreateAccountHandler(in_create, create)
+		err = createHandler.Create()
+		if err != nil {
+			panic(err.Error())
+		}
+	}()
+
+	deleteHandler := handlers.NewDeleteAccountHandler(in_delete, delete)
+	err = deleteHandler.Delete()
 	if err != nil {
 		panic(err.Error())
 	}
