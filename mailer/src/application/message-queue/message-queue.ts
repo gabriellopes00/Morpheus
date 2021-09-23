@@ -16,7 +16,7 @@ const connectionOptions: amqp.Options.Connect = {
 
 export class MessageQueue {
   private conn: amqp.Connection = null
-  private readonly queues = ['account_created', 'account_deleted']
+  private readonly queues = ['account_created_mail']
 
   constructor(
     private readonly mailQueue: MailQueue,
@@ -35,6 +35,7 @@ export class MessageQueue {
 
     for (const queue of this.queues) {
       channel.assertQueue(queue, { durable: true })
+      channel.bindQueue(queue, 'accounts_ex', 'account_created')
       channel.prefetch(1)
       channel.consume(queue, async msg => await this.handleMessage(msg, queue), { noAck: true })
     }
@@ -44,15 +45,15 @@ export class MessageQueue {
     const account: AccountData = JSON.parse(msg.content.toString())
 
     switch (queue) {
-      case 'account_created':
+      case 'account_created_mail':
         await this.mailQueue.addProcess(account)
         await this.saveAccount.save(account)
         break
 
-      case 'account_deleted':
-        await this.mailQueue.addProcess(account)
-        await this.deleteAccount.delete(account.id)
-        break
+      // case 'account_deleted':
+      //   await this.mailQueue.addProcess(account)
+      //   await this.deleteAccount.delete(account.id)
+      //   break
 
       default:
         break

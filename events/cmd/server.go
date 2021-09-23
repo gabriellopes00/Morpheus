@@ -33,7 +33,7 @@ func main() {
 
 	in := make(chan []byte)
 
-	queue.Consume("account_created", rabbitmq, in)
+	queue.Consume("account_created_events", rabbitmq, in)
 
 	repo := repositories.NewPgAccountRepository(database)
 	u := application.CreateAccountUsecase{Repository: repo}
