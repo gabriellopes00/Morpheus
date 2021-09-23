@@ -43,7 +43,7 @@ func (h *deleteAccountHandler) Delete(c echo.Context) error {
 		}
 	}
 
-	payload, err := json.Marshal(map[string]string{"account_id": accountId})
+	payload, err := json.Marshal(map[string]string{"id": accountId})
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
@@ -51,7 +51,7 @@ func (h *deleteAccountHandler) Delete(c echo.Context) error {
 		)
 	}
 
-	err = h.MessageQueue.SendMessage(interfaces.QueueAccountDeleted, []byte(payload))
+	err = h.MessageQueue.SendMessage(interfaces.QueueAccountDeleted, payload)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
