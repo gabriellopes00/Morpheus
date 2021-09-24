@@ -42,11 +42,5 @@ func validate(e *Event) errors.DomainErr {
 			"name")
 	}
 
-	if len(e.Description) == 4 {
-		return errors.NewValidationError(
-			"Events descriptions must have at least of 4 characters",
-			"description")
-	}
-
 	return nil
 }
