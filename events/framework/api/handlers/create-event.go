@@ -5,6 +5,7 @@ import (
 	"events/domain/entities"
 	"events/domain/usecases"
 	"events/framework/queue"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -26,13 +27,17 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 	var params entities.Event
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.String(http.StatusUnprocessableEntity, "")
+		return c.JSON(
+			http.StatusUnprocessableEntity,
+			map[string]string{"error": "unexpected internal server error"},
+		)
 	}
 
 	params.OrganizerAccountId = c.Request().Header.Get("account_id")
 
 	event, err := handler.Usecase.Create(&params)
 	if err != nil {
+		log.Println(err)
 		return c.JSON(
 			http.StatusInternalServerError,
 			map[string]string{"error": "unexpected internal server error"},
@@ -42,6 +47,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 	payload, err := json.Marshal(event)
 	if err != nil {
+		log.Println(err)
 		return c.JSON(
 			http.StatusInternalServerError,
 			map[string]string{"error": "unexpected internal server error"},
@@ -50,6 +56,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 	err = handler.MessageQueue.PublishMessage("", "", payload)
 	if err != nil {
+		log.Println(err)
 		return c.JSON(
 			http.StatusInternalServerError,
 			map[string]string{"error": "unexpected internal server error"},

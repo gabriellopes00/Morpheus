@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"events/application"
 	"events/config/env"
 	"events/framework/api"
@@ -16,6 +17,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,8 +29,8 @@ func main() {
 	}
 
 	err = db.AutoMigrate(database)
-	if err != nil {
-		fmt.Println(err.Error())
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatalln(err)
 	}
 
 	defer database.Close()
@@ -60,11 +62,13 @@ func main() {
 		}
 	}()
 
-	deleteHandler := handlers.NewDeleteAccountHandler(in_delete, delete)
-	err = deleteHandler.Delete()
-	if err != nil {
-		panic(err.Error())
-	}
+	go func() {
+		deleteHandler := handlers.NewDeleteAccountHandler(in_delete, delete)
+		err = deleteHandler.Delete()
+		if err != nil {
+			panic(err.Error())
+		}
+	}()
 
 	e := echo.New()
 	api.SetupServer(e, database, amqpConn)
