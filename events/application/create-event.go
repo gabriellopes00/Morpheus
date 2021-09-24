@@ -5,18 +5,17 @@ import (
 	"events/framework/db/repositories"
 )
 
-type CreateEventUsecase struct {
+type createEventUsecase struct {
 	Repository repositories.EventsRepository
 }
 
-type CreateEventParams struct {
-	Name               string
-	Description        string
-	IsAvailable        bool
-	OrganizerAccountId string
+func NewCreateEventUsecase(repo repositories.EventsRepository) *createEventUsecase {
+	return &createEventUsecase{
+		Repository: repo,
+	}
 }
 
-func (c CreateEventUsecase) Create(params *CreateEventParams) error {
+func (c *createEventUsecase) Create(params *entities.Event) (*entities.Event, error) {
 
 	event, err := entities.NewEvent(
 		params.Name,
@@ -25,8 +24,12 @@ func (c CreateEventUsecase) Create(params *CreateEventParams) error {
 		params.IsAvailable,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return c.Repository.Create(event)
+	if err = c.Repository.Create(event); err != nil {
+		return nil, err
+	}
+
+	return event, nil
 }
