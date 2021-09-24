@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"events/application"
 	"events/framework/api/handlers"
+	"events/framework/api/middlewares"
 	"events/framework/db/repositories"
+	"events/framework/encrypter"
 	"events/framework/queue"
 	"net/http"
 
@@ -18,12 +20,16 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 	// init adapters
 	eventsRepo := repositories.NewPgEventsRepository(database)
 	rabbitMQ := queue.NewRabbitMQ(amqpConn)
+	jwtEncrypter := encrypter.NewJwtEncrypter()
 
 	// init usecases
 	createEvent := application.NewCreateEventUsecase(eventsRepo)
 
 	// init handlers
 	createEventHandler := handlers.NewCreateEventHandler(createEvent, rabbitMQ)
+
+	// init middlewares
+	authMiddleware := middlewares.NewAuthMiddleware(jwtEncrypter)
 
 	// setup middlewares
 	router.Use(middleware.CORS())
@@ -41,5 +47,5 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "Err"})
 	})
 
-	router.POST("/events", createEventHandler.Create)
+	router.POST("/events", createEventHandler.Create, authMiddleware.Auth)
 }
