@@ -2,17 +2,14 @@ package usecases
 
 import (
 	"accounts/domain"
-	"accounts/framework/cache"
 	"accounts/framework/encrypter"
 	"accounts/interfaces"
 	"errors"
-	"time"
 )
 
 type authAccount struct {
-	Repository      interfaces.Repository
-	Encrypter       encrypter.Encrypter
-	CacheRepository cache.CacheRepository
+	Repository interfaces.Repository
+	Encrypter  encrypter.Encrypter
 }
 
 var (
@@ -22,12 +19,10 @@ var (
 func NewAuthAccount(
 	repository interfaces.Repository,
 	encrypter encrypter.Encrypter,
-	cacheRepository cache.CacheRepository,
 ) *authAccount {
 	return &authAccount{
-		Repository:      repository,
-		Encrypter:       encrypter,
-		CacheRepository: cacheRepository,
+		Repository: repository,
+		Encrypter:  encrypter,
 	}
 }
 
@@ -42,16 +37,6 @@ func (a *authAccount) Auth(email, password string) (domain.AuthModel, error) {
 	}
 
 	token, err := a.Encrypter.EncryptAuthToken(account.Id)
-	if err != nil {
-		return domain.AuthModel{}, err
-	}
-
-	err = a.CacheRepository.Set(token.AccessId, token.AccessToken, time.Duration(token.AtExpires))
-	if err != nil {
-		return domain.AuthModel{}, err
-	}
-
-	err = a.CacheRepository.Set(token.RefreshId, token.RefreshToken, time.Duration(token.RtExpires))
 	if err != nil {
 		return domain.AuthModel{}, err
 	}

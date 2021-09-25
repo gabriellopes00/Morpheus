@@ -22,13 +22,13 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
 	redisRepo := cache.NewRedisCacheRepository(client)
-	jwtEncrypter := encrypter.NewEncrypter()
+	jwtEncrypter := encrypter.NewEncrypter(redisRepo)
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 
 	// init usecases
 	createAccount := usecases.NewCreateAccount(accountRepo)
-	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
-	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter, redisRepo)
+	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
+	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter)
 	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
 
 	// init handlers

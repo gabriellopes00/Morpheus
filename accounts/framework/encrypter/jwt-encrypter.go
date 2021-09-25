@@ -2,6 +2,7 @@ package encrypter
 
 import (
 	"accounts/config/env"
+	"accounts/framework/cache"
 	"errors"
 	"time"
 
@@ -14,15 +15,18 @@ var (
 	ErrExpiredToken          = errors.New("authorization token expired")
 	ErrInvalidTokenSignature = errors.New("invalid authorization token signature")
 	ErrInvalidTokenMetadata  = errors.New("invalid authorization token metadata")
+	ErrInvalidRefreshToken   = errors.New("invalid refresh token")
 )
 
-type encrypter struct{}
-
-func NewEncrypter() *encrypter {
-	return &encrypter{}
+type encrypter struct {
+	cache cache.CacheRepository
 }
 
-func (encrypter) EncryptAuthToken(accountId string) (Token, error) {
+func NewEncrypter(cacheRepository cache.CacheRepository) *encrypter {
+	return &encrypter{cache: cacheRepository}
+}
+
+func (e *encrypter) EncryptAuthToken(accountId string) (Token, error) {
 	token := Token{}
 	var err error
 
@@ -45,6 +49,11 @@ func (encrypter) EncryptAuthToken(accountId string) (Token, error) {
 		return Token{}, err
 	}
 
+	err = e.cache.Set(token.AccessId, token.AccessToken, time.Duration(token.AtExpires))
+	if err != nil {
+		return Token{}, err
+	}
+
 	// Auth Token
 	rtClaims := jwt.MapClaims{}
 	rtClaims["id"] = token.RefreshId
@@ -57,10 +66,15 @@ func (encrypter) EncryptAuthToken(accountId string) (Token, error) {
 		return Token{}, err
 	}
 
+	err = e.cache.Set(token.RefreshId, token.RefreshToken, time.Duration(token.RtExpires))
+	if err != nil {
+		return Token{}, err
+	}
+
 	return token, nil
 }
 
-func (encrypter *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
+func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 	token := Token{}
 	var err error
 
@@ -84,12 +98,30 @@ func (encrypter *encrypter) RefreshAuthToken(refreshToken string) (Token, error)
 		return Token{}, ErrInvalidTokenMetadata
 	}
 
+	refreshTokenId, ok := claims["id"].(string)
+	if !ok {
+		return Token{}, ErrInvalidTokenMetadata
+	}
+
+	exitingToken, err := e.cache.Get(refreshTokenId)
+	if err != nil {
+		return Token{}, err
+	}
+
+	if exitingToken != refreshToken {
+		return Token{}, ErrInvalidRefreshToken
+	}
+
+	if err = e.cache.Delete(refreshTokenId); err != nil {
+		return Token{}, err
+	}
+
 	accountId, ok := claims["account_id"].(string)
 	if !ok {
 		return Token{}, ErrInvalidTokenMetadata
 	}
 
-	token, err = encrypter.EncryptAuthToken(accountId)
+	token, err = e.EncryptAuthToken(accountId)
 	if err != nil {
 		return Token{}, nil
 	}
