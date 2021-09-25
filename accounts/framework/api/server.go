@@ -4,32 +4,37 @@ import (
 	usecases "accounts/application"
 	"accounts/framework/api/handlers"
 	"accounts/framework/api/middlewares"
+	"accounts/framework/cache"
 	"accounts/framework/db"
 	"accounts/framework/encrypter"
 	"accounts/framework/queue"
 	"database/sql"
 	"net/http"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/streadway/amqp"
 )
 
-func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
+func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, client *redis.Client) {
 
 	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
+	redisRepo := cache.NewRedisCacheRepository(client)
 	jwtEncrypter := encrypter.NewEncrypter()
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 
 	// init usecases
 	createAccount := usecases.NewCreateAccount(accountRepo)
-	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
+	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
+	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter, redisRepo)
 	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)
 	authHandler := handlers.NewAuthHandler(authAccount)
+	refreshAuthHandler := handlers.NewRefreshAuthHandler(refreshAuth)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)
 
 	// init middlewares
@@ -53,7 +58,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 
 	router.POST("/accounts", createAccountHandler.Create)
 	router.POST("/signin", authHandler.Auth)
-	router.POST("/auth/refresh", authHandler.Auth)
+	router.POST("/auth/refresh", refreshAuthHandler.Handle)
 	router.GET("/accounts/:id", createAccountHandler.Create)
 	router.DELETE("/accounts/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
 }

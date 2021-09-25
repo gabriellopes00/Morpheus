@@ -18,12 +18,17 @@ type CreateAccount interface {
 	Create(data Account) (*Account, error)
 }
 
+type AuthModel struct {
+	AccessToken  string
+	RefreshToken string
+}
+
 type AuthAccount interface {
-	Auth(email, password string) (string, error)
+	Auth(email, password string) (AuthModel, error)
 }
 
 type RefreshAuth interface {
-	Refresh(refreshToken string) (string, error)
+	Refresh(refreshToken string) (AuthModel, error)
 }
 
 type DeleteAccount interface {

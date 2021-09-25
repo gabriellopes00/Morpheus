@@ -30,7 +30,7 @@ func (h *authHandler) Auth(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	authToken, err := h.Usecase.Auth(params.Email, params.Password)
+	token, err := h.Usecase.Auth(params.Email, params.Password)
 	if err != nil {
 		if errors.Is(err, usecases.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
@@ -42,5 +42,11 @@ func (h *authHandler) Auth(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"auth_token": authToken})
+	return c.JSON(
+		http.StatusOK,
+		map[string]string{
+			"access_token":  token.AccessToken,
+			"refresh_token": token.RefreshToken,
+		},
+	)
 }

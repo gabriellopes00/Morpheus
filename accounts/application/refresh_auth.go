@@ -1,25 +1,44 @@
 package usecases
 
 import (
+	"accounts/domain"
+	"accounts/framework/cache"
 	"accounts/framework/encrypter"
-	"accounts/interfaces"
+	"time"
 )
 
 type refreshAuth struct {
-	Encrypter encrypter.Encrypter
+	Encrypter       encrypter.Encrypter
+	CacheRepository cache.CacheRepository
 }
 
-func NewRefreshAuth(repository interfaces.Repository, encrypter encrypter.Encrypter) *refreshAuth {
+func NewRefreshAuth(encrypter encrypter.Encrypter, cacheRepository cache.CacheRepository) *refreshAuth {
 	return &refreshAuth{
-		Encrypter: encrypter,
+		Encrypter:       encrypter,
+		CacheRepository: cacheRepository,
 	}
 }
 
-func (a *refreshAuth) RefreshAuth(refreshToken string) (string, error) {
-	token, err := a.Encrypter.RefreshAuthToken(refreshToken)
+func (r *refreshAuth) Refresh(refreshToken string) (domain.AuthModel, error) {
+	token, err := r.Encrypter.RefreshAuthToken(refreshToken)
 	if err != nil {
-		return "", err
+		return domain.AuthModel{}, err
 	}
 
-	return token.AccessToken, nil
+	err = r.CacheRepository.Set(token.AccessId, token.AccessToken, time.Duration(token.AtExpires))
+	if err != nil {
+		return domain.AuthModel{}, nil
+	}
+
+	err = r.CacheRepository.Set(token.RefreshId, token.RefreshToken, time.Duration(token.RtExpires))
+	if err != nil {
+		return domain.AuthModel{}, nil
+	}
+
+	authModel := domain.AuthModel{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+	}
+
+	return authModel, nil
 }

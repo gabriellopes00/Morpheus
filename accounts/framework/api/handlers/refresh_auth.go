@@ -4,6 +4,7 @@ import (
 	usecases "accounts/application"
 	"accounts/domain"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -19,9 +20,10 @@ func NewRefreshAuthHandler(usecase domain.RefreshAuth) *refreshAuthHandler {
 	}
 }
 
-func (h *refreshAuthHandler) Auth(c echo.Context) error {
-
-	params := map[string]string{}
+func (h *refreshAuthHandler) Handle(c echo.Context) error {
+	var params struct {
+		RefreshToken string `json:"refresh_token,omitempty"`
+	}
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
@@ -30,10 +32,11 @@ func (h *refreshAuthHandler) Auth(c echo.Context) error {
 		)
 	}
 
-	refreshToken := params["refresh_token"]
+	fmt.Println(params.RefreshToken)
 
-	accessToken, err := h.Usecase.Refresh(refreshToken)
+	token, err := h.Usecase.Refresh(params.RefreshToken)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, usecases.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
@@ -44,5 +47,11 @@ func (h *refreshAuthHandler) Auth(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"access_token": accessToken})
+	return c.JSON(
+		http.StatusOK,
+		map[string]string{
+			"access_token":  token.AccessToken,
+			"refresh_token": token.RefreshToken,
+		},
+	)
 }

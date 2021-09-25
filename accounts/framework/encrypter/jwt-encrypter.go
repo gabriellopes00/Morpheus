@@ -48,7 +48,7 @@ func (encrypter) EncryptAuthToken(accountId string) (Token, error) {
 	// Auth Token
 	rtClaims := jwt.MapClaims{}
 	rtClaims["id"] = token.RefreshId
-	atClaims["account_id"] = accountId
+	rtClaims["account_id"] = accountId
 	rtClaims["exp"] = token.RtExpires
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
