@@ -11,5 +11,6 @@ type Token struct {
 
 type Encrypter interface {
 	EncryptAuthToken(accountId string) (Token, error)
+	RefreshAuthToken(refreshToken string) (Token, error)
 	DecryptAuthToken(token string) (string, error)
 }

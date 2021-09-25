@@ -22,6 +22,10 @@ type AuthAccount interface {
 	Auth(email, password string) (string, error)
 }
 
+type RefreshAuth interface {
+	Refresh(refreshToken string) (string, error)
+}
+
 type DeleteAccount interface {
 	Delete(accountId string) error
 }
