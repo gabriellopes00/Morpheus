@@ -3,6 +3,7 @@ package handlers
 import (
 	usecases "accounts/application"
 	"accounts/domain"
+	"accounts/framework/encrypter"
 	"accounts/interfaces"
 	"encoding/json"
 	"errors"
@@ -13,7 +14,7 @@ import (
 
 type deleteAccountHandler struct {
 	Usecase      domain.DeleteAccount
-	Encrypter    interfaces.Encrypter
+	Encrypter    encrypter.Encrypter
 	MessageQueue interfaces.MessageQueue
 }
 
@@ -28,8 +29,14 @@ func NewDeleteAccountHandler(
 }
 
 func (h *deleteAccountHandler) Delete(c echo.Context) error {
-
 	accountId := c.Request().Header.Get("account_id")
+	paramId := c.Param("id")
+
+	if accountId != paramId {
+		return c.JSON(
+			http.StatusForbidden,
+			map[string]string{"error": "forbidden account deletion"})
+	}
 
 	err := h.Usecase.Delete(accountId)
 	if err != nil {

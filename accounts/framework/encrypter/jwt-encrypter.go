@@ -2,75 +2,127 @@ package encrypter
 
 import (
 	"accounts/config/env"
-	"accounts/domain"
 	"errors"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt"
+	gouuid "github.com/satori/go.uuid"
 )
-
-type jwtEncrypter struct{}
-
-func NewJwtEncrypter() *jwtEncrypter {
-	return &jwtEncrypter{}
-}
-
-func (j *jwtEncrypter) Encrypt(payload *domain.Account) (string, error) {
-	claims := jwt.MapClaims{}
-
-	id, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-
-	claims["id"] = id.String()
-	claims["authorized"] = true
-	claims["account_id"] = payload.Id
-	claims["account_email"] = payload.Email
-	claims["account_name"] = payload.Name
-	claims["account_created_at"] = payload.CreatedAt
-	claims["exp"] = time.Now().Add(time.Minute * time.Duration(env.TOKEN_EXPIRATION_TIME)).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signed, err := token.SignedString([]byte(env.TOKEN_KEY))
-	if err != nil {
-		return "", err
-	}
-
-	return signed, nil
-}
 
 var (
-	ErrInvalidToken = errors.New("invalid authorization token")
+	ErrInvalidToken          = errors.New("invalid authorization token")
+	ErrExpiredToken          = errors.New("authorization token expired")
+	ErrInvalidTokenSignature = errors.New("invalid authorization token signature")
+	ErrInvalidTokenMetadata  = errors.New("invalid authorization token metadata")
 )
 
-func (j *jwtEncrypter) Decrypt(token string) (*domain.Account, error) {
+type encrypter struct{}
 
-	payload, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+func NewEncrypter() *encrypter {
+	return &encrypter{}
+}
 
+func (encrypter) EncryptAuthToken(accountId string) (Token, error) {
+	token := Token{}
+	var err error
+
+	token.AtExpires = time.Now().Add(time.Minute * time.Duration(env.AUTH_TOKEN_EXPIRATION_TIME)).Unix()
+	token.AccessId = gouuid.NewV4().String()
+
+	token.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	token.RefreshId = gouuid.NewV4().String()
+
+	// Auth Token
+	atClaims := jwt.MapClaims{}
+	atClaims["id"] = gouuid.NewV4().String()
+	atClaims["authorized"] = true
+	atClaims["account_id"] = accountId
+	atClaims["exp"] = token.AtExpires
+
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+	token.AccessToken, err = at.SignedString([]byte(env.AUTH_TOKEN_KEY))
+	if err != nil {
+		return Token{}, err
+	}
+
+	// Auth Token
+	rtClaims := jwt.MapClaims{}
+	rtClaims["id"] = token.RefreshId
+	atClaims["account_id"] = accountId
+	rtClaims["exp"] = token.RtExpires
+
+	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
+	token.RefreshToken, err = rt.SignedString([]byte(env.REFRESH_TOKEN_KEY))
+	if err != nil {
+		return Token{}, err
+	}
+
+	return token, nil
+}
+
+func (encrypter *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
+	token := Token{}
+	var err error
+
+	jwtToken, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidToken
+			return nil, ErrInvalidTokenSignature
 		}
-
-		return []byte(env.TOKEN_KEY), nil
+		return []byte(env.REFRESH_TOKEN_KEY), nil
 	})
 
 	if err != nil {
-		return nil, err
+		return Token{}, err
 	}
 
-	var account domain.Account
-
-	claims, ok := payload.Claims.(jwt.MapClaims)
-	if ok && payload.Valid {
-
-		account.Id = claims["account_id"].(string)
-		account.Email = claims["account_email"].(string)
-		account.Name = claims["account_name"].(string)
-		// account.CreatedAt = time.Parse(time.RFC1123) claims["account_created_at"].(string)
-
+	if !jwtToken.Valid {
+		return Token{}, ErrInvalidToken
 	}
 
-	return &account, nil
+	claims, ok := jwtToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return Token{}, ErrInvalidTokenMetadata
+	}
+
+	accountId, ok := claims["account_id"].(string)
+	if !ok {
+		return Token{}, ErrInvalidTokenMetadata
+	}
+
+	token, err = encrypter.EncryptAuthToken(accountId)
+	if err != nil {
+		return Token{}, nil
+	}
+
+	return token, nil
+
+}
+
+func (encrypter) DecryptAuthToken(token string) (string, error) {
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrInvalidTokenSignature
+		}
+		return []byte(env.AUTH_TOKEN_KEY), nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	claims, ok := jwtToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", ErrInvalidTokenMetadata
+	}
+
+	if !jwtToken.Valid {
+		return "", ErrInvalidToken
+	}
+
+	accountId := claims["account_id"].(string)
+	if accountId == "" {
+		return "", ErrInvalidTokenMetadata
+	}
+
+	return accountId, nil
 }

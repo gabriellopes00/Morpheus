@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"accounts/framework/encrypter"
-	"accounts/interfaces"
 	"errors"
 	"net/http"
 	"strings"
@@ -11,17 +10,16 @@ import (
 )
 
 var (
-	ErrInternalServer    = errors.New("internal server error")
-	ErrInvalidToken      = errors.New("invalid authentication token")
-	ErrMissingToken      = errors.New("missing authentication token")
-	ErrForbiddenDeletion = errors.New("forbidden account deletion")
+	ErrInternalServer = errors.New("internal server error")
+	ErrInvalidToken   = errors.New("invalid authentication token")
+	ErrMissingToken   = errors.New("missing authentication token")
 )
 
 type authMiddleware struct {
-	Encrypter interfaces.Encrypter
+	Encrypter encrypter.Encrypter
 }
 
-func NewAuthMiddleware(encrypter interfaces.Encrypter) *authMiddleware {
+func NewAuthMiddleware(encrypter encrypter.Encrypter) *authMiddleware {
 	return &authMiddleware{
 		Encrypter: encrypter,
 	}
@@ -29,8 +27,6 @@ func NewAuthMiddleware(encrypter interfaces.Encrypter) *authMiddleware {
 
 func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		accountId := c.Param("id")
-
 		bearerToken := c.Request().Header.Get("Authorization")
 		authorization := strings.Split(bearerToken, " ")
 		if len(authorization) != 2 {
@@ -41,7 +37,7 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		token := authorization[1]
 
-		account, err := m.Encrypter.Decrypt(token)
+		accountId, err := m.Encrypter.DecryptAuthToken(token)
 		if err != nil {
 			if errors.Is(err, encrypter.ErrInvalidToken) {
 				return c.JSON(
@@ -54,13 +50,7 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 				map[string]string{"error": ErrInternalServer.Error()})
 		}
 
-		if accountId != account.Id {
-			return c.JSON(
-				http.StatusForbidden,
-				map[string]string{"error": ErrForbiddenDeletion.Error()})
-		}
-
-		c.Request().Header.Set("account_id", account.Id)
+		c.Request().Header.Set("account_id", accountId)
 
 		return next(c)
 	}

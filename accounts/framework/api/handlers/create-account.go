@@ -3,6 +3,7 @@ package handlers
 import (
 	usecases "accounts/application"
 	"accounts/domain"
+	"accounts/framework/encrypter"
 	"accounts/interfaces"
 	"encoding/json"
 	"errors"
@@ -13,14 +14,14 @@ import (
 
 type createAccountHandler struct {
 	Usecase      domain.CreateAccount
-	Encrypter    interfaces.Encrypter
+	Encrypter    encrypter.Encrypter
 	MessageQueue interfaces.MessageQueue
 }
 
 func NewCreateAccountHandler(
 	usecase domain.CreateAccount,
 	messageQueue interfaces.MessageQueue,
-	encrypter interfaces.Encrypter,
+	encrypter encrypter.Encrypter,
 ) *createAccountHandler {
 	return &createAccountHandler{
 		Usecase:      usecase,
@@ -61,7 +62,7 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 			map[string]string{"error": "unexpected internal server error"})
 	}
 
-	authToken, err := h.Encrypter.Encrypt(account)
+	token, err := h.Encrypter.EncryptAuthToken(account.Id)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
@@ -70,6 +71,10 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 
 	return c.JSON(
 		http.StatusCreated,
-		map[string]interface{}{"account": account, "auth_token": authToken},
+		map[string]interface{}{
+			"account":       account,
+			"access_token":  token.AccessToken,
+			"refresh_token": token.RefreshToken,
+		},
 	)
 }

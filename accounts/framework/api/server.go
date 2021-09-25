@@ -19,7 +19,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 
 	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
-	jwtEncrypter := encrypter.NewJwtEncrypter()
+	jwtEncrypter := encrypter.NewEncrypter()
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 
 	// init usecases
@@ -53,6 +53,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel) {
 
 	router.POST("/accounts", createAccountHandler.Create)
 	router.POST("/signin", authHandler.Auth)
+	router.POST("/auth/refresh", authHandler.Auth)
 	router.GET("/accounts/:id", createAccountHandler.Create)
 	router.DELETE("/accounts/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
 }
