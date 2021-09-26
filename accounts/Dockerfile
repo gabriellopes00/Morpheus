@@ -18,7 +18,7 @@ WORKDIR /usr/src/morpheus/accounts
 
 COPY --from=builder /go/src/morpheus/accounts/app .
 COPY .env .
-COPY ./framework/db/migrations/*.sql ./framework/db/migrations/
+COPY ./pkg/db/migrations/*.sql ./pkg/db/migrations/
 
 EXPOSE 7765
 ENTRYPOINT /usr/src/morpheus/accounts/app

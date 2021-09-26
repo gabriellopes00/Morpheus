@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"log"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -18,10 +17,9 @@ func NewRedisCacheRepository(client *redis.Client) *redisCacheRepository {
 }
 
 func (r *redisCacheRepository) Set(key string, value string, exp time.Duration) error {
-	result := r.client.Set(r.client.Context(), key, value, exp)
-	if result.Err() != nil {
-		log.Println(result.Err())
-		return result.Err()
+	err := r.client.Set(r.client.Context(), key, value, exp).Err()
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -30,18 +28,16 @@ func (r *redisCacheRepository) Set(key string, value string, exp time.Duration) 
 func (r *redisCacheRepository) Get(key string) (string, error) {
 	result := r.client.Get(r.client.Context(), key)
 	if result.Err() != nil {
-		log.Println(result.Err())
 		return "", result.Err()
 	}
 
-	return result.String(), nil
+	return result.Val(), nil
 }
 
 func (r *redisCacheRepository) Delete(key string) error {
-	result := r.client.Del(r.client.Context(), key)
-	if result.Err() != nil {
-		log.Println(result.Err())
-		return result.Err()
+	err := r.client.Del(r.client.Context(), key).Err()
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -32,9 +32,7 @@ func (h *refreshAuthHandler) Handle(c echo.Context) error {
 		)
 	}
 
-	fmt.Println(params.RefreshToken)
-
-	token, err := h.Usecase.Refresh(params.RefreshToken)
+	tokens, err := h.Usecase.Refresh(params.RefreshToken)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, usecases.ErrUnregisteredEmail) {
@@ -50,8 +48,8 @@ func (h *refreshAuthHandler) Handle(c echo.Context) error {
 	return c.JSON(
 		http.StatusOK,
 		map[string]string{
-			"access_token":  token.AccessToken,
-			"refresh_token": token.RefreshToken,
+			"access_token":  tokens.AccessToken,
+			"refresh_token": tokens.RefreshToken,
 		},
 	)
 }

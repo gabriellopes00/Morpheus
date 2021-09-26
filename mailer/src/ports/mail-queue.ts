@@ -1,10 +1,6 @@
 import { AccountData } from '@/domain/account'
 
-export interface MailQueueProcess {
-  process(): Promise<void>
-}
-
 export interface MailQueue {
-  addProcess(data: MailQueueProcess): Promise<void>
+  addProcess(data: AccountData): Promise<void>
   process(): Promise<void>
 }

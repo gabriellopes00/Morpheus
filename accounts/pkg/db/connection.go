@@ -43,7 +43,7 @@ func AutoMigrate(db *sql.DB) error {
 		return err
 	}
 
-	migration, err := migrate.NewWithDatabaseInstance("file://infra/db/migrations", env.DB_NAME, driver)
+	migration, err := migrate.NewWithDatabaseInstance("file://pkg/db/migrations", env.DB_NAME, driver)
 	if err != nil {
 		return err
 	}

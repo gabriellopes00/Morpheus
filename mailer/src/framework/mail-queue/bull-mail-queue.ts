@@ -1,22 +1,22 @@
 import { Mailer } from '@/application/mail/mailer'
 import { AccountData } from '@/domain/account'
-import { MailQueue, MailQueueProcess } from '@/ports/mail-queue'
+import { MailQueue } from '@/ports/mail-queue'
 import Queue from 'bull'
 import { Sentry } from '../utils/sentry'
 
 const { REDIS_PORT, REDIS_HOST } = process.env
 
 export class BullMailQueue implements MailQueue {
-  private readonly queue: Queue.Queue<MailQueueProcess> = null
+  private readonly queue: Queue.Queue<AccountData> = null
 
   constructor(private readonly mailer: Mailer) {
-    this.queue = new Queue<MailQueueProcess>('mail-queue', {
+    this.queue = new Queue<AccountData>('mail-queue', {
       defaultJobOptions: { attempts: 5, backoff: 1000 * 60 },
       redis: { port: Number(REDIS_PORT), host: REDIS_HOST }
     })
   }
 
-  public async addProcess(process: MailQueueProcess): Promise<void> {
+  public async addProcess(process: AccountData): Promise<void> {
     try {
       await this.queue.add(process, { removeOnComplete: true })
     } catch (error) {
@@ -27,8 +27,7 @@ export class BullMailQueue implements MailQueue {
   public async process(): Promise<void> {
     return await this.queue.process(async (job, done) => {
       try {
-        // await this.mailer.sendEmail(job.data)
-        await job.data.process()
+        await this.mailer.sendEmail(job.data)
         done(null)
       } catch (err) {
         done(err)
