@@ -7,5 +7,6 @@ type Repository interface {
 	Exists(email string) (bool, error)
 	ExistsId(param string) (bool, error)
 	FindByEmail(email string) (*domain.Account, error)
+	FindById(id string) (*domain.Account, error)
 	Delete(id string) error
 }

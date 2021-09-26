@@ -30,12 +30,14 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
 	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter)
 	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
+	getAccount := usecases.NewGetAccount(accountRepo)
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)
 	authHandler := handlers.NewAuthHandler(authAccount)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(refreshAuth)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)
+	getAccountHandler := handlers.NewGetAccountHandler(getAccount)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(jwtEncrypter)
@@ -59,6 +61,6 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	router.POST("/accounts", createAccountHandler.Create)
 	router.POST("/signin", authHandler.Auth)
 	router.POST("/auth/refresh", refreshAuthHandler.Handle)
-	router.GET("/accounts/:id", createAccountHandler.Create)
+	router.GET("/accounts/:id", getAccountHandler.Handle, authMiddleware.Auth)
 	router.DELETE("/accounts/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
 }

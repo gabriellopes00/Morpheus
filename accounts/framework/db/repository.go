@@ -80,7 +80,33 @@ func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error)
 
 }
 
-func (r *pgAccountRepository) ExistsId(param string) (bool, error) {
+func (r *pgAccountRepository) FindById(id string) (*domain.Account, error) {
+	stm, err := r.Db.Prepare("SELECT * FROM accounts WHERE id=$1")
+	if err != nil {
+		return nil, err
+	}
+
+	defer stm.Close()
+
+	var account domain.Account
+
+	err = stm.QueryRow(id).Scan(
+		&account.Id,
+		&account.Name,
+		&account.Email,
+		&account.Password,
+		&account.AvatarUrl,
+		&account.CreatedAt,
+	)
+	if err != nil {
+		return nil, nil
+	}
+
+	return &account, nil
+
+}
+
+func (r *pgAccountRepository) ExistsId(id string) (bool, error) {
 	stm, err := r.Db.Prepare("SELECT id FROM accounts WHERE id=$1")
 	if err != nil {
 		return false, err
@@ -90,7 +116,7 @@ func (r *pgAccountRepository) ExistsId(param string) (bool, error) {
 
 	var accountId string
 
-	err = stm.QueryRow(param).Scan(&accountId)
+	err = stm.QueryRow(id).Scan(&accountId)
 	if err != nil {
 		return false, nil
 	}
