@@ -2,13 +2,13 @@ package usecases
 
 import (
 	"accounts/domain"
-	"accounts/framework/encrypter"
-	"accounts/interfaces"
+	"accounts/pkg/db"
+	"accounts/pkg/encrypter"
 	"errors"
 )
 
 type authAccount struct {
-	Repository interfaces.Repository
+	Repository db.Repository
 	Encrypter  encrypter.Encrypter
 }
 
@@ -17,7 +17,7 @@ var (
 )
 
 func NewAuthAccount(
-	repository interfaces.Repository,
+	repository db.Repository,
 	encrypter encrypter.Encrypter,
 ) *authAccount {
 	return &authAccount{

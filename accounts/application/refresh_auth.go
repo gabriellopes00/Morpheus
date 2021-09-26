@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"accounts/domain"
-	"accounts/framework/encrypter"
+	"accounts/pkg/encrypter"
 )
 
 type refreshAuth struct {

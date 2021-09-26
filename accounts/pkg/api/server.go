@@ -2,12 +2,12 @@ package api
 
 import (
 	usecases "accounts/application"
-	"accounts/framework/api/handlers"
-	"accounts/framework/api/middlewares"
-	"accounts/framework/cache"
-	"accounts/framework/db"
-	"accounts/framework/encrypter"
-	"accounts/framework/queue"
+	"accounts/pkg/api/handlers"
+	"accounts/pkg/api/middlewares"
+	"accounts/pkg/cache"
+	"accounts/pkg/db"
+	"accounts/pkg/encrypter"
+	"accounts/pkg/queue"
 	"database/sql"
 	"net/http"
 

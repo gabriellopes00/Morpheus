@@ -1,15 +1,15 @@
 package usecases
 
 import (
-	"accounts/interfaces"
+	"accounts/pkg/db"
 	"errors"
 )
 
 type deleteUsecase struct {
-	Repository interfaces.Repository
+	Repository db.Repository
 }
 
-func NewDeleteUsecase(Repository interfaces.Repository) *deleteUsecase {
+func NewDeleteUsecase(Repository db.Repository) *deleteUsecase {
 	return &deleteUsecase{
 		Repository: Repository,
 	}

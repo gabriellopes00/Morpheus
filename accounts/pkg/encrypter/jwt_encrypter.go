@@ -2,7 +2,7 @@ package encrypter
 
 import (
 	"accounts/config/env"
-	"accounts/framework/cache"
+	"accounts/pkg/cache"
 	"errors"
 	"time"
 

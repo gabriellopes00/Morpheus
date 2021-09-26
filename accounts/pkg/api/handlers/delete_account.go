@@ -3,8 +3,8 @@ package handlers
 import (
 	usecases "accounts/application"
 	"accounts/domain"
-	"accounts/framework/encrypter"
-	"accounts/interfaces"
+	"accounts/pkg/encrypter"
+	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -15,12 +15,12 @@ import (
 type deleteAccountHandler struct {
 	Usecase      domain.DeleteAccount
 	Encrypter    encrypter.Encrypter
-	MessageQueue interfaces.MessageQueue
+	MessageQueue queue.MessageQueue
 }
 
 func NewDeleteAccountHandler(
 	usecase domain.DeleteAccount,
-	messageQueue interfaces.MessageQueue,
+	messageQueue queue.MessageQueue,
 ) *deleteAccountHandler {
 	return &deleteAccountHandler{
 		Usecase:      usecase,
@@ -58,7 +58,7 @@ func (h *deleteAccountHandler) Delete(c echo.Context) error {
 		)
 	}
 
-	err = h.MessageQueue.SendMessage(interfaces.QueueAccountDeleted, payload)
+	err = h.MessageQueue.SendMessage(queue.QueueAccountDeleted, payload)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

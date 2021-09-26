@@ -1,4 +1,4 @@
-package interfaces
+package queue
 
 const (
 	QueueAccountCreated = "account_created"

@@ -1,4 +1,4 @@
-package interfaces
+package db
 
 import "accounts/domain"
 

@@ -2,14 +2,14 @@ package usecases
 
 import (
 	"accounts/domain"
-	"accounts/interfaces"
+	"accounts/pkg/db"
 )
 
 type getAccount struct {
-	Repository interfaces.Repository
+	Repository db.Repository
 }
 
-func NewGetAccount(repo interfaces.Repository) *getAccount {
+func NewGetAccount(repo db.Repository) *getAccount {
 	return &getAccount{
 		Repository: repo,
 	}

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"accounts/framework/encrypter"
+	"accounts/pkg/encrypter"
 	"errors"
 	"net/http"
 	"strings"

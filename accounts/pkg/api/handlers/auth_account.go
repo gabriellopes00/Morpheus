@@ -27,7 +27,9 @@ func (h *authHandler) Auth(c echo.Context) error {
 	}
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(
+			http.StatusBadRequest,
+			map[string]string{"error": "invalid request params"})
 	}
 
 	token, err := h.Usecase.Auth(params.Email, params.Password)

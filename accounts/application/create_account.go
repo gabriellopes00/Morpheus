@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"accounts/domain"
-	"accounts/interfaces"
+	"accounts/pkg/db"
 	"errors"
 	"time"
 
@@ -11,14 +11,14 @@ import (
 )
 
 type createAccount struct {
-	Repository interfaces.Repository
+	Repository db.Repository
 }
 
 var (
 	ErrEmailAlreadyInUse = errors.New("email already in use")
 )
 
-func NewCreateAccount(Repository interfaces.Repository) *createAccount {
+func NewCreateAccount(Repository db.Repository) *createAccount {
 	return &createAccount{
 		Repository: Repository,
 	}
