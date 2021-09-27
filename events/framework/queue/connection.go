@@ -47,5 +47,20 @@ func NewRabbitMQConnection() (*amqp.Channel, error) {
 		return nil, err
 	}
 
+	err = channel.ExchangeDeclare("events_ex", amqp.ExchangeDirect, true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = channel.QueueDeclare("event_created", true, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = channel.QueueBind("event_created", "event_created", "events_ex", false, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	return channel, nil
 }

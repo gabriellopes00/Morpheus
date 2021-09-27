@@ -8,54 +8,47 @@ import (
 
 const (
 	QueueEventCreated = "event_created"
+	ExchangeEvents    = "events_ex"
 )
 
 type MessageQueue interface {
 	Consume(queue string, channel chan<- []byte)
-	PublishMessage(exchange, queue string, message []byte) error
+	PublishMessage(exchange, key string, message []byte) error
 }
 
 type rabbitMQ struct {
 	Channel *amqp.Channel
 }
 
-func NewRabbitMQ(connection *amqp.Channel) *rabbitMQ {
+func NewRabbitMQ(channel *amqp.Channel) *rabbitMQ {
 	return &rabbitMQ{
-		Channel: connection,
+		Channel: channel,
 	}
 }
 
 func (rabbitmq *rabbitMQ) Consume(queue string, channel chan<- []byte) {
-
-	q, err := rabbitmq.Channel.QueueDeclare(queue, true, false, false, false, nil)
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	msgs, err := rabbitmq.Channel.Consume(q.Name, "", true, false, false, false, nil)
-
+	msgs, err := rabbitmq.Channel.Consume(queue, "", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	go func() {
 		for m := range msgs {
-			channel <- []byte(m.Body)
+			channel <- m.Body
 		}
 		close(channel)
 	}()
 }
 
-func (rabbitmq *rabbitMQ) PublishMessage(queue, exchange string, payload []byte) error {
+func (rabbitmq *rabbitMQ) PublishMessage(exchange, key string, message []byte) error {
 	return rabbitmq.Channel.Publish(
 		exchange,
-		queue,
+		key,
 		false,
 		false,
 		amqp.Publishing{
 			ContentType: "application/json",
-			Body:        payload,
+			Body:        message,
 			Timestamp:   time.Now().Local(),
 		})
 }

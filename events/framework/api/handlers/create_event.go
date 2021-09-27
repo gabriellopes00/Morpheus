@@ -7,6 +7,7 @@ import (
 	domainErrs "events/domain/errors"
 	"events/domain/usecases"
 	"events/framework/queue"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -48,14 +49,17 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 		)
 	}
 
+	params.OrganizerAccountId = accountId
+
 	event, err := handler.Usecase.Create(&params)
 	if err != nil {
-		if domainErrs.IsDomainError(err) {
+		if !domainErrs.IsDomainError(err) {
 			return c.JSON(
 				http.StatusBadRequest,
 				map[string]string{"error": err.Error()},
 			)
 		}
+
 		return c.JSON(
 			http.StatusInternalServerError,
 			map[string]string{"error": ErrInternalServer.Error()},
@@ -71,7 +75,8 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 		)
 	}
 
-	err = handler.MessageQueue.PublishMessage("events_ex", "event_created", payload)
+	err = handler.MessageQueue.PublishMessage(queue.ExchangeEvents, queue.QueueEventCreated, payload)
+	fmt.Println(err)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
