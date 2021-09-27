@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"events/domain/entities"
+	domainErrs "events/domain/errors"
 	"events/domain/usecases"
 	"events/framework/queue"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -23,43 +24,58 @@ func NewCreateEventHandler(usecase usecases.CreateEvent, messageQueue queue.Mess
 	}
 }
 
+var (
+	ErrUnprocessableEntity = errors.New("unprocessable entity")
+	ErrUnauthorized        = errors.New("unauthorized event creation")
+	ErrInternalServer      = errors.New("unexpected internal server error")
+)
+
 func (handler *createEventHandler) Create(c echo.Context) error {
 	var params entities.Event
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
 			http.StatusUnprocessableEntity,
-			map[string]string{"error": "unexpected internal server error"},
+			map[string]string{"error": ErrUnprocessableEntity.Error()},
 		)
 	}
 
-	params.OrganizerAccountId = c.Request().Header.Get("account_id")
+	accountId := c.Request().Header.Get("account_id")
+	if accountId == "" {
+		return c.JSON(
+			http.StatusUnauthorized,
+			map[string]string{"error": ErrUnauthorized.Error()},
+		)
+	}
 
 	event, err := handler.Usecase.Create(&params)
 	if err != nil {
-		log.Println(err)
+		if domainErrs.IsDomainError(err) {
+			return c.JSON(
+				http.StatusBadRequest,
+				map[string]string{"error": err.Error()},
+			)
+		}
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"},
+			map[string]string{"error": ErrInternalServer.Error()},
 		)
 
 	}
 
 	payload, err := json.Marshal(event)
 	if err != nil {
-		log.Println(err)
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"},
+			map[string]string{"error": ErrInternalServer.Error()},
 		)
 	}
 
-	err = handler.MessageQueue.PublishMessage("", "", payload)
+	err = handler.MessageQueue.PublishMessage("events_ex", "event_created", payload)
 	if err != nil {
-		log.Println(err)
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"},
+			map[string]string{"error": ErrInternalServer.Error()},
 		)
 	}
 

@@ -10,9 +10,7 @@ import (
 )
 
 var (
-	ErrInternalServer = errors.New("internal server error")
-	ErrInvalidToken   = errors.New("invalid authentication token")
-	ErrMissingToken   = errors.New("missing authentication token")
+	ErrMissingToken = errors.New("missing authentication token")
 )
 
 type authMiddleware struct {
@@ -38,20 +36,14 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		token := authorization[1]
 
-		account, err := m.Encrypter.Decrypt(token)
+		accountId, err := m.Encrypter.Decrypt(token)
 		if err != nil {
-			if errors.Is(err, encrypter.ErrInvalidToken) {
-				return c.JSON(
-					http.StatusUnauthorized,
-					map[string]string{"error": ErrInvalidToken.Error()})
-			}
-
 			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()})
+				http.StatusUnauthorized,
+				map[string]string{"error": err.Error()})
 		}
 
-		c.Request().Header.Set("account_id", account.Id)
+		c.Request().Header.Set("account_id", accountId)
 
 		return next(c)
 	}

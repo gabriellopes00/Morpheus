@@ -25,3 +25,8 @@ func NewValidationError(message, field string) DomainErr {
 		Field:      field,
 	}
 }
+
+func IsDomainError(err interface{}) bool {
+	_, ok := err.(ValidationError)
+	return ok
+}
