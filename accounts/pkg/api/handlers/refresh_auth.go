@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	usecases "accounts/application"
 	"accounts/domain"
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -28,21 +25,17 @@ func (h *refreshAuthHandler) Handle(c echo.Context) error {
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
 			http.StatusUnprocessableEntity,
-			map[string]string{"error": err.Error()},
+			map[string]string{"error": ErrUnprocessableEntity.Error()},
 		)
 	}
 
 	tokens, err := h.Usecase.Refresh(params.RefreshToken)
 	if err != nil {
-		fmt.Println(err)
-		if errors.Is(err, usecases.ErrUnregisteredEmail) {
-			return c.JSON(http.StatusConflict, err.Error())
-		} else {
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()},
-			)
-		}
+		return c.JSON(
+			http.StatusUnauthorized,
+			map[string]string{"error": err.Error()},
+		)
+
 	}
 
 	return c.JSON(

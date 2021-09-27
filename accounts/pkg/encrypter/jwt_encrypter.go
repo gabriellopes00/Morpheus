@@ -6,16 +6,15 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/golang-jwt/jwt"
 	gouuid "github.com/satori/go.uuid"
 )
 
 var (
-	ErrInvalidToken          = errors.New("invalid authorization token")
-	ErrExpiredToken          = errors.New("authorization token expired")
-	ErrInvalidTokenSignature = errors.New("invalid authorization token signature")
-	ErrInvalidTokenMetadata  = errors.New("invalid authorization token metadata")
-	ErrInvalidRefreshToken   = errors.New("invalid refresh token")
+	ErrInvalidToken        = errors.New("invalid authentication token")
+	ErrExpiredToken        = errors.New("authentication token expired")
+	ErrInvalidRefreshToken = errors.New("invalid refresh token")
 )
 
 type encrypter struct {
@@ -80,13 +79,13 @@ func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 
 	jwtToken, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidTokenSignature
+			return nil, ErrInvalidToken
 		}
 		return []byte(env.REFRESH_TOKEN_KEY), nil
 	})
 
 	if err != nil {
-		return Token{}, err
+		return Token{}, ErrInvalidToken
 	}
 
 	if !jwtToken.Valid {
@@ -95,16 +94,16 @@ func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 
 	claims, ok := jwtToken.Claims.(jwt.MapClaims)
 	if !ok {
-		return Token{}, ErrInvalidTokenMetadata
+		return Token{}, ErrInvalidToken
 	}
 
 	refreshTokenId, ok := claims["id"].(string)
 	if !ok {
-		return Token{}, ErrInvalidTokenMetadata
+		return Token{}, ErrInvalidToken
 	}
 
 	exitingToken, err := e.cache.Get(refreshTokenId)
-	if err != nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		return Token{}, err
 	}
 
@@ -118,7 +117,7 @@ func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 
 	accountId, ok := claims["account_id"].(string)
 	if !ok {
-		return Token{}, ErrInvalidTokenMetadata
+		return Token{}, ErrInvalidToken
 	}
 
 	token, err = e.EncryptAuthToken(accountId)
@@ -133,7 +132,7 @@ func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 func (encrypter) DecryptAuthToken(token string) (string, error) {
 	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidTokenSignature
+			return nil, ErrInvalidToken
 		}
 		return []byte(env.AUTH_TOKEN_KEY), nil
 	})
@@ -144,7 +143,7 @@ func (encrypter) DecryptAuthToken(token string) (string, error) {
 
 	claims, ok := jwtToken.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", ErrInvalidTokenMetadata
+		return "", ErrInvalidToken
 	}
 
 	if !jwtToken.Valid {
@@ -153,7 +152,7 @@ func (encrypter) DecryptAuthToken(token string) (string, error) {
 
 	accountId := claims["account_id"].(string)
 	if accountId == "" {
-		return "", ErrInvalidTokenMetadata
+		return "", ErrInvalidToken
 	}
 
 	return accountId, nil

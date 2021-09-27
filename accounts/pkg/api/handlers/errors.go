@@ -3,6 +3,8 @@ package handlers
 import "errors"
 
 var (
-	ErrInternalServer = errors.New("unexpected internal server error")
-	ErrInvalidRequest = errors.New("invalid request")
+	ErrInvalidRequest      = errors.New("invalid request")
+	ErrUnprocessableEntity = errors.New("unprocessable entity")
+	ErrUnauthorized        = errors.New("unauthorized event creation")
+	ErrInternalServer      = errors.New("unexpected internal server error")
 )

@@ -28,8 +28,8 @@ func (h *authHandler) Auth(c echo.Context) error {
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
-			http.StatusBadRequest,
-			map[string]string{"error": "invalid request params"})
+			http.StatusUnprocessableEntity,
+			map[string]string{"error": ErrUnprocessableEntity.Error()})
 	}
 
 	token, err := h.Usecase.Auth(params.Email, params.Password)
