@@ -7,7 +7,6 @@ import (
 	domainErrs "events/domain/errors"
 	"events/domain/usecases"
 	"events/framework/queue"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +26,7 @@ func NewCreateEventHandler(usecase usecases.CreateEvent, messageQueue queue.Mess
 
 var (
 	ErrUnprocessableEntity = errors.New("unprocessable entity")
-	ErrUnauthorized        = errors.New("unauthorized event creation")
+	ErrUnauthorized        = errors.New("unauthorized")
 	ErrInternalServer      = errors.New("unexpected internal server error")
 )
 
@@ -76,7 +75,6 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 	}
 
 	err = handler.MessageQueue.PublishMessage(queue.ExchangeEvents, queue.QueueEventCreated, payload)
-	fmt.Println(err)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

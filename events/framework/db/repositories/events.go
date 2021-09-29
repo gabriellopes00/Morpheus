@@ -7,6 +7,7 @@ import (
 
 type EventsRepository interface {
 	Create(event *entities.Event) error
+	GetAccountEvents(accountId string) ([]*entities.Event, error)
 }
 
 type pgEventsRepository struct {
@@ -35,4 +36,41 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 	)
 
 	return err
+}
+
+func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.Event, error) {
+	stm, err := repo.Db.Prepare("SELECT * FROM events WHERE organizer_account_id = $1")
+	if err != nil {
+		return nil, err
+	}
+
+	defer stm.Close()
+
+	events := []*entities.Event{}
+
+	rows, err := stm.Query(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		event := entities.Event{}
+		err := rows.Scan(
+			&event.Id,
+			&event.Name,
+			&event.Description,
+			&event.IsAvailable,
+			&event.OrganizerAccountId,
+			&event.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, &event)
+	}
+
+	return events, nil
 }
