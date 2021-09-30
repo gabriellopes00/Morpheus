@@ -19,7 +19,6 @@ spec:
           image: gabriellopes00/morpheus-events:v1
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,5 +28,5 @@ spec:
   selector:
     app: events
   ports:
-  - name: api-port
-    port: 7765
+    - name: api-port
+      port: 4422

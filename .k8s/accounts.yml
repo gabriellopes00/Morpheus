@@ -16,18 +16,20 @@ spec:
     spec:
       containers:
         - name: accounts
-          image: gabriellopes00/morpheus-accounts:v1
+          image: gabriellopes00/morpheus-accounts:v14
+          envFrom:
+            - configMapRef:
+                name: env-config
 
 ---
-
 apiVersion: v1
 kind: Service
-metadata: 
+metadata:
   name: accounts-srv
 spec:
   type: ClusterIP
   selector:
     app: accounts
-  ports:  
-  - name: api-port
-    port: 7765
+  ports:
+    - name: api-port
+      port: 7765

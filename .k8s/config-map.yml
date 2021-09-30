@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+  namespace: default
+data:
+  AUTH_TOKEN_KEY: 88D88ab529c5464Fa1d8Ef2cb479e5fd45c7bdf1bB00e6AAA2542B3c72e16B89
+  RABBITMQ_DEFAULT_PASS: 55d2c622D2049cfba1Ed39Df57C1651
+  RABBITMQ_DEFAULT_USER: A498e80b5Bc74Bd7b56417576346ac8E

@@ -19,7 +19,7 @@ var (
 	DB_SSL_MODE  = ""
 	DB_TIME_ZONE = ""
 
-	TOKEN_KEY = ""
+	AUTH_TOKEN_KEY = ""
 
 	PORT = 0
 
@@ -55,7 +55,7 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	TOKEN_KEY = os.Getenv("TOKEN_KEY")
+	AUTH_TOKEN_KEY = os.Getenv("AUTH_TOKEN_KEY")
 
 	RABBITMQ_HOST = os.Getenv("RABBITMQ_HOST")
 	RABBITMQ_USER = os.Getenv("RABBITMQ_USER")
