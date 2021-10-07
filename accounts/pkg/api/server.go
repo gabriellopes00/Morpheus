@@ -58,9 +58,11 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "Err"})
 	})
 
-	router.POST("/accounts", createAccountHandler.Create)
-	router.POST("/signin", authHandler.Auth)
-	router.POST("/auth/refresh", refreshAuthHandler.Handle)
-	router.GET("/accounts/:id", getAccountHandler.Handle, authMiddleware.Auth)
-	router.DELETE("/accounts/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
+	r := router.Group("/accounts")
+
+	r.POST("/", createAccountHandler.Create)
+	r.POST("/auth", authHandler.Auth)
+	r.POST("/auth/refresh", refreshAuthHandler.Handle)
+	r.GET("/:id", getAccountHandler.Handle, authMiddleware.Auth)
+	r.DELETE("/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
 }
