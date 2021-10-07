@@ -49,6 +49,9 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "Err"})
 	})
 
-	router.POST("/events", createEventHandler.Create, authMiddleware.Auth)
-	router.GET("/:account_id/events", getEventsHandler.Handle, authMiddleware.Auth)
+	events := router.Group("/events")
+	events.POST("/events", createEventHandler.Create, authMiddleware.Auth)
+
+	accounts := router.Group("/accounts")
+	accounts.GET("/:account_id/events", getEventsHandler.Handle, authMiddleware.Auth)
 }

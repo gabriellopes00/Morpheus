@@ -20,7 +20,7 @@ func (jwtEncrypter) Decrypt(token string) (accountId string, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, ErrInvalidToken
 		}
-		return []byte(env.TOKEN_KEY), nil
+		return []byte(env.AUTH_TOKEN_KEY), nil
 	})
 
 	if err != nil {
