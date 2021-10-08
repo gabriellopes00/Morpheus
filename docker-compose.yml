@@ -65,11 +65,11 @@ services:
     image: kong:2.6.0-alpine
     command: kong migrations bootstrap
     depends_on:
-      - db
+      - kong_db
     environment:
       KONG_DATABASE: postgres
       KONG_PG_DATABASE: kong
-      KONG_PG_HOST: db
+      KONG_PG_HOST: kong_db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
     networks:
@@ -83,11 +83,11 @@ services:
     image: kong:2.6.0-alpine
     command: kong migrations up && kong migrations finish
     depends_on:
-      - db
+      - kong_db
     environment:
       KONG_DATABASE: postgres
       KONG_PG_DATABASE: kong
-      KONG_PG_HOST: db
+      KONG_PG_HOST: kong_db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
     networks:
@@ -101,15 +101,15 @@ services:
     image: kong:2.6.0-alpine
     user: 'kong'
     depends_on:
-      - db
+      - kong_db
     environment:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: '0.0.0.0:8001'
-      KONG_CASSANDRA_CONTACT_POINTS: db
+      KONG_CASSANDRA_CONTACT_POINTS: kong_db
       KONG_DATABASE: postgres
       KONG_PG_DATABASE: kong
-      KONG_PG_HOST: db
+      KONG_PG_HOST: kong_db
       KONG_PG_USER: kong
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
@@ -131,7 +131,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  db:
+  kong_db:
     image: postgres:9.5
     environment:
       POSTGRES_DB: kong
@@ -156,12 +156,12 @@ services:
   konga-prepare:
     container_name: konga-prepare
     image: pantsel/konga:latest
-    command: '-c prepare -a postgres -u postgresql://kong:kong@db:5432/konga_db'
+    command: '-c prepare -a postgres -u postgresql://kong:kong@kong_db:5432/konga_db'
     networks:
       - morpheus
     restart: on-failure
     depends_on:
-      - db
+      - kong_db
 
   konga:
     container_name: konga
@@ -171,19 +171,77 @@ services:
       - morpheus
     environment:
       DB_ADAPTER: postgres
-      DB_HOST: db
+      DB_HOST: kong_db
       DB_USER: kong
       DB_PASSWORD: kong
       TOKEN_SECRET: ahfdjgjgf79JKLFHJKh978953kgdfjkl
       DB_DATABASE: konga_db
       NODE_ENV: production
     depends_on:
-      - db
+      - kong_db
     ports:
       - '1337:1337'
 
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=elasticsearch
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - 'ELASTIC_PASSWORD=kong'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+      # - .kong/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 9200:9200
+    networks:
+      - morpheus
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    depends_on:
+      - elasticsearch
+    volumes:
+      - kibana:/usr/share/kibana/config
+      # - .kong/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    networks:
+      - morpheus
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:7.14.1
+    depends_on:
+      - elasticsearch
+    volumes:
+      - logstash:/usr/share/logstash
+      # - .kong/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - .kong/logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - 5000:5000
+      - 9600:9600
+    networks:
+      - morpheus
+    environment:
+      ES_JAVA_OPTS: '-Xmx256m -Xms256m'
+
 volumes:
   kong_data:
+  elastic:
+  kibana:
+  logstash:
 
 networks:
   morpheus:
