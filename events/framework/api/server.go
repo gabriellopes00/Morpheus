@@ -24,9 +24,11 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 
 	// init usecases
 	createEvent := application.NewCreateEventUsecase(eventsRepo)
+	getEvents := application.NewGetEvents(eventsRepo)
 
 	// init handlers
 	createEventHandler := handlers.NewCreateEventHandler(createEvent, rabbitMQ)
+	getEventsHandler := handlers.NewGetEventsHandler(getEvents)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(jwtEncrypter)
@@ -47,5 +49,9 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "Err"})
 	})
 
-	router.POST("/events", createEventHandler.Create, authMiddleware.Auth)
+	events := router.Group("/events")
+	events.POST("/events", createEventHandler.Create, authMiddleware.Auth)
+
+	accounts := router.Group("/accounts")
+	accounts.GET("/:account_id/events", getEventsHandler.Handle, authMiddleware.Auth)
 }

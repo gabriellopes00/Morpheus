@@ -17,18 +17,16 @@ spec:
           ports:
             - containerPort: 15672
             - containerPort: 5672
+          envFrom:
+            - configMapRef:
+                name: env-config
           env:
             - name: RABBITMQ_ERLANG_COOKIE
               value: 4a7143f5c6d641d7975d853bed7fd926
-            - name: RABBITMQ_DEFAULT_USER
-              value: rabbitmq
-            - name: RABBITMQ_DEFAULT_PASS
-              value: rabbitmq
             - name: RABBITMQ_DEFAULT_VHOST
               value: /
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
