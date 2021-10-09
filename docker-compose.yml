@@ -1,20 +1,6 @@
 version: '3.9'
 
 services:
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:3-management
-    restart: always
-    environment:
-      RABBITMQ_ERLANG_COOKIE: 83da6479156341769d743dc1f9c7ba98
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: rabbitmq
-      RABBITMQ_DEFAULT_VHOST: /
-    ports:
-      - '15672:15672'
-      - '5672:5672'
-    networks:
-      - morpheus
 
   accounts:
     container_name: accounts
@@ -43,10 +29,24 @@ services:
     container_name: mailer
     restart: always
     depends_on:
-      #- postgresql
       - redis
       - rabbitmq
     build: ./mailer/
+    networks:
+      - morpheus
+  
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+      RABBITMQ_ERLANG_COOKIE: 83da6479156341769d743dc1f9c7ba98
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - '15672:15672'
+      - '5672:5672'
     networks:
       - morpheus
 
@@ -60,10 +60,11 @@ services:
       - REDIS_REPLICATION_MODE=master
     networks:
       - morpheus
-  # ----------------- KONG GATEWAY --------------
+
   kong-migrations:
     image: kong:2.6.0-alpine
     command: kong migrations bootstrap
+    restart: on-failure
     depends_on:
       - kong_db
     environment:
@@ -72,16 +73,25 @@ services:
       KONG_PG_HOST: kong_db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
+    mem_limit: "512m"
+    memswap_limit: "512m"
+    cpus: 0.5
+    logging:
+      options:
+        max-size: "50m"
     networks:
       - morpheus
-    restart: on-failure
-    deploy:
-      restart_policy:
-        condition: on-failure
 
   kong-migrations-up:
     image: kong:2.6.0-alpine
     command: kong migrations up && kong migrations finish
+    restart: on-failure
+    mem_limit: "512m"
+    memswap_limit: "512m"
+    cpus: 0.5
+    logging:
+      options:
+        max-size: "50m"
     depends_on:
       - kong_db
     environment:
@@ -92,14 +102,17 @@ services:
       KONG_PG_PASSWORD: kong
     networks:
       - morpheus
-    restart: on-failure
-    deploy:
-      restart_policy:
-        condition: on-failure
 
   kong:
     image: kong:2.6.0-alpine
+    restart: always
     user: 'kong'
+    mem_limit: "2g"
+    memswap_limit: "2g"
+    cpus: 4
+    logging:
+      options:
+        max-size: "50m"
     depends_on:
       - kong_db
     environment:
@@ -126,13 +139,16 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-    restart: on-failure
-    deploy:
-      restart_policy:
-        condition: on-failure
 
   kong_db:
+    container_name: kong_db
     image: postgres:9.5
+    mem_limit: "6g"
+    memswap_limit: "6g"
+    cpus: 4
+    logging:
+      options:
+        max-size: "50m"
     environment:
       POSTGRES_DB: kong
       POSTGRES_USER: kong
@@ -142,10 +158,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-    restart: on-failure
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: always
     stdin_open: true
     tty: true
     networks:
@@ -157,6 +170,12 @@ services:
     container_name: konga-prepare
     image: pantsel/konga:latest
     command: '-c prepare -a postgres -u postgresql://kong:kong@kong_db:5432/konga_db'
+    mem_limit: "512m"
+    memswap_limit: "512m"
+    cpus: 0.5
+    logging:
+      options:
+        max-size: "50m"
     networks:
       - morpheus
     restart: on-failure
@@ -167,6 +186,12 @@ services:
     container_name: konga
     image: pantsel/konga:latest
     restart: always
+    mem_limit: "1g"
+    memswap_limit: "1g"
+    cpus: 1
+    logging:
+      options:
+        max-size: "50m"
     networks:
       - morpheus
     environment:
@@ -198,7 +223,6 @@ services:
         hard: -1
     volumes:
       - elastic:/usr/share/elasticsearch/data
-      # - .kong/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 9200:9200
     networks:
@@ -211,7 +235,6 @@ services:
       - elasticsearch
     volumes:
       - kibana:/usr/share/kibana/config
-      # - .kong/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
     networks:
@@ -227,7 +250,6 @@ services:
       - elasticsearch
     volumes:
       - logstash:/usr/share/logstash
-      # - .kong/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - .kong/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - 5000:5000
