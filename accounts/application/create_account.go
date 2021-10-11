@@ -4,9 +4,7 @@ import (
 	"accounts/domain"
 	"accounts/pkg/db"
 	"errors"
-	"time"
 
-	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,7 +22,7 @@ func NewCreateAccount(Repository db.Repository) *createAccount {
 	}
 }
 
-func (c *createAccount) Create(account domain.Account) (*domain.Account, error) {
+func (c *createAccount) Create(account *domain.CreateAccountDTO) (*domain.Account, error) {
 	existingAccount, err := c.Repository.Exists(account.Email)
 	if err != nil {
 		return nil, err
@@ -34,26 +32,25 @@ func (c *createAccount) Create(account domain.Account) (*domain.Account, error) 
 		return nil, ErrEmailAlreadyInUse
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
-
-	account.Id = id.String()
-
 	hash, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
-
-	account.Password = string(hash)
-
-	account.CreatedAt = time.Now().Local()
-
-	err = c.Repository.Create(&account)
+	a, err := domain.NewAccount(
+		account.Name,
+		account.Email,
+		string(hash),
+		account.AvatarUrl,
+		account.RG,
+		account.BirthDate)
 	if err != nil {
 		return nil, err
 	}
 
-	return &account, nil
+	err = c.Repository.Create(a)
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
 }

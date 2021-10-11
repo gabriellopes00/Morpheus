@@ -31,10 +31,12 @@ func NewCreateAccountHandler(
 }
 
 func (h *createAccountHandler) Create(c echo.Context) error {
-	var params domain.Account
+	var params *domain.CreateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.String(http.StatusUnprocessableEntity, "invalid request params")
+		return c.JSON(
+			http.StatusUnprocessableEntity,
+			map[string]string{"error": "invalid request params"})
 	}
 
 	account, err := h.Usecase.Create(params)
@@ -47,6 +49,8 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 				map[string]string{"error": "unexpected internal server error"})
 		}
 	}
+
+	account.Password = ""
 
 	payload, err := json.Marshal(account)
 	if err != nil {

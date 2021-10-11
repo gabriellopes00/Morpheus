@@ -1,6 +1,12 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"fmt"
+	"time"
+
+	gouuid "github.com/satori/go.uuid"
+)
 
 // Account entity
 type Account struct {
@@ -9,13 +15,45 @@ type Account struct {
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	AvatarUrl string    `json:"avatar_url,omitempty"`
+	RG        string    `json:"rg,omitempty"`
+	BirthDate time.Time `json:"birth_date,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
+}
+
+func NewAccount(name, email, password, avatarUrl, rg, birthDate string) (*Account, error) {
+	account := &Account{
+		Id:        gouuid.NewV4().String(),
+		Name:      name,
+		Email:     email,
+		Password:  password,
+		AvatarUrl: avatarUrl,
+		RG:        rg,
+		CreatedAt: time.Now().Local(),
+	}
+
+	parsed, err := time.Parse(time.RFC3339, birthDate)
+	if err != nil {
+		fmt.Println("here")
+		return nil, errors.New("invalid account birth date format")
+	}
+	account.BirthDate = parsed
+
+	return account, nil
 }
 
 // Account usecases
 
+type CreateAccountDTO struct {
+	Name      string `json:"name,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Password  string `json:"password,omitempty"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	RG        string `json:"rg,omitempty"`
+	BirthDate string `json:"birth_date,omitempty"`
+}
+
 type CreateAccount interface {
-	Create(data Account) (*Account, error)
+	Create(data *CreateAccountDTO) (*Account, error)
 }
 
 type AuthModel struct {
