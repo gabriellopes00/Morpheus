@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"events/domain/entities"
+	"events/application"
 	domainErrs "events/domain/errors"
 	"events/domain/usecases"
 	"events/framework/queue"
@@ -31,7 +31,7 @@ var (
 )
 
 func (handler *createEventHandler) Create(c echo.Context) error {
-	var params entities.Event
+	var params application.CreateEventParams
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(

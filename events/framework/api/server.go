@@ -50,7 +50,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 	})
 
 	events := router.Group("/events")
-	events.POST("/events", createEventHandler.Create, authMiddleware.Auth)
+	events.POST("", createEventHandler.Create, authMiddleware.Auth)
 
 	accounts := router.Group("/accounts")
 	accounts.GET("/:account_id/events", getEventsHandler.Handle, authMiddleware.Auth)

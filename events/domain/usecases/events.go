@@ -1,9 +1,12 @@
 package usecases
 
-import "events/domain/entities"
+import (
+	"events/application"
+	"events/domain/entities"
+)
 
 type CreateEvent interface {
-	Create(event *entities.Event) (*entities.Event, error)
+	Create(event *application.CreateEventParams) (*entities.Event, error)
 }
 
 type GetEvents interface {
