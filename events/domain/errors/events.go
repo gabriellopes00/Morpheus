@@ -1,4 +1,4 @@
-package errors
+package domain_errors
 
 type DomainErr interface {
 	Error() string
@@ -7,8 +7,9 @@ type DomainErr interface {
 // Validation Error
 
 type ValidationError struct {
-	ErrMessage string `json:"message"`
-	Field      string `json:"field"`
+	ErrMessage string      `json:"message,omitempty"`
+	Field      string      `json:"field,omitempty"`
+	Value      interface{} `json:"value,omitempty"`
 }
 
 func (e *ValidationError) Error() string {
@@ -19,10 +20,11 @@ func (e *ValidationError) InvalidField() string {
 	return e.Field
 }
 
-func NewValidationError(message, field string) DomainErr {
+func NewValidationError(message, field string, value interface{}) DomainErr {
 	return &ValidationError{
 		ErrMessage: message,
 		Field:      field,
+		Value:      value,
 	}
 }
 
