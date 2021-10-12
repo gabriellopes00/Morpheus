@@ -12,6 +12,7 @@ type EventStatus string
 
 const (
 	StatusAvailable EventStatus = "available"
+	StatusSoldOut   EventStatus = "sold_out"
 	StatusFinished  EventStatus = "finished"
 	StatusCanceled  EventStatus = "canceled"
 )
@@ -26,17 +27,21 @@ type Event struct {
 	MaximumCapacity    int           `json:"maximum_capacity,omitempty"`
 	Status             EventStatus   `json:"status,omitempty"`
 	Location           EventLocation `json:"location"`
+	Duration           time.Duration `json:"duration,omitempty"`
 	TicketPrice        float32       `json:"ticket_price,omitempty"`
-	Dates              []time.Time   `json:"dates,omitempty"`
+	Date               time.Time     `json:"date,omitempty"`
 	UpdatedAt          time.Time     `json:"updated_at,omitempty"`
 	CreatedAt          time.Time     `json:"created_at,omitempty"`
+	DeletedAt          time.Time     `json:"deleted_at,omitempty"`
 }
 
 func NewEvent(
 	name, description string, isAvailable bool, organizerAccountId string,
 	ageGroup, maximumCapacity int, status string, location *EventLocation,
-	ticketPrice float32, dates []string,
+	duration int, ticketPrice float32, date string,
 ) (*Event, domain_errors.DomainErr) {
+	var err error
+
 	event := &Event{
 		Id:                 gouuid.NewV4().String(),
 		Name:               strings.TrimSpace(name),
@@ -47,19 +52,16 @@ func NewEvent(
 		AgeGroup:           ageGroup,
 		MaximumCapacity:    maximumCapacity,
 		Location:           *location,
+		Duration:           time.Duration(time.Minute * time.Duration(duration)),
 		UpdatedAt:          time.Now().Local(),
 		CreatedAt:          time.Now().Local(),
 	}
 
-	for _, date := range dates {
-		parsed, err := time.Parse(time.RFC3339, date)
-		if err != nil {
-			return nil, domain_errors.NewValidationError(
-				"Event's dates must be in \"RFC3339\" format",
-				"Date", date)
-		}
-
-		event.Dates = append(event.Dates, parsed)
+	event.Date, err = time.Parse(time.RFC3339, date)
+	if err != nil {
+		return nil, domain_errors.NewValidationError(
+			`Event's dates must be in "RFC3339" format`,
+			"Date", date)
 	}
 
 	switch status {
@@ -69,14 +71,15 @@ func NewEvent(
 		event.Status = StatusCanceled
 	case string(StatusFinished):
 		event.Status = StatusFinished
+	case string(StatusSoldOut):
+		event.Status = StatusSoldOut
 	default:
 		return nil, domain_errors.NewValidationError(
-			"Events' status must be \"available\", \"canceled\" or \"finished\"",
+			`Events' status must be "available", "sold_out", "canceled" or "finished"`,
 			"Status", status)
 	}
 
-	err := event.validate()
-	if err != nil {
+	if err = event.validate(); err != nil {
 		return nil, err
 	}
 
@@ -93,6 +96,7 @@ func (e *Event) validate() domain_errors.DomainErr {
 
 	switch e.AgeGroup {
 	case 0, 10, 12, 14, 16, 18:
+		break
 	default:
 		{
 			return domain_errors.NewValidationError(

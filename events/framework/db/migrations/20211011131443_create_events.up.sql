@@ -1,7 +1,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'EVENT_STATUS') THEN
-        CREATE TYPE EVENT_STATUS AS ENUM ('available', 'finished', 'canceled');
+        CREATE TYPE EVENT_STATUS AS ENUM ('available', 'finished', 'canceled', 'sold_out');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'EVENT_AGE_GROUP') THEN
@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS "events" (
     maximum_capacity INTEGER NOT NULL CHECK (maximum_capacity >= 1),
     status EVENT_STATUS NOT NULL,
     ticket_price REAL NOT NULL CHECK (ticket_price >= 0),
-    dates TIMESTAMP [] NOT NULL,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    duration SMALLINT DEFAULT NULL CHECK (duration >= 1),
     location_street VARCHAR NOT NULL,
     location_district VARCHAR NOT NULL,
     location_state VARCHAR NOT NULL,
@@ -30,8 +31,10 @@ CREATE TABLE IF NOT EXISTS "events" (
     location_number SMALLINT NOT NULL CHECK (location_number >= 0),
     location_latitude FLOAT DEFAULT NULL,
     location_longitude FLOAT DEFAULT NULL,
-    created_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (organizer_account_id) REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (organizer_account_id) REFERENCES accounts(id) ON DELETE SET NULL
 );

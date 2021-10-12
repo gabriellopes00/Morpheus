@@ -34,8 +34,9 @@ type CreateEventParams struct {
 		Latitude    float64 `json:"latitude,omitempty"`
 		Longitude   float64 `json:"longitude,omitempty"`
 	} `json:"location,omitempty"`
-	TicketPrice float32  `json:"ticket_price,omitempty"`
-	Dates       []string `json:"dates,omitempty"`
+	TicketPrice float32 `json:"ticket_price,omitempty"`
+	Date        string  `json:"date,omitempty"`
+	Duration    int     `json:"duration,omitempty"`
 }
 
 func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event, error) {
@@ -51,7 +52,7 @@ func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event,
 
 	event, err := entities.NewEvent(
 		params.Name, params.Description, params.IsAvailable, params.OrganizerAccountId, params.AgeGroup,
-		params.MaximumCapacity, params.Status, eventLocation, params.TicketPrice, params.Dates)
+		params.MaximumCapacity, params.Status, eventLocation, params.Duration, params.TicketPrice, params.Date)
 	if err != nil {
 		return nil, err
 	}

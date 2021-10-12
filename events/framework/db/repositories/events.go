@@ -4,8 +4,7 @@ import (
 	"database/sql"
 	"events/domain/entities"
 	"strconv"
-
-	"github.com/lib/pq"
+	"time"
 )
 
 type EventsRepository interface {
@@ -32,7 +31,8 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 							maximum_capacity,
 							status,
 							ticket_price,
-							dates,
+							date,
+							duration,
 							location_street,
 							location_district,
 							location_state,
@@ -42,9 +42,10 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 							location_number,
 							location_latitude,
 							location_longitude,
-							created_at)
+							created_at,
+							updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
-		$11, $12, $13, $14, $15, $16, $17, $18, $19, $20);
+		$11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22);
 	`)
 	if err != nil {
 		return err
@@ -62,7 +63,8 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		event.MaximumCapacity,
 		event.Status,
 		event.TicketPrice,
-		pq.Array(event.Dates),
+		event.Date,
+		event.Duration.Minutes(),
 		event.Location.Street,
 		event.Location.District,
 		event.Location.State,
@@ -73,7 +75,7 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		event.Location.Latitude,
 		event.Location.Longitude,
 		event.CreatedAt,
-	)
+		event.UpdatedAt)
 
 	return err
 }
@@ -89,7 +91,8 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 				maximum_capacity,
 				status,
 				ticket_price,
-				dates,
+				date,
+				duration,
 				location_street,
 				location_district,
 				location_state,
@@ -99,9 +102,11 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 				location_number,
 				location_latitude,
 				location_longitude,
-				created_at)
-		FROM EVENTS
-		WHERE organizer_account_id = $1;
+				created_at,
+				updated_at)
+		FROM events
+		WHERE organizer_account_id = $1 
+		AND WHERE deleted_at IS NULL;
 	`)
 	if err != nil {
 		return nil, err
@@ -120,6 +125,7 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 
 	for rows.Next() {
 		event := &entities.Event{}
+		var eventDuration *int
 		err := rows.Scan(
 			event.Id,
 			event.Name,
@@ -130,7 +136,8 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 			event.MaximumCapacity,
 			event.Status,
 			event.TicketPrice,
-			event.Dates,
+			event.Date,
+			eventDuration,
 			event.Location.Street,
 			event.Location.District,
 			event.Location.State,
@@ -141,11 +148,12 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 			event.Location.Latitude,
 			event.Location.Longitude,
 			event.CreatedAt,
-		)
+			event.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
 
+		event.Duration = time.Duration(time.Minute * time.Duration(*eventDuration))
 		events = append(events, event)
 	}
 
