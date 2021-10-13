@@ -27,7 +27,7 @@ type Event struct {
 	MaximumCapacity    int           `json:"maximum_capacity,omitempty"`
 	Status             EventStatus   `json:"status,omitempty"`
 	Location           EventLocation `json:"location"`
-	Duration           time.Duration `json:"duration,omitempty"`
+	Duration           int           `json:"duration,omitempty"`
 	TicketPrice        float32       `json:"ticket_price,omitempty"`
 	Date               time.Time     `json:"date,omitempty"`
 	UpdatedAt          time.Time     `json:"updated_at,omitempty"`
@@ -52,7 +52,7 @@ func NewEvent(
 		AgeGroup:           ageGroup,
 		MaximumCapacity:    maximumCapacity,
 		Location:           *location,
-		Duration:           time.Duration(time.Minute * time.Duration(duration)),
+		Duration:           duration,
 		UpdatedAt:          time.Now().Local(),
 		CreatedAt:          time.Now().Local(),
 	}
@@ -118,6 +118,13 @@ func (e *Event) validate() domain_errors.DomainErr {
 			"Events' ticket price must be greather than 0",
 			"TicketPrice",
 			e.TicketPrice)
+	}
+
+	if e.Duration <= 0 {
+		return domain_errors.NewValidationError(
+			"Events' duration must be greather than 0 minutes",
+			"Duration",
+			e.Duration)
 	}
 
 	return nil
