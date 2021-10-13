@@ -43,9 +43,8 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 							location_longitude,
 							created_at,
 							updated_at)
-		VALUES ($1, $2, NULLIF($3, ''), $4, $5, $6, $7, $8, $9, $10, 
-		NULLIF($11, 0), $12, $13, $14, $15, $16, NULLIF($17, ''), 
-		$18, NULLIF($19, 0::float), NULLIF($20, 0::float), $21, $22);
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+		$16, $17, $18, $19, $20, $21, $22);
 	`)
 	if err != nil {
 		return err
@@ -82,7 +81,7 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 
 func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.Event, error) {
 	stm, err := repo.Db.Prepare(`
-		SELECT (id,
+		SELECT id,
 				name,
 				description,
 				is_available,
@@ -103,10 +102,10 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 				location_latitude,
 				location_longitude,
 				created_at,
-				updated_at)
+				updated_at
 		FROM events
 		WHERE organizer_account_id = $1 
-		AND WHERE deleted_at IS NULL;
+		AND deleted_at IS NULL;
 	`)
 	if err != nil {
 		return nil, err
@@ -124,35 +123,35 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 	defer rows.Close()
 
 	for rows.Next() {
-		event := &entities.Event{}
+		var event entities.Event
 		err := rows.Scan(
-			event.Id,
-			event.Name,
-			event.Description,
-			event.IsAvailable,
-			event.OrganizerAccountId,
-			event.AgeGroup,
-			event.MaximumCapacity,
-			event.Status,
-			event.TicketPrice,
-			event.Date,
-			event.Duration,
-			event.Location.Street,
-			event.Location.District,
-			event.Location.State,
-			event.Location.City,
-			event.Location.PostalCode,
-			event.Location.Description,
-			event.Location.Number,
-			event.Location.Latitude,
-			event.Location.Longitude,
-			event.CreatedAt,
-			event.UpdatedAt)
+			&event.Id,
+			&event.Name,
+			&event.Description,
+			&event.IsAvailable,
+			&event.OrganizerAccountId,
+			&event.AgeGroup,
+			&event.MaximumCapacity,
+			&event.Status,
+			&event.TicketPrice,
+			&event.Date,
+			&event.Duration,
+			&event.Location.Street,
+			&event.Location.District,
+			&event.Location.State,
+			&event.Location.City,
+			&event.Location.PostalCode,
+			&event.Location.Description,
+			&event.Location.Number,
+			&event.Location.Latitude,
+			&event.Location.Longitude,
+			&event.CreatedAt,
+			&event.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
 
-		events = append(events, event)
+		events = append(events, &event)
 	}
 
 	return events, nil

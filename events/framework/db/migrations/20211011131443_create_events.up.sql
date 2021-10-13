@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "events" (
     status EVENT_STATUS NOT NULL,
     ticket_price REAL NOT NULL CHECK (ticket_price >= 0),
     date TIMESTAMP WITH TIME ZONE NOT NULL,
-    duration SMALLINT DEFAULT NULL CHECK (duration >= 1),
+    duration SMALLINT NOT NULL CHECK (duration >= 1),
     location_street VARCHAR NOT NULL,
     location_district VARCHAR NOT NULL,
     location_state VARCHAR NOT NULL,
