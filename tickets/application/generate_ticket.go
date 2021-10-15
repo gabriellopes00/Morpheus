@@ -3,17 +3,17 @@ package application
 import (
 	"errors"
 	"tickets/domain/entities"
-	"tickets/framework/db"
+	"tickets/framework/db/repositories"
 )
 
 type ticketGenerator struct {
-	ticketsRepo db.TicketsRepository
-	eventsRepo  db.EventsRepository
+	ticketsRepo repositories.TicketsRepository
+	eventsRepo  repositories.EventsRepository
 }
 
 func NewTicketGenerator(
-	ticketsRepository db.TicketsRepository,
-	eventsRepository db.EventsRepository) *ticketGenerator {
+	ticketsRepository repositories.TicketsRepository,
+	eventsRepository repositories.EventsRepository) *ticketGenerator {
 	return &ticketGenerator{
 		ticketsRepo: ticketsRepository,
 		eventsRepo:  eventsRepository,

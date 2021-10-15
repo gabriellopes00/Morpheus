@@ -2,26 +2,26 @@ package application
 
 import (
 	"tickets/domain/entities"
-	"tickets/framework/db"
+	"tickets/framework/db/repositories"
 	"time"
 )
 
 type createEvent struct {
-	repo db.EventsRepository
+	repo repositories.EventsRepository
 }
 
-func NewCreateEvent(repository db.EventsRepository) *createEvent {
+func NewCreateEvent(repository repositories.EventsRepository) *createEvent {
 	return &createEvent{
 		repo: repository,
 	}
 }
 
-func (c *createEvent) Create(eventId string, date time.Time) (*entities.Event, error) {
+func (c *createEvent) Create(eventId string, date time.Time) error {
 	event := entities.NewEvent(eventId, date)
 	if err := c.repo.Create(event); err != nil {
-		return nil, err
+		return err
 	}
 
-	return event, nil
+	return nil
 
 }

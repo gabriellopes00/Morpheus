@@ -1,6 +1,9 @@
 FROM golang:1.17.0-alpine3.14 AS builder
 
-WORKDIR /go/src/morpheus/accounts
+WORKDIR /go/src/morpheus/tickets
+
+RUN adduser -D morpheus && chown -R morpheus /go/src/morpheus/tickets
+USER morpheus
 
 COPY go.* ./
 COPY Makefile .
@@ -13,11 +16,10 @@ RUN make build
 
 FROM alpine:3.14
 
-WORKDIR /usr/src/morpheus/accounts
+WORKDIR /usr/src/morpheus/tickets
 
-COPY --from=builder /go/src/morpheus/accounts/app .
+COPY --from=builder /go/src/morpheus/tickets/app .
 COPY .env .
-COPY ./infra/db/migrations/*.sql ./infra/db/migrations/
+COPY ./framework/db/migrations/*.sql ./framework/db/migrations/
 
-EXPOSE 7765
-ENTRYPOINT /usr/src/morpheus/accounts/app
+ENTRYPOINT /usr/src/morpheus/tickets/app
