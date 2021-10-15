@@ -13,14 +13,14 @@
     "orm": "node ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
-    "@sentry/node": "^6.13.2",
+    "@sentry/node": "^6.13.3",
     "@sentry/tracing": "^6.13.1",
     "amqplib": "^0.8.0",
     "bull": "^3.29.2",
     "dotenv": "^10.0.0",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
-    "nodemailer": "^6.6.5",
+    "nodemailer": "^6.7.0",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.38",
