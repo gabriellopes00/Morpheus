@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: accounts
+  name: tickets
   labels:
-    app: accounts
+    app: tickets
 spec:
   selector:
     matchLabels:
-      app: accounts
+      app: tickets
   replicas: 1
   template:
     metadata:
       labels:
-        app: accounts
+        app: tickets
     spec:
       containers:
-        - name: accounts
-          image: gabriellopes00/morpheus-accounts:v1
+        - name: tickets
+          image: gabriellopes00/morpheus-tickets:v1
           envFrom:
             - configMapRef:
                 name: env-config
@@ -25,11 +25,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: accounts-srv
+  name: tickets-srv
 spec:
   type: ClusterIP
   selector:
-    app: accounts
+    app: tickets
   ports:
     - name: api-port
       port: 7765
