@@ -19,9 +19,6 @@ var (
 	DB_SSL_MODE  = ""
 	DB_TIME_ZONE = ""
 
-	TOKEN_KEY             = ""
-	TOKEN_EXPIRATION_TIME = 0
-
 	PORT = 0
 
 	RABBITMQ_HOST  = ""
@@ -31,7 +28,7 @@ var (
 	RABBITMQ_VHOST = ""
 )
 
-var ErrLoadingEnvVars = errors.New("error on loading environment variables")
+var ErrLoadingEnvVars = errors.New("error while loading environment variables")
 
 func init() {
 	err := godotenv.Load()
@@ -52,12 +49,6 @@ func init() {
 	DB_SSL_MODE = os.Getenv("DB_SSL_MODE")
 	DB_TIME_ZONE = os.Getenv("DB_TIME_ZONE")
 	DB_PORT, err = strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	TOKEN_KEY = os.Getenv("TOKEN_KEY")
-	TOKEN_EXPIRATION_TIME, err = strconv.Atoi(os.Getenv("TOKEN_EXPIRATION_TIME"))
 	if err != nil {
 		log.Fatalln(err)
 	}
