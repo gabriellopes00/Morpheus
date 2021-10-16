@@ -2,13 +2,15 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"events/domain/entities"
 	"strconv"
 )
 
 type EventsRepository interface {
 	Create(event *entities.Event) error
-	GetAccountEvents(accountId string) ([]*entities.Event, error)
+	FindAccountEvents(accountId string) ([]*entities.Event, error)
+	FindById(accountId string) (*entities.Event, error)
 }
 
 type pgEventsRepository struct {
@@ -79,7 +81,7 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 	return err
 }
 
-func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.Event, error) {
+func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]*entities.Event, error) {
 	stm, err := repo.Db.Prepare(`
 		SELECT id,
 				name,
@@ -155,4 +157,74 @@ func (repo *pgEventsRepository) GetAccountEvents(accountId string) ([]*entities.
 	}
 
 	return events, nil
+}
+
+func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error) {
+	stm, err := repo.Db.Prepare(`
+		SELECT id,
+				name,
+				description,
+				is_available,
+				organizer_account_id,
+				age_group,
+				maximum_capacity,
+				status,
+				ticket_price,
+				date,
+				duration,
+				location_street,
+				location_district,
+				location_state,
+				location_city,
+				location_postal_code,
+				location_description,
+				location_number,
+				location_latitude,
+				location_longitude,
+				created_at,
+				updated_at
+		FROM events
+		WHERE id = $1 
+		AND deleted_at IS NULL;
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer stm.Close()
+
+	var event entities.Event
+
+	err = stm.QueryRow(eventId).Scan(
+		&event.Id,
+		&event.Name,
+		&event.Description,
+		&event.IsAvailable,
+		&event.OrganizerAccountId,
+		&event.AgeGroup,
+		&event.MaximumCapacity,
+		&event.Status,
+		&event.TicketPrice,
+		&event.Date,
+		&event.Duration,
+		&event.Location.Street,
+		&event.Location.District,
+		&event.Location.State,
+		&event.Location.City,
+		&event.Location.PostalCode,
+		&event.Location.Description,
+		&event.Location.Number,
+		&event.Location.Latitude,
+		&event.Location.Longitude,
+		&event.CreatedAt,
+		&event.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &event, nil
 }

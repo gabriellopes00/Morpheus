@@ -9,6 +9,7 @@ type CreateEvent interface {
 	Create(event *application.CreateEventParams) (*entities.Event, error)
 }
 
-type GetEvents interface {
-	GetAccountEvents(accountId string) ([]*entities.Event, error)
+type FindEvents interface {
+	FindAccountEvents(accountId string) ([]*entities.Event, error)
+	FindEventById(eventId string) (*entities.Event, error)
 }

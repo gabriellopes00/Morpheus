@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"events/domain/usecases"
 	"log"
 	"net/http"
@@ -9,21 +8,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type getEventsHandler struct {
-	Usecase usecases.GetEvents
+type findAccountEventsHandler struct {
+	Usecase usecases.FindEvents
 }
 
-func NewGetEventsHandler(usecase usecases.GetEvents) *getEventsHandler {
-	return &getEventsHandler{
+func NewFindAccountEventsHandler(usecase usecases.FindEvents) *findAccountEventsHandler {
+	return &findAccountEventsHandler{
 		Usecase: usecase,
 	}
 }
 
-var (
-	ErrBadRequest = errors.New("invalid request")
-)
-
-func (handler *getEventsHandler) Handle(c echo.Context) error {
+func (handler *findAccountEventsHandler) Handle(c echo.Context) error {
 
 	accountId := c.Param("account_id")
 	if accountId == "" {
@@ -40,7 +35,7 @@ func (handler *getEventsHandler) Handle(c echo.Context) error {
 		)
 	}
 
-	events, err := handler.Usecase.GetAccountEvents(accountId)
+	events, err := handler.Usecase.FindAccountEvents(accountId)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(

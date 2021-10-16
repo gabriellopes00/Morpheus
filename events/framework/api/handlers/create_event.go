@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"events/application"
 	domainErrs "events/domain/errors"
 	"events/domain/usecases"
@@ -23,12 +22,6 @@ func NewCreateEventHandler(usecase usecases.CreateEvent, messageQueue queue.Mess
 		MessageQueue: messageQueue,
 	}
 }
-
-var (
-	ErrUnprocessableEntity = errors.New("unprocessable entity")
-	ErrUnauthorized        = errors.New("unauthorized")
-	ErrInternalServer      = errors.New("unexpected internal server error")
-)
 
 func (handler *createEventHandler) Create(c echo.Context) error {
 	var params application.CreateEventParams

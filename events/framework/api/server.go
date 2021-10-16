@@ -24,11 +24,12 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 
 	// init usecases
 	createEvent := application.NewCreateEventUsecase(eventsRepo)
-	getEvents := application.NewGetEvents(eventsRepo)
+	findEvents := application.NewFindEvents(eventsRepo)
 
 	// init handlers
 	createEventHandler := handlers.NewCreateEventHandler(createEvent, rabbitMQ)
-	getEventsHandler := handlers.NewGetEventsHandler(getEvents)
+	findAccountEventsHandler := handlers.NewFindAccountEventsHandler(findEvents)
+	findEventsHandler := handlers.NewFindEventsHandler(findEvents)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(jwtEncrypter)
@@ -51,7 +52,8 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 
 	events := router.Group("/events")
 	events.POST("", createEventHandler.Create, authMiddleware.Auth)
+	events.GET("/:id", findEventsHandler.Handle, authMiddleware.Auth)
 
 	accounts := router.Group("/accounts")
-	accounts.GET("/:account_id/events", getEventsHandler.Handle, authMiddleware.Auth)
+	accounts.GET("/:account_id/events", findAccountEventsHandler.Handle, authMiddleware.Auth)
 }
