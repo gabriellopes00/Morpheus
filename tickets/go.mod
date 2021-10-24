@@ -5,7 +5,7 @@ go 1.17
 require github.com/joho/godotenv v1.4.0
 
 require (
-	github.com/golang-migrate/migrate/v4 v4.15.0
+	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/lib/pq v1.10.3
 	github.com/streadway/amqp v1.0.0
 )
