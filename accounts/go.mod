@@ -3,7 +3,6 @@ module accounts
 go 1.17
 
 require (
-	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/lib/pq v1.10.3
