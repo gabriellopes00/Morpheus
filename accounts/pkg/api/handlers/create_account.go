@@ -42,11 +42,12 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 	account, err := h.Usecase.Create(params)
 	if err != nil {
 		if errors.Is(err, usecases.ErrEmailAlreadyInUse) {
-			return c.JSON(http.StatusConflict, err.Error())
+			return c.JSON(http.StatusConflict,
+				map[string]string{"error": err.Error()})
 		} else {
 			return c.JSON(
 				http.StatusInternalServerError,
-				map[string]string{"error": "unexpected internal server error"})
+				map[string]string{"error": ErrInternalServer.Error()})
 		}
 	}
 
@@ -56,21 +57,21 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"})
+			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
 	err = h.MessageQueue.SendMessage(queue.QueueAccountCreated, []byte(payload))
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"})
+			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
 	token, err := h.Encrypter.EncryptAuthToken(account.Id)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"})
+			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
 	return c.JSON(

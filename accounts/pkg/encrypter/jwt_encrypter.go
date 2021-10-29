@@ -29,15 +29,17 @@ func (e *encrypter) EncryptAuthToken(accountId string) (Token, error) {
 	token := Token{}
 	var err error
 
-	token.AtExpires = time.Now().Add(time.Minute * time.Duration(env.AUTH_TOKEN_EXPIRATION_TIME)).Unix()
+	atDuration := time.Now().Add(time.Minute * time.Duration(env.AUTH_TOKEN_EXPIRATION_TIME))
+	token.AtExpires = atDuration.Unix()
 	token.AccessId = gouuid.NewV4().String()
 
-	token.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	rtDuration := time.Now().Add(time.Hour * 24 * 7)
+	token.RtExpires = rtDuration.Unix()
 	token.RefreshId = gouuid.NewV4().String()
 
 	// Auth Token
 	atClaims := jwt.MapClaims{}
-	atClaims["id"] = gouuid.NewV4().String()
+	atClaims["id"] = token.AccessId
 	atClaims["authorized"] = true
 	atClaims["account_id"] = accountId
 	atClaims["exp"] = token.AtExpires
@@ -48,7 +50,7 @@ func (e *encrypter) EncryptAuthToken(accountId string) (Token, error) {
 		return Token{}, err
 	}
 
-	err = e.cache.Set(token.AccessId, token.AccessToken, time.Duration(token.AtExpires))
+	err = e.cache.Set(token.AccessId, token.AccessToken, time.Until(atDuration))
 	if err != nil {
 		return Token{}, err
 	}
@@ -65,7 +67,7 @@ func (e *encrypter) EncryptAuthToken(accountId string) (Token, error) {
 		return Token{}, err
 	}
 
-	err = e.cache.Set(token.RefreshId, token.RefreshToken, time.Duration(token.RtExpires))
+	err = e.cache.Set(token.RefreshId, token.RefreshToken, time.Until(rtDuration))
 	if err != nil {
 		return Token{}, err
 	}
@@ -120,7 +122,7 @@ func (e *encrypter) RefreshAuthToken(refreshToken string) (Token, error) {
 		return Token{}, ErrInvalidToken
 	}
 
-	token, err = e.EncryptAuthToken(accountId)
+	token, err = e.EncryptAuthToken(accountId) // TODO: cannot call encrypt token without find this account id in db
 	if err != nil {
 		return Token{}, nil
 	}
