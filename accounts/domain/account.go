@@ -62,11 +62,11 @@ type AuthModel struct {
 }
 
 type AuthAccount interface {
-	Auth(email, password string) (AuthModel, error)
+	Auth(email, password string) (*AuthModel, error)
 }
 
 type RefreshAuth interface {
-	Refresh(refreshToken string) (AuthModel, error)
+	Refresh(refreshToken string) (*AuthModel, error)
 }
 
 type DeleteAccount interface {

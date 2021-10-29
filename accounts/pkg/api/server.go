@@ -27,8 +27,8 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 
 	// init usecases
 	createAccount := usecases.NewCreateAccount(accountRepo)
-	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter)
-	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter)
+	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
+	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter, accountRepo, redisRepo)
 	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
 	getAccount := usecases.NewGetAccount(accountRepo)
 

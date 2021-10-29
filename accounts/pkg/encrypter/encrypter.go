@@ -1,16 +1,18 @@
 package encrypter
 
+import "time"
+
 type Token struct {
-	AccessToken  string
-	RefreshToken string
-	AccessId     string
-	RefreshId    string
-	AtExpires    int64
-	RtExpires    int64
+	AccessToken          string
+	AccessTokenId        string
+	AccessTokenDuration  time.Duration
+	RefreshToken         string
+	RefreshTokenId       string
+	RefreshTokenDuration time.Duration
 }
 
 type Encrypter interface {
-	EncryptAuthToken(accountId string) (Token, error)
-	RefreshAuthToken(refreshToken string) (Token, error)
+	EncryptAuthToken(accountId string) (*Token, error)
 	DecryptAuthToken(token string) (string, error)
+	DecryptRefreshToken(token string) (*RefreshTokenClaims, error)
 }
