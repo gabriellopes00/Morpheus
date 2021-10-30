@@ -58,7 +58,7 @@ func (h *deleteAccountHandler) Delete(c echo.Context) error {
 		)
 	}
 
-	err = h.MessageQueue.SendMessage(queue.QueueAccountDeleted, payload)
+	err = h.MessageQueue.SendMessage(queue.ExchangeAccounts, queue.KeyAccountDeleted, payload)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

@@ -60,7 +60,7 @@ func (h *createAccountHandler) Create(c echo.Context) error {
 			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
-	err = h.MessageQueue.SendMessage(queue.QueueAccountCreated, []byte(payload))
+	err = h.MessageQueue.SendMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, []byte(payload))
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

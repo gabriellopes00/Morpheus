@@ -1,11 +1,12 @@
 package queue
 
 const (
-	QueueAccountCreated = "account_created"
-	QueueAccountUpdated = "account_updated"
-	QueueAccountDeleted = "account_deleted"
+	KeyAccountCreated = "account_created"
+	KeyAccountDeleted = "account_deleted"
+
+	ExchangeAccounts = "accounts_ex"
 )
 
 type MessageQueue interface {
-	SendMessage(queue string, payload []byte) error
+	SendMessage(exchange, routingKey string, payload []byte) error
 }

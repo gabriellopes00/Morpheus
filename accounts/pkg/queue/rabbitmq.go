@@ -16,10 +16,10 @@ func NewRabbitMQ(connection *amqp.Channel) *rabbitMQ {
 	}
 }
 
-func (r *rabbitMQ) SendMessage(queue string, payload []byte) error {
-	err := r.Channel.Publish(
-		"accounts_ex",
-		queue,
+func (r *rabbitMQ) SendMessage(exchange, routingKey string, payload []byte) error {
+	return r.Channel.Publish(
+		exchange,
+		routingKey,
 		false,
 		false,
 		amqp.Publishing{
@@ -27,6 +27,4 @@ func (r *rabbitMQ) SendMessage(queue string, payload []byte) error {
 			Body:        payload,
 			Timestamp:   time.Now().Local(),
 		})
-
-	return err
 }

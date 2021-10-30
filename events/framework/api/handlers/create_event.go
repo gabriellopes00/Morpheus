@@ -67,7 +67,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 		)
 	}
 
-	err = handler.MessageQueue.PublishMessage(queue.ExchangeEvents, queue.QueueEventCreated, payload)
+	err = handler.MessageQueue.PublishMessage(queue.ExchangeEvents, queue.KeyEventCreated, payload)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

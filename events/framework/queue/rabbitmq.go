@@ -6,16 +6,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const (
-	QueueEventCreated = "event_created"
-	ExchangeEvents    = "events_ex"
-)
-
-type MessageQueue interface {
-	Consume(queue string, channel chan<- []byte)
-	PublishMessage(exchange, key string, message []byte) error
-}
-
 type rabbitMQ struct {
 	Channel *amqp.Channel
 }

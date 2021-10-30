@@ -27,27 +27,7 @@ func NewRabbitMQConnection() (*amqp.Channel, error) {
 		return nil, err
 	}
 
-	err = channel.ExchangeDeclare("accounts_ex", amqp.ExchangeDirect, true, false, false, false, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = channel.QueueDeclare("account_created", true, false, false, false, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = channel.QueueDeclare("account_deleted", true, false, false, false, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = channel.QueueBind("account_created", "account_created", "accounts_ex", false, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = channel.QueueBind("account_deleted", "account_deleted", "accounts_ex", false, nil)
+	err = channel.ExchangeDeclare(ExchangeAccounts, amqp.ExchangeDirect, true, false, false, false, nil)
 	if err != nil {
 		return nil, err
 	}
