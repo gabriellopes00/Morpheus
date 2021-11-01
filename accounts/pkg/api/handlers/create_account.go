@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	usecases "accounts/application"
-	usecases2 "accounts/domain/usecases"
+	"accounts/application"
+	"accounts/domain/usecases"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
 	"encoding/json"
@@ -13,13 +13,13 @@ import (
 )
 
 type createAccountHandler struct {
-	Usecase      usecases2.CreateAccount
+	Usecase      usecases.CreateAccount
 	Encrypter    encrypter.Encrypter
 	MessageQueue queue.MessageQueue
 }
 
 func NewCreateAccountHandler(
-	usecase usecases2.CreateAccount,
+	usecase usecases.CreateAccount,
 	messageQueue queue.MessageQueue,
 	encrypter encrypter.Encrypter,
 ) *createAccountHandler {
@@ -31,7 +31,7 @@ func NewCreateAccountHandler(
 }
 
 func (h *createAccountHandler) Handle(c echo.Context) error {
-	var params *usecases2.CreateAccountDTO
+	var params *usecases.CreateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
@@ -41,7 +41,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 
 	account, err := h.Usecase.Create(params)
 	if err != nil {
-		if errors.Is(err, usecases.ErrEmailAlreadyInUse) {
+		if errors.Is(err, application.ErrEmailAlreadyInUse) {
 			return c.JSON(http.StatusConflict,
 				map[string]string{"error": err.Error()})
 		} else {

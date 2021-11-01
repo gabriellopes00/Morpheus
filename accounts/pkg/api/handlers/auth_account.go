@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	usecases "accounts/application"
+	"accounts/application"
 	"accounts/domain"
 	"errors"
 	"net/http"
@@ -34,7 +34,7 @@ func (h *authHandler) Handle(c echo.Context) error {
 
 	token, err := h.Usecase.Auth(params.Email, params.Password)
 	if err != nil {
-		if errors.Is(err, usecases.ErrUnregisteredEmail) {
+		if errors.Is(err, application.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
 			return c.JSON(

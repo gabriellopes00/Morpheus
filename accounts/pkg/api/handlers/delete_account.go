@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	usecases "accounts/application"
+	"accounts/application"
 	"accounts/domain"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
@@ -40,7 +40,7 @@ func (h *deleteAccountHandler) Handle(c echo.Context) error {
 
 	err := h.Usecase.Delete(accountId)
 	if err != nil {
-		if errors.Is(err, usecases.ErrIdNotFound) {
+		if errors.Is(err, application.ErrIdNotFound) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
 			return c.JSON(

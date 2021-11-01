@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	usecases "accounts/application"
+	"accounts/application"
 	"accounts/domain"
 	"accounts/pkg/queue"
 	"encoding/json"
@@ -42,7 +42,7 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 
 	account, err := h.Usecase.Update(accountId, params)
 	if err != nil {
-		if errors.Is(err, usecases.ErrIdNotFound) {
+		if errors.Is(err, application.ErrIdNotFound) {
 			return c.JSON(http.StatusConflict,
 				map[string]string{"error": err.Error()})
 		} else {

@@ -1,7 +1,7 @@
 package api
 
 import (
-	usecases "accounts/application"
+	"accounts/application"
 	"accounts/pkg/api/handlers"
 	"accounts/pkg/api/middlewares"
 	"accounts/pkg/cache"
@@ -26,12 +26,12 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 
 	// init usecases
-	createAccount := usecases.NewCreateAccount(accountRepo)
-	authAccount := usecases.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
-	refreshAuth := usecases.NewRefreshAuth(jwtEncrypter, accountRepo, redisRepo)
-	deleteAccount := usecases.NewDeleteUsecase(accountRepo)
-	getAccount := usecases.NewGetAccount(accountRepo)
-	updateAccount := usecases.NewUpdateAccount(accountRepo)
+	createAccount := application.NewCreateAccount(accountRepo)
+	authAccount := application.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
+	refreshAuth := application.NewRefreshAuth(jwtEncrypter, accountRepo, redisRepo)
+	deleteAccount := application.NewDeleteUsecase(accountRepo)
+	getAccount := application.NewGetAccount(accountRepo)
+	updateAccount := application.NewUpdateAccount(accountRepo)
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)

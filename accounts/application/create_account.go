@@ -1,4 +1,4 @@
-package usecases
+package application
 
 import (
 	"accounts/domain/entities"
