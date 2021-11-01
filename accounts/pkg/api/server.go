@@ -62,10 +62,10 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 
 	r := router.Group("/accounts")
 
-	r.POST("", createAccountHandler.Create)
-	r.POST("/auth", authHandler.Auth)
+	r.POST("", createAccountHandler.Handle)
+	r.POST("/auth", authHandler.Handle)
 	r.POST("/auth/refresh", refreshAuthHandler.Handle)
 	r.GET("/:id", getAccountHandler.Handle, authMiddleware.Auth)
-	r.DELETE("/:id", deleteAccountHandler.Delete, authMiddleware.Auth)
+	r.DELETE("/:id", deleteAccountHandler.Handle, authMiddleware.Auth)
 	r.PUT("/:id", updateAccountHandler.Handle, authMiddleware.Auth)
 }

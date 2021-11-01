@@ -24,19 +24,20 @@ func NewUpdateAccountHandler(usecase domain.UpdateAccount, messageQueue queue.Me
 }
 
 func (h *updateAccountHandler) Handle(c echo.Context) error {
+	accountId := c.Request().Header.Get("account_id")
+	paramId := c.Param("id")
+	if accountId != paramId {
+		return c.JSON(
+			http.StatusForbidden,
+			map[string]string{"error": "forbidden accout update"})
+	}
+
 	var params *domain.UpdateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(
 			http.StatusUnprocessableEntity,
 			map[string]string{"error": "invalid request data"})
-	}
-
-	accountId := c.Param("id")
-	if accountId == "" {
-		return c.JSON(
-			http.StatusBadRequest,
-			map[string]string{"error": "invalid request param"})
 	}
 
 	account, err := h.Usecase.Update(accountId, params)

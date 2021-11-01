@@ -28,7 +28,7 @@ func NewDeleteAccountHandler(
 	}
 }
 
-func (h *deleteAccountHandler) Delete(c echo.Context) error {
+func (h *deleteAccountHandler) Handle(c echo.Context) error {
 	accountId := c.Request().Header.Get("account_id")
 	paramId := c.Param("id")
 

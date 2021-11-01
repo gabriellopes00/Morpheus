@@ -30,7 +30,7 @@ func NewCreateAccountHandler(
 	}
 }
 
-func (h *createAccountHandler) Create(c echo.Context) error {
+func (h *createAccountHandler) Handle(c echo.Context) error {
 	var params *domain.CreateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {

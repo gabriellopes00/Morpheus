@@ -19,7 +19,7 @@ func NewAuthHandler(usecase domain.AuthAccount) *authHandler {
 	}
 }
 
-func (h *authHandler) Auth(c echo.Context) error {
+func (h *authHandler) Handle(c echo.Context) error {
 
 	var params struct {
 		Email    string `json:"email"`
