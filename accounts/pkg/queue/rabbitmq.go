@@ -16,10 +16,10 @@ func NewRabbitMQ(connection *amqp.Channel) *rabbitMQ {
 	}
 }
 
-func (r *rabbitMQ) SendMessage(exchange, routingKey string, payload []byte) error {
+func (r *rabbitMQ) PublishMessage(exchange, key string, payload []byte) error {
 	return r.Channel.Publish(
 		exchange,
-		routingKey,
+		key,
 		false,
 		false,
 		amqp.Publishing{

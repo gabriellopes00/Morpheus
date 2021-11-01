@@ -61,7 +61,7 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
-	err = h.MessageQueue.SendMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, []byte(payload))
+	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountUpdated, payload)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
