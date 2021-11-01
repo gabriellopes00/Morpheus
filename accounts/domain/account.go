@@ -15,19 +15,17 @@ type Account struct {
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	AvatarUrl string    `json:"avatar_url,omitempty"`
-	RG        string    `json:"rg,omitempty"`
 	BirthDate time.Time `json:"birth_date,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
-func NewAccount(name, email, password, avatarUrl, rg, birthDate string) (*Account, error) {
+func NewAccount(name, email, password, avatarUrl, birthDate string) (*Account, error) {
 	account := &Account{
 		Id:        gouuid.NewV4().String(),
 		Name:      name,
 		Email:     email,
 		Password:  password,
 		AvatarUrl: avatarUrl,
-		RG:        rg,
 		CreatedAt: time.Now().Local(),
 	}
 

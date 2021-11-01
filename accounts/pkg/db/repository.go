@@ -1,9 +1,12 @@
 package db
 
-import "accounts/domain"
+import (
+	"accounts/domain"
+	"accounts/domain/entities"
+)
 
 type Repository interface {
-	Create(account *domain.Account) error
+	Create(account *entities.Account) error
 	Exists(email string) (bool, error)
 	ExistsId(param string) (bool, error)
 	FindByEmail(email string) (*domain.Account, error)

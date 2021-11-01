@@ -2,6 +2,7 @@ package db
 
 import (
 	"accounts/domain"
+	"accounts/domain/entities"
 	"database/sql"
 	"fmt"
 )
@@ -16,8 +17,17 @@ func NewPgAccountRepository(db *sql.DB) *pgAccountRepository {
 	}
 }
 
-func (r *pgAccountRepository) Create(account *domain.Account) error {
-	stm, err := r.Db.Prepare("INSERT INTO accounts VALUES ($1, $2, $3, $4, $5, $6)")
+func (r *pgAccountRepository) Create(account *entities.Account) error {
+	stm, err := r.Db.Prepare(`
+		INSERT INTO accounts (id,
+							 name,
+							 email,
+							 password,
+							 avatar_url,
+							 created_at,
+							 updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7);
+	`)
 	if err != nil {
 		return err
 	}
@@ -31,7 +41,7 @@ func (r *pgAccountRepository) Create(account *domain.Account) error {
 		account.Password,
 		account.AvatarUrl,
 		account.CreatedAt,
-	)
+		account.UpdatedAt)
 
 	return err
 }

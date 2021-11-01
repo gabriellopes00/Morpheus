@@ -1,9 +1,9 @@
 package usecases
 
 import (
-	"accounts/domain"
+	"accounts/domain/entities"
+	"accounts/domain/usecases"
 	"accounts/pkg/db"
-	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,45 +12,37 @@ type createAccount struct {
 	Repository db.Repository
 }
 
-var (
-	ErrEmailAlreadyInUse = errors.New("email already in use")
-)
-
 func NewCreateAccount(Repository db.Repository) *createAccount {
 	return &createAccount{
 		Repository: Repository,
 	}
 }
 
-func (c *createAccount) Create(account *domain.CreateAccountDTO) (*domain.Account, error) {
-	existingAccount, err := c.Repository.Exists(account.Email)
+func (c *createAccount) Create(data *usecases.CreateAccountDTO) (*entities.Account, error) {
+	accountExists, err := c.Repository.Exists(data.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	if existingAccount {
+	if accountExists {
 		return nil, ErrEmailAlreadyInUse
+	}
+
+	account, err := entities.NewAccount(data.Name, data.Email, data.Password, data.AvatarUrl, data.BirthDate)
+	if err != nil {
+		return nil, err
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
-	a, err := domain.NewAccount(
-		account.Name,
-		account.Email,
-		string(hash),
-		account.AvatarUrl,
-		account.RG,
-		account.BirthDate)
+	account.Password = string(hash)
+
+	err = c.Repository.Create(account)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.Repository.Create(a)
-	if err != nil {
-		return nil, err
-	}
-
-	return a, nil
+	return account, nil
 }
