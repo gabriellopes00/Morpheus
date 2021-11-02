@@ -1,27 +1,27 @@
 package handlers
 
 import (
-	"accounts/domain"
+	"accounts/domain/usecases"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-type getAccountHandler struct {
-	Usecase domain.GetAccount
+type findAccountHandler struct {
+	Usecase usecases.FindAccount
 }
 
-func NewGetAccountHandler(usecase domain.GetAccount) *getAccountHandler {
-	return &getAccountHandler{
+func NewFindAccountHandler(usecase usecases.FindAccount) *findAccountHandler {
+	return &findAccountHandler{
 		Usecase: usecase,
 	}
 }
 
-func (h *getAccountHandler) Handle(c echo.Context) error {
+func (h *findAccountHandler) Handle(c echo.Context) error {
 
 	accountId := c.Param("id")
 
-	account, err := h.Usecase.GetById(accountId)
+	account, err := h.Usecase.FindById(accountId)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

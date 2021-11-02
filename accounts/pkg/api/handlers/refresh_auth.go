@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"accounts/domain"
+	"accounts/domain/usecases"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type refreshAuthHandler struct {
-	Usecase domain.RefreshAuth
+	Usecase usecases.RefreshAuth
 }
 
-func NewRefreshAuthHandler(usecase domain.RefreshAuth) *refreshAuthHandler {
+func NewRefreshAuthHandler(usecase usecases.RefreshAuth) *refreshAuthHandler {
 	return &refreshAuthHandler{
 		Usecase: usecase,
 	}

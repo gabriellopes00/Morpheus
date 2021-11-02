@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/domain"
+	"accounts/domain/usecases"
 	"errors"
 	"net/http"
 
@@ -10,10 +10,10 @@ import (
 )
 
 type authHandler struct {
-	Usecase domain.AuthAccount
+	Usecase usecases.AuthAccount
 }
 
-func NewAuthHandler(usecase domain.AuthAccount) *authHandler {
+func NewAuthHandler(usecase usecases.AuthAccount) *authHandler {
 	return &authHandler{
 		Usecase: usecase,
 	}

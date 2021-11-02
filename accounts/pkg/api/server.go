@@ -30,7 +30,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	authAccount := application.NewAuthAccount(accountRepo, jwtEncrypter, redisRepo)
 	refreshAuth := application.NewRefreshAuth(jwtEncrypter, accountRepo, redisRepo)
 	deleteAccount := application.NewDeleteUsecase(accountRepo)
-	getAccount := application.NewGetAccount(accountRepo)
+	findAccount := application.NewFindAccount(accountRepo)
 	updateAccount := application.NewUpdateAccount(accountRepo)
 
 	// init handlers
@@ -38,7 +38,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	authHandler := handlers.NewAuthHandler(authAccount)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(refreshAuth)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)
-	getAccountHandler := handlers.NewGetAccountHandler(getAccount)
+	getAccountHandler := handlers.NewFindAccountHandler(findAccount)
 	updateAccountHandler := handlers.NewUpdateAccountHandler(updateAccount, rabbitMQ)
 
 	// init middlewares

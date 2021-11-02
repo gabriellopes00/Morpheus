@@ -1,8 +1,8 @@
 package db
 
 import (
-	"accounts/domain"
 	"accounts/domain/entities"
+	"accounts/domain/usecases"
 	"database/sql"
 	"fmt"
 )
@@ -64,7 +64,7 @@ func (r *pgAccountRepository) Exists(email string) (bool, error) {
 	return true, nil
 }
 
-func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error) {
+func (r *pgAccountRepository) FindByEmail(email string) (*entities.Account, error) {
 	stm, err := r.Db.Prepare("SELECT * FROM accounts WHERE email=$1")
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error)
 
 	defer stm.Close()
 
-	var account domain.Account
+	var account entities.Account
 
 	err = stm.QueryRow(email).Scan(
 		&account.Id,
@@ -90,7 +90,7 @@ func (r *pgAccountRepository) FindByEmail(email string) (*domain.Account, error)
 
 }
 
-func (r *pgAccountRepository) FindById(id string) (*domain.Account, error) {
+func (r *pgAccountRepository) FindById(id string) (*entities.Account, error) {
 	stm, err := r.Db.Prepare("SELECT * FROM accounts WHERE id=$1")
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (r *pgAccountRepository) FindById(id string) (*domain.Account, error) {
 
 	defer stm.Close()
 
-	var account domain.Account
+	var account entities.Account
 
 	err = stm.QueryRow(id).Scan(
 		&account.Id,
@@ -154,7 +154,7 @@ func (r *pgAccountRepository) Delete(id string) error {
 
 }
 
-func (r *pgAccountRepository) Update(accountId string, data *domain.UpdateAccountDTO) (*domain.Account, error) {
+func (r *pgAccountRepository) Update(accountId string, data *usecases.UpdateAccountDTO) (*entities.Account, error) {
 	stm, err := r.Db.Prepare(`
 		UPDATE accounts
 		SET name = $1,
@@ -176,7 +176,7 @@ func (r *pgAccountRepository) Update(accountId string, data *domain.UpdateAccoun
 
 	defer stm.Close()
 
-	account := domain.Account{}
+	account := entities.Account{}
 
 	row := stm.QueryRow(
 		accountId,

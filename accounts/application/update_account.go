@@ -1,7 +1,8 @@
 package application
 
 import (
-	"accounts/domain"
+	"accounts/domain/entities"
+	"accounts/domain/usecases"
 	"accounts/pkg/db"
 )
 
@@ -15,7 +16,7 @@ func NewUpdateAccount(Repository db.Repository) *updateAccount {
 	}
 }
 
-func (c *updateAccount) Update(accountId string, data *domain.UpdateAccountDTO) (*domain.Account, error) {
+func (c *updateAccount) Update(accountId string, data *usecases.UpdateAccountDTO) (*entities.Account, error) {
 	existingAccount, err := c.Repository.ExistsId(accountId)
 	if err != nil {
 		return nil, err

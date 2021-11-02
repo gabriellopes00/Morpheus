@@ -1,7 +1,7 @@
 package application
 
 import (
-	"accounts/domain"
+	"accounts/domain/usecases"
 	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"accounts/pkg/encrypter"
@@ -21,7 +21,7 @@ func NewRefreshAuth(encrypter encrypter.Encrypter, repo db.Repository, cacheRepo
 	}
 }
 
-func (r *refreshAuth) Refresh(refreshToken string) (*domain.AuthModel, error) {
+func (r *refreshAuth) Refresh(refreshToken string) (*usecases.AuthModel, error) {
 	refreshTokenClaims, err := r.Encrypter.DecryptRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (r *refreshAuth) Refresh(refreshToken string) (*domain.AuthModel, error) {
 		return nil, err
 	}
 
-	authModel := &domain.AuthModel{
+	authModel := &usecases.AuthModel{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}
