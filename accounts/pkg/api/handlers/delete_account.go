@@ -7,6 +7,7 @@ import (
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -40,6 +41,7 @@ func (h *deleteAccountHandler) Handle(c echo.Context) error {
 
 	err := h.Usecase.Delete(accountId)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, application.ErrIdNotFound) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {

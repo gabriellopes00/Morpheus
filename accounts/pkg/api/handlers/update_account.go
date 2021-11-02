@@ -6,6 +6,7 @@ import (
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -42,6 +43,7 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 
 	account, err := h.Usecase.Update(accountId, params)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, application.ErrIdNotFound) {
 			return c.JSON(http.StatusConflict,
 				map[string]string{"error": err.Error()})
@@ -69,6 +71,6 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 	}
 
 	return c.JSON(
-		http.StatusCreated,
+		http.StatusOK,
 		map[string]interface{}{"account": account})
 }

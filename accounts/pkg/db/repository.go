@@ -2,7 +2,6 @@ package db
 
 import (
 	"accounts/domain/entities"
-	"accounts/domain/usecases"
 )
 
 type Repository interface {
@@ -12,5 +11,5 @@ type Repository interface {
 	FindByEmail(email string) (*entities.Account, error)
 	FindById(id string) (*entities.Account, error)
 	Delete(id string) error
-	Update(accountId string, data *usecases.UpdateAccountDTO) (*entities.Account, error)
+	Update(data *entities.Account) error
 }

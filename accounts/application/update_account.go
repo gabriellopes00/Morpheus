@@ -4,6 +4,7 @@ import (
 	"accounts/domain/entities"
 	"accounts/domain/usecases"
 	"accounts/pkg/db"
+	"time"
 )
 
 type updateAccount struct {
@@ -17,16 +18,21 @@ func NewUpdateAccount(Repository db.Repository) *updateAccount {
 }
 
 func (c *updateAccount) Update(accountId string, data *usecases.UpdateAccountDTO) (*entities.Account, error) {
-	existingAccount, err := c.Repository.ExistsId(accountId)
+	account, err := c.Repository.FindById(accountId)
 	if err != nil {
 		return nil, err
 	}
 
-	if !existingAccount {
+	if account == nil {
 		return nil, ErrIdNotFound
 	}
 
-	account, err := c.Repository.Update(accountId, data)
+	account.Name = data.Name
+	account.AvatarUrl = data.AvatarUrl
+	account.BirthDate, _ = time.Parse(time.RFC3339, data.BirthDate)
+	account.UpdatedAt = time.Now()
+
+	err = c.Repository.Update(account)
 	if err != nil {
 		return nil, err
 	}

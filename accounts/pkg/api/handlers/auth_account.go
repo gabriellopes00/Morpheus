@@ -4,6 +4,7 @@ import (
 	"accounts/application"
 	"accounts/domain/usecases"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -34,6 +35,7 @@ func (h *authHandler) Handle(c echo.Context) error {
 
 	token, err := h.Usecase.Auth(params.Email, params.Password)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, application.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {

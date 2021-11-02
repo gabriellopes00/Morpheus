@@ -18,7 +18,6 @@ type Account struct {
 	BirthDate time.Time `json:"birth_date,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	DeletedAt time.Time `json:"deleted_at,omitempty"`
 }
 
 func NewAccount(name, email, password, avatarUrl, birthDate string) (*Account, error) {
@@ -37,7 +36,7 @@ func NewAccount(name, email, password, avatarUrl, birthDate string) (*Account, e
 		return nil, errors.New("invalid account birth date format")
 	}
 
-	if time.Since(parsed) >= 0 {
+	if time.Since(parsed) <= 0 {
 		return nil, errors.New("invalid birth date")
 	}
 
