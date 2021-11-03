@@ -12,4 +12,5 @@ type CreateEvent interface {
 type FindEvents interface {
 	FindAccountEvents(accountId string) ([]*entities.Event, error)
 	FindEventById(eventId string) (*entities.Event, error)
+	FindAll(state string, month, ageGroup int) ([]entities.Event, error)
 }
