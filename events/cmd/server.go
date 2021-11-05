@@ -3,13 +3,10 @@ package main
 import (
 	"context"
 	"errors"
-	"events/application"
 	"events/config/env"
 	"events/framework/api"
 	"events/framework/db"
-	"events/framework/db/repositories"
 	"events/framework/queue"
-	"events/framework/queue/handlers"
 	"fmt"
 	"log"
 	"os"
@@ -42,33 +39,7 @@ func main() {
 
 	defer amqpConn.Close()
 
-	rabbitmq := queue.NewRabbitMQ(amqpConn)
-
-	in_create := make(chan []byte)
-	in_delete := make(chan []byte)
-
-	rabbitmq.Consume("account_created_events", in_create)
-	rabbitmq.Consume("account_deleted_events", in_delete)
-
-	repo := repositories.NewPgAccountRepository(database)
-	create := application.CreateAccountUsecase{Repository: repo}
-	delete := application.DeleteAccountUsecase{Repository: repo}
-
-	go func() {
-		createHandler := handlers.NewCreateAccountHandler(in_create, create)
-		err = createHandler.Create()
-		if err != nil {
-			panic(err.Error())
-		}
-	}()
-
-	go func() {
-		deleteHandler := handlers.NewDeleteAccountHandler(in_delete, delete)
-		err = deleteHandler.Delete()
-		if err != nil {
-			panic(err.Error())
-		}
-	}()
+	queue.SetUpQueueServer(amqpConn, database)
 
 	e := echo.New()
 	api.SetupServer(e, database, amqpConn)
@@ -84,6 +55,12 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
+		log.Fatal(err.Error())
+	}
+	if err := amqpConn.Close(); err != nil {
+		log.Fatal(err.Error())
+	}
+	if err := database.Close(); err != nil {
 		log.Fatal(err.Error())
 	}
 }

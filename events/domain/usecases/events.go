@@ -14,3 +14,7 @@ type FindEvents interface {
 	FindEventById(eventId string) (*entities.Event, error)
 	FindAll(state string, month, ageGroup int) ([]entities.Event, error)
 }
+
+type UpdateEvents interface {
+	UpdateStatus(eventId string, status interface{}) error
+}

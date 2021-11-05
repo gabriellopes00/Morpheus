@@ -5,6 +5,8 @@ const (
 	KeyAccountCreated = "account_created"
 	KeyAccountDeleted = "account_deleted"
 
+	KeyEventSoldOut = "event_sold_out"
+
 	ExchangeEvents   = "events_ex"
 	ExchangeAccounts = "accounts_ex"
 
