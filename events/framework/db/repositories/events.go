@@ -10,7 +10,9 @@ import (
 type EventsRepository interface {
 	Create(event *entities.Event) error
 	FindAccountEvents(accountId string) ([]*entities.Event, error)
-	FindById(accountId string) (*entities.Event, error)
+	FindById(eventId string) (*entities.Event, error)
+	ExistsId(eventId string) (bool, error)
+	SetStatus(eventId string, status entities.EventStatus) error
 	FindAll(state string, month, ageGroup int) ([]entities.Event, error)
 }
 
@@ -78,6 +80,21 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		event.Location.Longitude,
 		event.CreatedAt,
 		event.UpdatedAt)
+
+	return err
+}
+
+func (repo *pgEventsRepository) SetStatus(eventId string, status entities.EventStatus) error {
+	stm, err := repo.Db.Prepare(`
+		UPDATE events SET status = $1 WHERE id = $2 AND deleted_at IS NULL;
+	`)
+	if err != nil {
+		return err
+	}
+
+	defer stm.Close()
+
+	_, err = stm.Exec(eventId, status)
 
 	return err
 }
@@ -307,4 +324,24 @@ func (repo *pgEventsRepository) FindAll(state string, month, ageGroup int) ([]en
 	}
 
 	return events, nil
+}
+
+func (r *pgEventsRepository) ExistsId(eventId string) (bool, error) {
+	stm, err := r.Db.Prepare(`
+		SELECT EXISTS(SELECT 1 FROM events WHERE id = $1 AND deleted_at IS NULL);
+	`)
+	if err != nil {
+		return false, err
+	}
+
+	defer stm.Close()
+
+	var exists bool
+
+	err = stm.QueryRow(eventId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
