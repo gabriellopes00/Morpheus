@@ -48,21 +48,23 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 }
 
 func (r *pgAccountRepository) Exists(email string) (bool, error) {
-	stm, err := r.Db.Prepare("SELECT id FROM accounts WHERE email=$1")
+	stm, err := r.Db.Prepare(`
+		SELECT EXISTS(SELECT 1 FROM accounts WHERE email = $1);
+	`)
 	if err != nil {
 		return false, err
 	}
 
 	defer stm.Close()
 
-	var accountId string
+	var exists bool
 
-	err = stm.QueryRow(email).Scan(&accountId)
+	err = stm.QueryRow(email).Scan(&exists)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
-	return true, nil
+	return exists, nil
 }
 
 func (r *pgAccountRepository) FindByEmail(email string) (*entities.Account, error) {
@@ -148,21 +150,23 @@ func (r *pgAccountRepository) FindById(id string) (*entities.Account, error) {
 }
 
 func (r *pgAccountRepository) ExistsId(id string) (bool, error) {
-	stm, err := r.Db.Prepare("SELECT id FROM accounts WHERE id=$1")
+	stm, err := r.Db.Prepare(`
+		SELECT EXISTS(SELECT 1 FROM accounts WHERE id = $1);
+	`)
 	if err != nil {
 		return false, err
 	}
 
 	defer stm.Close()
 
-	var accountId string
+	var exists bool
 
-	err = stm.QueryRow(id).Scan(&accountId)
+	err = stm.QueryRow(id).Scan(&exists)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
-	return true, nil
+	return exists, nil
 }
 
 func (r *pgAccountRepository) Delete(id string) error {
