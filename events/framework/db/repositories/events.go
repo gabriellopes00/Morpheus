@@ -14,6 +14,7 @@ type EventsRepository interface {
 	ExistsId(eventId string) (bool, error)
 	SetStatus(eventId string, status entities.EventStatus) error
 	FindAll(state string, month, ageGroup int) ([]entities.Event, error)
+	Update(event *entities.Event) error
 }
 
 type pgEventsRepository struct {
@@ -95,6 +96,57 @@ func (repo *pgEventsRepository) SetStatus(eventId string, status entities.EventS
 	defer stm.Close()
 
 	_, err = stm.Exec(eventId, status)
+
+	return err
+}
+
+func (repo *pgEventsRepository) Update(event *entities.Event) error {
+	stm, err := repo.Db.Prepare(`
+		UPDATE events
+		SET    name = $1,
+			description = $2,
+			is_available = $3,
+			age_group = $4,
+			maximum_capacity = $5,
+			duration = $7,
+			ticket_price = $8,
+			date = $9,
+			location_street = $10,
+			location_district = $11,
+			location_state = $12,
+			location_city = $13,
+			location_postal_code = $14,
+			location_description = $15,
+			location_number = $16,
+			location_latitude = $17,
+			location_longitude = $18
+		WHERE  id = $19 AND deleted_at IS NULL; 
+	`)
+	if err != nil {
+		return err
+	}
+
+	defer stm.Close()
+
+	_, err = stm.Exec(
+		event.Name,
+		event.Description,
+		event.IsAvailable,
+		event.AgeGroup,
+		event.MaximumCapacity,
+		event.Duration,
+		event.TicketPrice,
+		event.Date,
+		event.Location.Street,
+		event.Location.District,
+		event.Location.State,
+		event.Location.City,
+		event.Location.PostalCode,
+		event.Location.Description,
+		event.Location.Number,
+		event.Location.Latitude,
+		event.Location.Longitude,
+		event.Id)
 
 	return err
 }

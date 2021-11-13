@@ -17,4 +17,5 @@ type FindEvents interface {
 
 type UpdateEvents interface {
 	UpdateStatus(eventId string, status interface{}) error
+	UpdateData(eventId string, data *application.UpdateEventDTO) (*entities.Event, error)
 }

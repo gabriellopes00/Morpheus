@@ -2,6 +2,7 @@ package queue
 
 const (
 	KeyEventCreated   = "event_created"
+	KeyEventUpdated   = "event_updated"
 	KeyAccountCreated = "account_created"
 	KeyAccountDeleted = "account_deleted"
 

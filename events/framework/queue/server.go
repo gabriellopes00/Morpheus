@@ -41,7 +41,7 @@ func SetUpQueueServer(amqpConn *amqp.Channel, database *sql.DB) {
 	}()
 
 	go func() {
-		soldOutEventHandler := handlers.NewsoldOutEventHandler(accountDeletedChan, updateEvent)
+		soldOutEventHandler := handlers.NewsoldOutEventHandler(soldOutChan, updateEvent)
 		if err := soldOutEventHandler.Handle(); err != nil {
 			panic(err.Error())
 		}
