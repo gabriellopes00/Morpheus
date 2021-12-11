@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.15.1
-	github.com/lib/pq v1.10.3
+	github.com/lib/pq v1.10.4
 	github.com/satori/go.uuid v1.2.0
 )
 
