@@ -212,6 +212,7 @@ export default function NavBar() {
     </AppBar>
   )
 }
+
 function FadeMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
