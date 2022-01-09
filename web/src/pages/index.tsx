@@ -3,6 +3,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import EventCard from '../components/event-card'
 import NavBar from '../components/nav-bar'
+import { SideBar } from '../components/side-bar'
 
 const Home: NextPage = () => {
   return (
@@ -13,20 +14,17 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar />
-
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3, sm: 4 }}
-        justifyContent="center"
-        columns={{ xs: 8, sm: 8, md: 12 }}
-        rowGap={2}
-        gap={2}
-      >
-        {Array.from(Array(10)).map((_, index) => (
-          <Grid item key={index}>
-            <EventCard />
-          </Grid>
-        ))}
+      <Grid container justifyContent="center" gap={4}>
+        <Grid item xs={2}>
+          <SideBar />
+        </Grid>
+        <Grid container item xs={8} justifyContent="center" gap={2}>
+          {Array.from(Array(9)).map((_, index) => (
+            <Grid item key={index}>
+              <EventCard />
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
     </>
   )
