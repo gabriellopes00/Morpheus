@@ -16,6 +16,8 @@ A complete ticketing platform for events of all kinds built with Go Lang and Nod
   <img src="https://cdn.svgporn.com/logos/kong-icon.svg" alt="kibana" height="30">
   <img src="https://cdn.svgporn.com/logos/kubernetes.svg" alt="kubernetes" height="30">
   <img src="https://cdn.svgporn.com/logos/rabbitmq-icon.svg" alt="rabbitmq" height="30">
+  <img src="https://cdn.svgporn.com/logos/react.svg" alt="react" height="30">
+  <img src="https://cdn.svgporn.com/logos/material-ui.svg" alt="material-ui" height="30">
 </p>
 
 ## Building and running 🛠
