@@ -14,11 +14,23 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar />
-      <Grid container justifyContent="center" gap={4}>
-        <Grid item xs={2}>
+      <Grid
+        container
+        justifyContent="space-between"
+        gap={4}
+        height={'calc(100vh - 69px)'}
+      >
+        <Grid item xs={3}>
           <SideBar />
         </Grid>
-        <Grid container item xs={8} justifyContent="center" gap={2}>
+        <Grid
+          container
+          item
+          xs={8}
+          justifyContent="center"
+          gap={2}
+          sx={{ overflowY: 'scroll', height: 'calc(100vh - 69px)' }}
+        >
           {Array.from(Array(9)).map((_, index) => (
             <Grid item key={index}>
               <EventCard />
