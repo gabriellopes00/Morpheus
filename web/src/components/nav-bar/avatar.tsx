@@ -34,15 +34,9 @@ export function AvatarMenu() {
         sx={{ mt: '45px' }}
         id="menu-appbar"
         anchorEl={anchorElUser}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >

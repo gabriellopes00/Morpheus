@@ -17,7 +17,7 @@ export function AgeGroupSelector() {
   }
 
   return (
-    <Grid container item>
+    <Grid container item justifyContent="center">
       {/* <Typography fontWeight="bold">Age group</Typography>   */}
       <ToggleButtonGroup value={alignment} exclusive onChange={handleChange}>
         <ToggleButton value="0" color="success">

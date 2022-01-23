@@ -6,6 +6,7 @@ import {
   Checkbox,
   ListItemText,
 } from '@mui/material'
+import { useState } from 'react'
 
 export function StatesList() {
   const states = [
@@ -38,6 +39,8 @@ export function StatesList() {
     { name: 'Tocantins (TO)', abbr: 'TO' },
   ]
 
+  const [selectedStates, setSelectedStates] = useState<string[]>([])
+
   return (
     <List
       sx={{
@@ -55,13 +58,13 @@ export function StatesList() {
           <ListItem key={state.abbr} disablePadding>
             <ListItemButton
               role={undefined}
-              // onClick={handleToggle(state)}
+              onClick={() => setSelectedStates([...selectedStates, state.abbr])}
               dense
             >
               <ListItemIcon>
                 <Checkbox
                   edge="start"
-                  // checked={checked.indexOf(state) !== -1}
+                  checked={selectedStates.indexOf(state.abbr) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}
