@@ -13,6 +13,7 @@ type Account struct {
 	Id        string    `json:"id,omitempty"`
 	Name      string    `json:"name,omitempty"`
 	Email     string    `json:"email,omitempty"`
+	Document  string    `json:"document,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	AvatarUrl string    `json:"avatar_url,omitempty"`
 	BirthDate time.Time `json:"birth_date,omitempty"`
@@ -20,12 +21,13 @@ type Account struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
-func NewAccount(name, email, password, avatarUrl, birthDate string) (*Account, error) {
+func NewAccount(name, email, password, avatarUrl, birthDate, document string) (*Account, error) {
 	account := &Account{
 		Id:        gouuid.NewV4().String(),
 		Name:      name,
 		Email:     email,
 		Password:  password,
+		Document:  document,
 		AvatarUrl: avatarUrl,
 		CreatedAt: time.Now().Local(),
 		UpdatedAt: time.Now().Local(),
@@ -38,10 +40,6 @@ func NewAccount(name, email, password, avatarUrl, birthDate string) (*Account, e
 
 	if time.Since(parsed) <= 0 {
 		return nil, errors.New("invalid birth date")
-	}
-
-	if time.Now().Year()-parsed.Year() < 12 {
-		return nil, errors.New("minimun age required to create an account is 12y")
 	}
 
 	account.BirthDate = parsed
@@ -71,6 +69,11 @@ func (account *Account) validate() error {
 
 	if !govalidator.IsEmail(account.Email) {
 		err = errors.New("invalid email format")
+	}
+
+	documentPattern := "([0-9]{2}[\\.]?[0-9]{3}[\\.]?[0-9]{3}[\\/]?[0-9]{4}[-]?[0-9]{2})|([0-9]{3}[\\.]?[0-9]{3}[\\.]?[0-9]{3}[-]?[0-9]{2})"
+	if !govalidator.Matches(account.Document, documentPattern) {
+		return errors.New("invalid document format")
 	}
 
 	return err

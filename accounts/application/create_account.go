@@ -28,7 +28,7 @@ func (c *createAccount) Create(data *usecases.CreateAccountDTO) (*entities.Accou
 		return nil, ErrEmailAlreadyInUse
 	}
 
-	account, err := entities.NewAccount(data.Name, data.Email, data.Password, data.AvatarUrl, data.BirthDate)
+	account, err := entities.NewAccount(data.Name, data.Email, data.Password, data.AvatarUrl, data.BirthDate, data.Document)
 	if err != nil {
 		return nil, err
 	}

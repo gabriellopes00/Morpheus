@@ -7,6 +7,7 @@ type CreateAccountDTO struct {
 	Email     string `json:"email,omitempty"`
 	Password  string `json:"password,omitempty"`
 	AvatarUrl string `json:"avatar_url,omitempty"`
+	Document  string `json:"document,omitempty"`
 	BirthDate string `json:"birth_date,omitempty"`
 }
 
