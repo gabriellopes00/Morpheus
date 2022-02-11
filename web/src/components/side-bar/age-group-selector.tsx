@@ -1,25 +1,24 @@
-import {
-  ToggleButtonGroup,
-  ToggleButton,
-  Grid,
-  Typography,
-} from '@mui/material'
+import { Grid, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { useState } from 'react'
+import { useFilter } from '../../contexts/event-filter-context'
 
 export function AgeGroupSelector() {
-  const [alignment, setAlignment] = useState('')
+  const { filter, updateFilter } = useFilter()
 
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string
-  ) => {
-    setAlignment(newAlignment)
+  const handleChange = (event: React.MouseEvent<HTMLElement>, age: string) => {
+    console.log(age)
+
+    updateFilter({ ...filter, ageGroup: +age })
+    console.log(filter)
   }
 
   return (
     <Grid container item justifyContent="center">
-      {/* <Typography fontWeight="bold">Age group</Typography>   */}
-      <ToggleButtonGroup value={alignment} exclusive onChange={handleChange}>
+      <ToggleButtonGroup
+        value={filter.ageGroup.toString()}
+        exclusive
+        onChange={handleChange}
+      >
         <ToggleButton value="0" color="success">
           L
         </ToggleButton>

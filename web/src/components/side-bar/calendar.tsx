@@ -1,21 +1,21 @@
 import { LocalizationProvider, StaticDatePicker } from '@mui/lab'
 import AdapterDateFns from '@mui/lab/AdapterDateFns'
 import { Grid, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useFilter } from '../../contexts/event-filter-context'
 
 export function FilterCalendar() {
-  const [date, setDate] = useState<Date>(new Date())
+  const { filter, updateFilter } = useFilter()
 
   return (
     <Grid container item>
-      <Typography>{date && date.toString()}</Typography>
+      <Typography>{filter.date && filter.date.toString()}</Typography>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <StaticDatePicker
           disablePast={true}
           displayStaticWrapperAs="desktop"
-          value={date}
+          value={filter.date}
           onChange={(newValue) => {
-            setDate(newValue || date)
+            updateFilter({ ...filter, date: newValue || filter.date })
           }}
           renderInput={(params) => <TextField {...params} />}
         />

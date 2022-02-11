@@ -1,12 +1,12 @@
 import {
+  Checkbox,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  Checkbox,
   ListItemText,
 } from '@mui/material'
-import { useState } from 'react'
+import { useFilter } from '../../contexts/event-filter-context'
 
 export function StatesList() {
   const states = [
@@ -39,7 +39,16 @@ export function StatesList() {
     { name: 'Tocantins (TO)', abbr: 'TO' },
   ]
 
-  const [selectedStates, setSelectedStates] = useState<string[]>([])
+  const { filter, updateFilter } = useFilter()
+
+  function handleToggleSelectedState(state: string) {
+    if (filter.states.includes(state)) {
+      updateFilter({
+        ...filter,
+        states: filter.states.filter((s) => s !== state),
+      })
+    } else updateFilter({ ...filter, states: [...filter.states, state] })
+  }
 
   return (
     <List
@@ -58,13 +67,13 @@ export function StatesList() {
           <ListItem key={state.abbr} disablePadding>
             <ListItemButton
               role={undefined}
-              onClick={() => setSelectedStates([...selectedStates, state.abbr])}
+              onClick={() => handleToggleSelectedState(state.abbr)}
               dense
             >
               <ListItemIcon>
                 <Checkbox
                   edge="start"
-                  checked={selectedStates.indexOf(state.abbr) !== -1}
+                  checked={filter.states.indexOf(state.abbr) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}

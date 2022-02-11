@@ -5,22 +5,27 @@ import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
 
-export default function EventCard() {
+export interface EventCardProps {
+  id?: string
+  title: string
+  description: string
+  imageUrl: string
+}
+
+export default function EventCard({
+  title,
+  description,
+  imageUrl,
+}: EventCardProps) {
   return (
     <Card sx={{ maxWidth: 345 }}>
-      <CardMedia
-        component="img"
-        height="140"
-        image="https://source.unsplash.com/random"
-        alt="green iguana"
-      />
+      <CardMedia component="img" height="140" image={imageUrl} alt={title} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Lizard
+          {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+          {description}
         </Typography>
       </CardContent>
       <CardActions>

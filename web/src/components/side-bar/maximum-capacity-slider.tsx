@@ -1,12 +1,13 @@
 import { Grid, Slider, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useFilter } from '../../contexts/event-filter-context'
 
 export function MaximumCapacitySlider() {
-  const [capacity, setCapacity] = useState(0)
+  const { filter, updateFilter } = useFilter()
+
   return (
     <Grid container item>
       <Typography fontWeight="bold">
-        Maximum capacity of people: {capacity}
+        Maximum capacity of people: {filter.maximumCapacity}
       </Typography>
       <Slider
         aria-label="maximum-capacity"
@@ -14,7 +15,9 @@ export function MaximumCapacitySlider() {
         valueLabelDisplay="auto"
         min={10}
         max={300}
-        onChangeCommitted={(e, v) => setCapacity(v as number)}
+        onChangeCommitted={(_, v) =>
+          updateFilter({ ...filter, maximumCapacity: v as number })
+        }
       />
     </Grid>
   )

@@ -3,9 +3,10 @@ import Menu from '@mui/material/Menu'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useState } from 'react'
 import theme from '../../styles/theme'
+import Link from 'next/link'
 
 export function NavMenu() {
-  const pages = ['Home', 'Events', 'Contact']
+  const pages = ['Home', 'Events', 'Contact', 'Sign Up']
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -23,7 +24,7 @@ export function NavMenu() {
         component="div"
         sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
       >
-        LOGO
+        Morpheus
       </Typography>
 
       <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -57,7 +58,9 @@ export function NavMenu() {
         >
           {pages.map((page) => (
             <MenuItem key={page} onClick={handleCloseNavMenu}>
-              <Typography textAlign="center">{page}</Typography>
+              <Link href="/sign-in">
+                <Typography textAlign="center">{page}</Typography>
+              </Link>
             </MenuItem>
           ))}
         </Menu>
@@ -68,21 +71,22 @@ export function NavMenu() {
         component="div"
         sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
       >
-        LOGO
+        Morpheus
       </Typography>
       <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
         {pages.map((page) => (
-          <Button
-            key={page}
-            onClick={handleCloseNavMenu}
-            sx={{
-              my: 2,
-              color: theme.palette.secondary.main,
-              display: 'block',
-            }}
-          >
-            {page}
-          </Button>
+          <Link href="/sign-in" key={page}>
+            <Button
+              onClick={handleCloseNavMenu}
+              sx={{
+                my: 2,
+                color: theme.palette.secondary.main,
+                display: 'block',
+              }}
+            >
+              {page}
+            </Button>
+          </Link>
         ))}
       </Box>
     </>
