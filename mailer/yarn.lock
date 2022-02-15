@@ -162,10 +162,10 @@
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.36.tgz#00d9301d4dc35c2f6465a8aec634bb533674c652"
   integrity sha512-HBNx4lhkxN7bx6P0++W8E289foSu8kO8GCk2unhuVggO+cE7rh9DhZUyPhUxNRG9m+5B5BTKxZQ5ZP92x/mx9Q==
 
-"@types/bull@^3.15.7":
-  version "3.15.7"
-  resolved "https://registry.yarnpkg.com/@types/bull/-/bull-3.15.7.tgz#a9d7fb332cc02dc021d0eb234b9604b356e9e6de"
-  integrity sha512-7NC7XN5NoS0A+leJ/dR69ZfKaegOlCZaii/xGgKnCyh1UYisRncibImb7VMwrc3OdJcbDJt6+4om70TeNl3J7g==
+"@types/bull@^3.15.8":
+  version "3.15.8"
+  resolved "https://registry.yarnpkg.com/@types/bull/-/bull-3.15.8.tgz#ae2139f94490d740b37c8da5d828ce75dd82ce7c"
+  integrity sha512-8DbSPMSsZH5PWPnGEkAZLYgJEH4ghHJNKF7LB6Wr5R0/v6g+Vs+JoaA7kcvLtHE936xg2WpFPkaoaJgExOmKDw==
   dependencies:
     "@types/ioredis" "*"
     "@types/redis" "^2.8.0"
