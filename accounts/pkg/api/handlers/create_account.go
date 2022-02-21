@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/domain/usecases"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
 	"encoding/json"
@@ -13,13 +12,13 @@ import (
 )
 
 type createAccountHandler struct {
-	Usecase      usecases.CreateAccount
+	Usecase      application.CreateAccount
 	Encrypter    encrypter.Encrypter
 	MessageQueue queue.MessageQueue
 }
 
 func NewCreateAccountHandler(
-	usecase usecases.CreateAccount,
+	usecase application.CreateAccount,
 	messageQueue queue.MessageQueue,
 	encrypter encrypter.Encrypter,
 ) *createAccountHandler {
@@ -31,7 +30,7 @@ func NewCreateAccountHandler(
 }
 
 func (h *createAccountHandler) Handle(c echo.Context) error {
-	var params *usecases.CreateAccountDTO
+	var params *application.CreateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(

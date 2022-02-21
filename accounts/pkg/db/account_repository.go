@@ -24,9 +24,10 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 							 password,
 							 avatar_url,
 							 birth_date,
+							 document,
 							 created_at,
 							 updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
 	`)
 	if err != nil {
 		return err
@@ -41,6 +42,7 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 		account.Password,
 		account.AvatarUrl,
 		account.BirthDate,
+		account.Document,
 		account.CreatedAt,
 		account.UpdatedAt)
 

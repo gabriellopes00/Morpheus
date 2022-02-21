@@ -34,7 +34,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	updateAccount := application.NewUpdateAccount(accountRepo)
 
 	// init handlers
-	createAccountHandler := handlers.NewCreateAccountHandler(createAccount, rabbitMQ, jwtEncrypter)
+	createAccountHandler := handlers.NewCreateAccountHandler(*createAccount, rabbitMQ, jwtEncrypter)
 	authHandler := handlers.NewAuthHandler(authAccount)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(refreshAuth)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)

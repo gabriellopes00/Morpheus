@@ -2,23 +2,31 @@ package application
 
 import (
 	"accounts/domain/entities"
-	"accounts/domain/usecases"
 	"accounts/pkg/db"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-type createAccount struct {
+type CreateAccountDTO struct {
+	Name      string `json:"name,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Password  string `json:"password,omitempty"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	Document  string `json:"document,omitempty"`
+	BirthDate string `json:"birth_date,omitempty"`
+}
+
+type CreateAccount struct {
 	Repository db.Repository
 }
 
-func NewCreateAccount(Repository db.Repository) *createAccount {
-	return &createAccount{
+func NewCreateAccount(Repository db.Repository) *CreateAccount {
+	return &CreateAccount{
 		Repository: Repository,
 	}
 }
 
-func (c *createAccount) Create(data *usecases.CreateAccountDTO) (*entities.Account, error) {
+func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error) {
 	accountExists, err := c.Repository.Exists(data.Email)
 	if err != nil {
 		return nil, err
@@ -28,7 +36,14 @@ func (c *createAccount) Create(data *usecases.CreateAccountDTO) (*entities.Accou
 		return nil, ErrEmailAlreadyInUse
 	}
 
-	account, err := entities.NewAccount(data.Name, data.Email, data.Password, data.AvatarUrl, data.BirthDate, data.Document)
+	account, err := entities.NewAccount(
+		data.Name,
+		data.Email,
+		data.Password,
+		data.AvatarUrl,
+		data.BirthDate,
+		data.Document,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,9 @@
 package application
 
-import "errors"
+import (
+	app_error "accounts/domain/errors"
+)
 
 var (
-	ErrEmailAlreadyInUse = errors.New("email already in use")
+	ErrEmailAlreadyInUse = app_error.NewAppError("Conflict error", "email already in use")
 )
