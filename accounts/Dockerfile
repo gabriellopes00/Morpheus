@@ -4,11 +4,11 @@ WORKDIR /go/src/morpheus/accounts
 
 COPY go.* ./
 COPY Makefile .
-COPY .env .
 
 RUN apk add --no-cache make
 RUN make install 
 
+COPY .env .
 COPY . .
 RUN make build
 
