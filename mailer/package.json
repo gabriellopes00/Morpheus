@@ -16,14 +16,14 @@
     "@sentry/node": "^6.18.1",
     "@sentry/tracing": "^6.18.1",
     "amqplib": "^0.8.0",
-    "bull": "^4.6.2",
+    "bull": "^4.7.0",
     "dotenv": "^16.0.0",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.7.2",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.44",
+    "typeorm": "^0.2.45",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "@types/uuid": "^8.3.4",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.5.0",
+    "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.6.2"
   },
