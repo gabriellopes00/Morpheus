@@ -20,5 +20,5 @@ COPY --from=builder /go/src/morpheus/accounts/app .
 COPY .env .
 COPY ./pkg/db/migrations/*.sql ./pkg/db/migrations/
 
-EXPOSE 7765
+EXPOSE 3792
 ENTRYPOINT /usr/src/morpheus/accounts/app

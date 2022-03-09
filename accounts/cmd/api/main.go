@@ -44,6 +44,7 @@ func main() {
 
 	rabbitmq, err := queue.NewRabbitMQConnection()
 	if err != nil {
+		fmt.Println("rabbitmq")
 		log.Fatalln(err.Error())
 	}
 
