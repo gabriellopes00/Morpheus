@@ -1,19 +1,19 @@
 package handlers
 
 import (
-	"accounts/domain/usecases"
+	"accounts/pkg/auth"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type refreshAuthHandler struct {
-	Usecase usecases.RefreshAuth
+	AuthProvider auth.AuthProvider
 }
 
-func NewRefreshAuthHandler(usecase usecases.RefreshAuth) *refreshAuthHandler {
+func NewRefreshAuthHandler(AuthProvider auth.AuthProvider) *refreshAuthHandler {
 	return &refreshAuthHandler{
-		Usecase: usecase,
+		AuthProvider: AuthProvider,
 	}
 }
 
@@ -29,7 +29,7 @@ func (h *refreshAuthHandler) Handle(c echo.Context) error {
 		)
 	}
 
-	tokens, err := h.Usecase.Refresh(params.RefreshToken)
+	tokens, err := h.AuthProvider.RefreshAuth(params.RefreshToken)
 	if err != nil {
 		return c.JSON(
 			http.StatusUnauthorized,

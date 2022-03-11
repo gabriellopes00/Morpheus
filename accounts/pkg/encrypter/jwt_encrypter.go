@@ -2,7 +2,6 @@ package encrypter
 
 import (
 	"accounts/config/env"
-	"accounts/pkg/cache"
 	"errors"
 	"fmt"
 	"time"
@@ -20,7 +19,7 @@ var (
 type encrypter struct {
 }
 
-func NewEncrypter(cacheRepository cache.CacheRepository) *encrypter {
+func NewEncrypter() *encrypter {
 	return &encrypter{}
 }
 

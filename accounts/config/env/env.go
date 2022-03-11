@@ -33,6 +33,12 @@ var (
 	RABBITMQ_PASS  = ""
 	RABBITMQ_PORT  = 0
 	RABBITMQ_VHOST = ""
+
+	KEYCLOACK_HOST          = ""
+	KEYCLOACK_PORT          = 0
+	KEYCLOACK_REALM         = ""
+	KEYCLOACK_CLIENT_ID     = ""
+	KEYCLOACK_CLIENT_SECRET = ""
 )
 
 var ErrLoadingEnvVars = errors.New("error on loading environment variables")
@@ -71,10 +77,19 @@ func init() {
 	REFRESH_TOKEN_KEY = os.Getenv("REFRESH_TOKEN_KEY")
 
 	RABBITMQ_HOST = os.Getenv("RABBITMQ_HOST")
-	RABBITMQ_USER = os.Getenv("RABBITMQ_DEFAULT_USER")
-	RABBITMQ_PASS = os.Getenv("RABBITMQ_DEFAULT_PASS")
+	RABBITMQ_USER = os.Getenv("RABBITMQ_USER")
+	RABBITMQ_PASS = os.Getenv("RABBITMQ_PASS")
 	RABBITMQ_VHOST = os.Getenv("RABBITMQ_VHOST")
 	RABBITMQ_PORT, err = strconv.Atoi(os.Getenv("RABBITMQ_PORT"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	KEYCLOACK_CLIENT_ID = os.Getenv("KEYCLOACK_CLIENT_ID")
+	KEYCLOACK_CLIENT_SECRET = os.Getenv("KEYCLOACK_CLIENT_SECRET")
+	KEYCLOACK_HOST = os.Getenv("KEYCLOACK_HOST")
+	KEYCLOACK_REALM = os.Getenv("KEYCLOACK_REALM")
+	KEYCLOACK_PORT, err = strconv.Atoi(os.Getenv("KEYCLOACK_PORT"))
 	if err != nil {
 		log.Fatalln(err)
 	}

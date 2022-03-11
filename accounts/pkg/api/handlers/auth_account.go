@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/domain/usecases"
+	"accounts/pkg/auth"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,12 +11,12 @@ import (
 )
 
 type authHandler struct {
-	Usecase usecases.AuthAccount
+	AuthProvider auth.AuthProvider
 }
 
-func NewAuthHandler(usecase usecases.AuthAccount) *authHandler {
+func NewAuthHandler(AuthProvider auth.AuthProvider) *authHandler {
 	return &authHandler{
-		Usecase: usecase,
+		AuthProvider: AuthProvider,
 	}
 }
 
@@ -33,7 +33,12 @@ func (h *authHandler) Handle(c echo.Context) error {
 			map[string]string{"error": ErrUnprocessableEntity.Error()})
 	}
 
-	token, err := h.Usecase.Auth(params.Email, params.Password)
+	token, err := h.AuthProvider.SignInUser(
+		auth.AuthUserCredentials{
+			Email:    params.Email,
+			Password: params.Password,
+		},
+	)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, application.ErrUnregisteredEmail) {

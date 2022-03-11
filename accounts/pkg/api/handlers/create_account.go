@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/pkg/encrypter"
+	app_error "accounts/domain/errors"
+	"accounts/pkg/auth"
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -13,19 +15,19 @@ import (
 
 type createAccountHandler struct {
 	Usecase      application.CreateAccount
-	Encrypter    encrypter.Encrypter
+	AuthProvider auth.AuthProvider
 	MessageQueue queue.MessageQueue
 }
 
 func NewCreateAccountHandler(
 	usecase application.CreateAccount,
 	messageQueue queue.MessageQueue,
-	encrypter encrypter.Encrypter,
+	authProvider auth.AuthProvider,
 ) *createAccountHandler {
 	return &createAccountHandler{
 		Usecase:      usecase,
 		MessageQueue: messageQueue,
-		Encrypter:    encrypter,
+		AuthProvider: authProvider,
 	}
 }
 
@@ -40,14 +42,31 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 
 	account, err := h.Usecase.Create(params)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, application.ErrEmailAlreadyInUse) {
 			return c.JSON(http.StatusConflict,
+				map[string]string{"error": err.Error()})
+		} else if app_error.IsAppError(err) {
+			return c.JSON(http.StatusBadRequest,
 				map[string]string{"error": err.Error()})
 		} else {
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{"error": ErrInternalServer.Error()})
 		}
+	}
+
+	token, err := h.AuthProvider.SignInUser(
+		auth.AuthUserCredentials{
+			Email:    account.Email,
+			Password: account.Password,
+		},
+	)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(
+			http.StatusInternalServerError,
+			map[string]string{"error": ErrInternalServer.Error()})
 	}
 
 	account.Password = ""
@@ -60,13 +79,6 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 	}
 
 	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, payload)
-	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
-	}
-
-	token, err := h.Encrypter.EncryptAuthToken(account.Id)
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,

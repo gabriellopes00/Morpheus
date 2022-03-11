@@ -2,20 +2,8 @@ package application
 
 import (
 	"accounts/domain/entities"
+	"accounts/pkg/auth"
 	"accounts/pkg/db"
-	"context"
-	"fmt"
-	"strings"
-
-	// "golang.org/x/crypto/bcrypt"
-	"github.com/Nerzal/gocloak/v8"
-)
-
-const (
-	ClientId     = "accounts_service"
-	ClientSecret = "BwJtYnEqzwgyKldF71DbcEVX1Yd0lvPW"
-	Realm        = "morpheus"
-	Hostname     = "http://localhost:8080"
 )
 
 type CreateAccountDTO struct {
@@ -28,12 +16,14 @@ type CreateAccountDTO struct {
 }
 
 type CreateAccount struct {
-	Repository db.Repository
+	Repository   db.Repository
+	AuthProvider auth.AuthProvider
 }
 
-func NewCreateAccount(Repository db.Repository) *CreateAccount {
+func NewCreateAccount(Repository db.Repository, AuthProvider auth.AuthProvider) *CreateAccount {
 	return &CreateAccount{
-		Repository: Repository,
+		Repository:   Repository,
+		AuthProvider: AuthProvider,
 	}
 }
 
@@ -59,43 +49,20 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 		return nil, err
 	}
 
-	// hash, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
+	// err = c.Repository.Create(account)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// account.Password = string(hash)
 
-	keycloack := gocloak.NewClient(Hostname)
-
-	clientToken, err := keycloack.LoginClient(context.Background(), ClientId, ClientSecret, Realm)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("client error")
-		return nil, err
-	}
-
-	keycloackUser := gocloak.User{
-		FirstName:     gocloak.StringP(strings.Split(account.Name, " ")[0]),
-		LastName:      gocloak.StringP(strings.Split(account.Name, " ")[1]),
-		Email:         gocloak.StringP(account.Email),
-		Enabled:       gocloak.BoolP(true),
-		EmailVerified: gocloak.BoolP(false),
-		Username:      gocloak.StringP(strings.Join(strings.Split(account.Name, " "), "")),
-	}
-
-	err = c.Repository.Create(account)
-	if err != nil {
-		return nil, err
-	}
-
-	newUserId, err := keycloack.CreateUser(context.Background(), clientToken.AccessToken, Realm, keycloackUser)
-	if err != nil {
-		fmt.Println("user error")
-		fmt.Println(err)
-		return nil, err
-	}
-
-	fmt.Printf("New user created %s\n", newUserId)
+	err = c.AuthProvider.CreateUser(
+		auth.AuthProviderUser{
+			Id:        account.Id,
+			Name:      account.Name,
+			Email:     account.Email,
+			Password:  account.Password,
+			CreatedAt: account.CreatedAt,
+		},
+	)
 
 	return account, nil
 }

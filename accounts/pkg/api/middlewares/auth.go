@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"accounts/pkg/auth"
 	"accounts/pkg/encrypter"
 	"errors"
 	"net/http"
@@ -16,12 +17,12 @@ var (
 )
 
 type authMiddleware struct {
-	Encrypter encrypter.Encrypter
+	AuthProvider auth.AuthProvider
 }
 
-func NewAuthMiddleware(encrypter encrypter.Encrypter) *authMiddleware {
+func NewAuthMiddleware(AuthProvider auth.AuthProvider) *authMiddleware {
 	return &authMiddleware{
-		Encrypter: encrypter,
+		AuthProvider: AuthProvider,
 	}
 }
 
@@ -37,7 +38,7 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		token := authorization[1]
 
-		accountId, err := m.Encrypter.DecryptAuthToken(token)
+		accountInfo, err := m.AuthProvider.AuthUser(token)
 		if err != nil {
 			if errors.Is(err, encrypter.ErrInvalidToken) {
 				return c.JSON(
@@ -50,7 +51,7 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 				map[string]string{"error": ErrInternalServer.Error()})
 		}
 
-		c.Request().Header.Set("account_id", accountId)
+		c.Request().Header.Set("account_id", accountInfo.Id)
 
 		return next(c)
 	}
