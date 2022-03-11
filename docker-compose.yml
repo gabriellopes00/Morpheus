@@ -51,6 +51,8 @@ services:
       - 8080:8080
     depends_on:
       - keycloack_db
+    networks:
+      - morpheus
 
   keycloack_db:
     image: postgres:13.6-alpine
@@ -60,6 +62,8 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: password
+    networks:
+      - morpheus
 
   rabbitmq:
     container_name: rabbitmq
