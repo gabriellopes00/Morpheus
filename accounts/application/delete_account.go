@@ -4,7 +4,6 @@ import (
 	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"errors"
-	"fmt"
 )
 
 type DeleteAccount struct {
@@ -38,7 +37,10 @@ func (d *DeleteAccount) Delete(accountId string) error {
 		return err
 	}
 
-	err = d.CacheRepository.Delete("asdf")
-	fmt.Println(err)
+	err = d.CacheRepository.Delete(accountId)
+	if err != nil {
+		return err
+	}
+
 	return err
 }

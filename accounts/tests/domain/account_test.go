@@ -16,6 +16,8 @@ func TestNewAccount(t *testing.T) {
 			"John Doe",
 			"johndoe@mai.com",
 			"https://johndoe.jpg",
+			"(11) 98800-0088",
+			"male",
 			time.Now().Local().String(),
 			"111.222.333-44",
 		)

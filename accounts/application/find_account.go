@@ -33,6 +33,10 @@ func (f *FindAccount) FindById(accountId string) (*entities.Account, error) {
 			return nil, err
 		}
 
+		if result == nil {
+			return nil, nil
+		}
+
 		value, err := json.Marshal(result)
 		if err != nil {
 			return nil, err

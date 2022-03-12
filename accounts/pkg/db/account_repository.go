@@ -24,9 +24,11 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 							 avatar_url,
 							 birth_date,
 							 document,
+							 phone_number,
+							 gender,
 							 created_at,
 							 updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 	`)
 	if err != nil {
 		return err
@@ -41,6 +43,8 @@ func (r *pgAccountRepository) Create(account *entities.Account) error {
 		account.AvatarUrl,
 		account.BirthDate,
 		account.Document,
+		account.PhoneNumber,
+		account.Gender,
 		account.CreatedAt,
 		account.UpdatedAt)
 
@@ -74,6 +78,8 @@ func (r *pgAccountRepository) FindByEmail(email string) (*entities.Account, erro
 			   email,
 			   document,
 			   avatar_url,
+			   document,
+			   gender
 			   birth_date,
 			   created_at,
 			   updated_at
@@ -92,6 +98,8 @@ func (r *pgAccountRepository) FindByEmail(email string) (*entities.Account, erro
 		&account.Email,
 		&account.Document,
 		&account.AvatarUrl,
+		&account.Document,
+		&account.Gender,
 		&account.BirthDate,
 		&account.CreatedAt,
 		&account.UpdatedAt,
@@ -115,6 +123,8 @@ func (r *pgAccountRepository) FindById(id string) (*entities.Account, error) {
 			   email,
 			   document,
 			   avatar_url,
+			   document,
+			   gender,
 			   birth_date,
 			   created_at,
 			   updated_at
@@ -133,6 +143,8 @@ func (r *pgAccountRepository) FindById(id string) (*entities.Account, error) {
 		&account.Email,
 		&account.Document,
 		&account.AvatarUrl,
+		&account.Document,
+		&account.Gender,
 		&account.BirthDate,
 		&account.CreatedAt,
 		&account.UpdatedAt,

@@ -8,12 +8,14 @@ import (
 )
 
 type CreateAccountDTO struct {
-	Name      string `json:"name,omitempty"`
-	Email     string `json:"email,omitempty"`
-	Password  string `json:"password,omitempty"`
-	AvatarUrl string `json:"avatar_url,omitempty"`
-	Document  string `json:"document,omitempty"`
-	BirthDate string `json:"birth_date,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Email       string `json:"email,omitempty"`
+	Password    string `json:"password,omitempty"`
+	AvatarUrl   string `json:"avatar_url,omitempty"`
+	PhoneNumber string `json:"phone_number,omitempty"`
+	Gender      string `json:"gender,omitempty"`
+	Document    string `json:"document,omitempty"`
+	BirthDate   string `json:"birth_date,omitempty"`
 }
 
 type CreateAccount struct {
@@ -42,6 +44,8 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 		data.Name,
 		data.Email,
 		data.AvatarUrl,
+		data.PhoneNumber,
+		data.Gender,
 		data.BirthDate,
 		data.Document,
 	)
@@ -67,6 +71,9 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 			CreatedAt: account.CreatedAt,
 		},
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return account, nil
 }
