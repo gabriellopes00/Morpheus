@@ -20,12 +20,8 @@ var (
 	DB_TIME_ZONE = ""
 
 	REDIS_HOST = ""
+	REDIS_PASS = ""
 	REDIS_PORT = 0
-
-	AUTH_TOKEN_KEY             = ""
-	AUTH_TOKEN_EXPIRATION_TIME = 0
-
-	REFRESH_TOKEN_KEY = ""
 
 	PORT = 0
 
@@ -69,18 +65,11 @@ func init() {
 	}
 
 	REDIS_HOST = os.Getenv("REDIS_HOST")
+	REDIS_PASS = os.Getenv("REDIS_PASS")
 	REDIS_PORT, err = strconv.Atoi(os.Getenv("REDIS_PORT"))
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	AUTH_TOKEN_KEY = os.Getenv("AUTH_TOKEN_KEY")
-	AUTH_TOKEN_EXPIRATION_TIME, err = strconv.Atoi(os.Getenv("AUTH_TOKEN_EXPIRATION_TIME"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	REFRESH_TOKEN_KEY = os.Getenv("REFRESH_TOKEN_KEY")
 
 	RABBITMQ_HOST = os.Getenv("RABBITMQ_HOST")
 	RABBITMQ_USER = os.Getenv("RABBITMQ_USER")

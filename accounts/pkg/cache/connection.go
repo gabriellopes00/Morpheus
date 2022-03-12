@@ -11,7 +11,7 @@ import (
 func NewRedisClient() (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", env.REDIS_HOST, env.REDIS_PORT),
-		Password: "",
+		Password: env.REDIS_PASS,
 		DB:       0,
 	})
 
