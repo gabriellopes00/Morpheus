@@ -54,8 +54,6 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 		}
 	}
 
-	account.Password = ""
-
 	payload, err := json.Marshal(account)
 	if err != nil {
 		return c.JSON(

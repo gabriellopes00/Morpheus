@@ -14,19 +14,17 @@ type Account struct {
 	Name      string    `json:"name,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Document  string    `json:"document,omitempty"`
-	Password  string    `json:"password,omitempty"` // set up multi-services authentication
 	AvatarUrl string    `json:"avatar_url,omitempty"`
 	BirthDate time.Time `json:"birth_date,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
-func NewAccount(name, email, password, avatarUrl, birthDate, document string) (*Account, error) {
+func NewAccount(name, email, avatarUrl, birthDate, document string) (*Account, error) {
 	account := &Account{
 		Id:        gouuid.NewV4().String(),
 		Name:      name,
 		Email:     email,
-		Password:  password,
 		Document:  document,
 		AvatarUrl: avatarUrl,
 		CreatedAt: time.Now().Local(),
@@ -57,10 +55,6 @@ func (account *Account) validate() error {
 
 	if len(account.Name) <= 4 || len(account.Name) > 255 {
 		err = app_error.NewAppError("Invalid input", "account's name must have at least of 4 characters and at most of 255")
-	}
-
-	if len(account.Password) <= 4 || len(account.Password) > 255 {
-		err = app_error.NewAppError("Invalid input", "account's password must have at least of 4 characters and at most of 255")
 	}
 
 	if !govalidator.IsURL(account.AvatarUrl) {

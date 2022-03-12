@@ -2,6 +2,7 @@ package application
 
 import (
 	"accounts/domain/entities"
+	app_error "accounts/domain/errors"
 	"accounts/pkg/auth"
 	"accounts/pkg/db"
 )
@@ -40,7 +41,6 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 	account, err := entities.NewAccount(
 		data.Name,
 		data.Email,
-		data.Password,
 		data.AvatarUrl,
 		data.BirthDate,
 		data.Document,
@@ -49,17 +49,21 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 		return nil, err
 	}
 
-	// err = c.Repository.Create(account)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if len(data.Password) < 4 {
+		return nil, app_error.NewAppError("Invalid iput", "password must have at least 4 characters")
+	}
+
+	err = c.Repository.Create(account)
+	if err != nil {
+		return nil, err
+	}
 
 	err = c.AuthProvider.CreateUser(
 		auth.AuthProviderUser{
 			Id:        account.Id,
 			Name:      account.Name,
 			Email:     account.Email,
-			Password:  account.Password,
+			Password:  data.Password,
 			CreatedAt: account.CreatedAt,
 		},
 	)

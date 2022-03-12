@@ -59,7 +59,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 	token, err := h.AuthProvider.SignInUser(
 		auth.AuthUserCredentials{
 			Email:    account.Email,
-			Password: account.Password,
+			Password: params.Password,
 		},
 	)
 	if err != nil {
@@ -68,8 +68,6 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 			http.StatusInternalServerError,
 			map[string]string{"error": ErrInternalServer.Error()})
 	}
-
-	account.Password = ""
 
 	payload, err := json.Marshal(account)
 	if err != nil {

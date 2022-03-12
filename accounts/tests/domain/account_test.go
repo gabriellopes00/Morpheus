@@ -15,10 +15,9 @@ func TestNewAccount(t *testing.T) {
 		_, err := entities.NewAccount(
 			"John Doe",
 			"johndoe@mai.com",
-			"lorepipsum",
 			"https://johndoe.jpg",
 			time.Now().Local().String(),
-			"asdf",
+			"111.222.333-44",
 		)
 
 		require.Nil(t, err)

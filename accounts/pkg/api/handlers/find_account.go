@@ -36,8 +36,6 @@ func (h *findAccountHandler) Handle(c echo.Context) error {
 		)
 	}
 
-	account.Password = ""
-
 	return c.JSON(
 		http.StatusCreated,
 		map[string]interface{}{"account": account},
