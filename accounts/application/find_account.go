@@ -5,16 +5,16 @@ import (
 	"accounts/pkg/db"
 )
 
-type findAccount struct {
+type FindAccount struct {
 	Repository db.Repository
 }
 
-func NewFindAccount(repo db.Repository) *findAccount {
-	return &findAccount{
+func NewFindAccount(repo db.Repository) *FindAccount {
+	return &FindAccount{
 		Repository: repo,
 	}
 }
 
-func (g *findAccount) FindById(accountId string) (*entities.Account, error) {
+func (g *FindAccount) FindById(accountId string) (*entities.Account, error) {
 	return g.Repository.FindById(accountId)
 }

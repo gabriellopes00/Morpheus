@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/domain/usecases"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
 	"encoding/json"
@@ -14,13 +13,13 @@ import (
 )
 
 type deleteAccountHandler struct {
-	Usecase      usecases.DeleteAccount
+	Usecase      application.DeleteAccount
 	Encrypter    encrypter.Encrypter
 	MessageQueue queue.MessageQueue
 }
 
 func NewDeleteAccountHandler(
-	usecase usecases.DeleteAccount,
+	usecase application.DeleteAccount,
 	messageQueue queue.MessageQueue,
 ) *deleteAccountHandler {
 	return &deleteAccountHandler{

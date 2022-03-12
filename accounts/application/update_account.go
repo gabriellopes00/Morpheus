@@ -2,22 +2,27 @@ package application
 
 import (
 	"accounts/domain/entities"
-	"accounts/domain/usecases"
 	"accounts/pkg/db"
 	"time"
 )
 
-type updateAccount struct {
+type UpdateAccountDTO struct {
+	Name      string `json:"name,omitempty"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	BirthDate string `json:"birth_date,omitempty"`
+}
+
+type UpdateAccount struct {
 	Repository db.Repository
 }
 
-func NewUpdateAccount(Repository db.Repository) *updateAccount {
-	return &updateAccount{
+func NewUpdateAccount(Repository db.Repository) *UpdateAccount {
+	return &UpdateAccount{
 		Repository: Repository,
 	}
 }
 
-func (c *updateAccount) Update(accountId string, data *usecases.UpdateAccountDTO) (*entities.Account, error) {
+func (c *UpdateAccount) Update(accountId string, data *UpdateAccountDTO) (*entities.Account, error) {
 	account, err := c.Repository.FindById(accountId)
 	if err != nil {
 		return nil, err

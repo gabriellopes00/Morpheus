@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"accounts/domain/usecases"
+	"accounts/application"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type findAccountHandler struct {
-	Usecase usecases.FindAccount
+	Usecase application.FindAccount
 }
 
-func NewFindAccountHandler(usecase usecases.FindAccount) *findAccountHandler {
+func NewFindAccountHandler(usecase application.FindAccount) *findAccountHandler {
 	return &findAccountHandler{
 		Usecase: usecase,
 	}

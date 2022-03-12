@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/domain/usecases"
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
@@ -13,11 +12,11 @@ import (
 )
 
 type updateAccountHandler struct {
-	Usecase      usecases.UpdateAccount
+	Usecase      application.UpdateAccount
 	MessageQueue queue.MessageQueue
 }
 
-func NewUpdateAccountHandler(usecase usecases.UpdateAccount, messageQueue queue.MessageQueue) *updateAccountHandler {
+func NewUpdateAccountHandler(usecase application.UpdateAccount, messageQueue queue.MessageQueue) *updateAccountHandler {
 	return &updateAccountHandler{
 		Usecase:      usecase,
 		MessageQueue: messageQueue,
@@ -33,7 +32,7 @@ func (h *updateAccountHandler) Handle(c echo.Context) error {
 			map[string]string{"error": "forbidden accout update"})
 	}
 
-	var params *usecases.UpdateAccountDTO
+	var params *application.UpdateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
 		return c.JSON(

@@ -25,7 +25,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 
 	// init usecases
 	createAccount := application.NewCreateAccount(accountRepo, keycloack)
-	deleteAccount := application.NewDeleteUsecase(accountRepo)
+	deleteAccount := application.NewDeleteAccount(accountRepo)
 	findAccount := application.NewFindAccount(accountRepo)
 	updateAccount := application.NewUpdateAccount(accountRepo)
 
@@ -33,9 +33,9 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	createAccountHandler := handlers.NewCreateAccountHandler(*createAccount, rabbitMQ, keycloack)
 	authHandler := handlers.NewAuthHandler(keycloack)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(keycloack)
-	deleteAccountHandler := handlers.NewDeleteAccountHandler(deleteAccount, rabbitMQ)
-	getAccountHandler := handlers.NewFindAccountHandler(findAccount)
-	updateAccountHandler := handlers.NewUpdateAccountHandler(updateAccount, rabbitMQ)
+	deleteAccountHandler := handlers.NewDeleteAccountHandler(*deleteAccount, rabbitMQ)
+	getAccountHandler := handlers.NewFindAccountHandler(*findAccount)
+	updateAccountHandler := handlers.NewUpdateAccountHandler(*updateAccount, rabbitMQ)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(keycloack)

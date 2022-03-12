@@ -5,12 +5,12 @@ import (
 	"errors"
 )
 
-type deleteUsecase struct {
+type DeleteAccount struct {
 	Repository db.Repository
 }
 
-func NewDeleteUsecase(Repository db.Repository) *deleteUsecase {
-	return &deleteUsecase{
+func NewDeleteAccount(Repository db.Repository) *DeleteAccount {
+	return &DeleteAccount{
 		Repository: Repository,
 	}
 }
@@ -19,7 +19,7 @@ var (
 	ErrIdNotFound = errors.New("id not found")
 )
 
-func (u *deleteUsecase) Delete(accountId string) error {
+func (u *DeleteAccount) Delete(accountId string) error {
 	existingAccount, err := u.Repository.ExistsId(accountId)
 	if err != nil {
 		return err
