@@ -9,6 +9,13 @@ require (
 )
 
 require (
+	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1 // indirect
+	github.com/go-resty/resty/v2 v2.3.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/segmentio/ksuid v1.0.3 // indirect
+)
+
+require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -18,6 +25,7 @@ require (
 )
 
 require (
+	github.com/Nerzal/gocloak/v7 v7.11.0
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

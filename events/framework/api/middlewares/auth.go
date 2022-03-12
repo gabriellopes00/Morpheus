@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"errors"
-	"events/framework/encrypter"
+	"events/framework/auth"
 	"net/http"
 	"strings"
 
@@ -14,12 +14,12 @@ var (
 )
 
 type authMiddleware struct {
-	Encrypter encrypter.Encrypter
+	AuthProvider auth.AuthProvider
 }
 
-func NewAuthMiddleware(encrypter encrypter.Encrypter) *authMiddleware {
+func NewAuthMiddleware(AuthProvider auth.AuthProvider) *authMiddleware {
 	return &authMiddleware{
-		Encrypter: encrypter,
+		AuthProvider: AuthProvider,
 	}
 }
 
@@ -36,14 +36,14 @@ func (m *authMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		token := authorization[1]
 
-		accountId, err := m.Encrypter.Decrypt(token)
+		accountInfo, err := m.AuthProvider.AuthUser(token)
 		if err != nil {
 			return c.JSON(
 				http.StatusUnauthorized,
 				map[string]string{"error": err.Error()})
 		}
 
-		c.Request().Header.Set("account_id", accountId)
+		c.Request().Header.Set("account_id", accountInfo.Id)
 
 		return next(c)
 	}
