@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"errors"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -27,7 +28,7 @@ func (r *redisCacheRepository) Set(key string, value string, exp time.Duration) 
 
 func (r *redisCacheRepository) Get(key string) (string, error) {
 	result := r.client.Get(r.client.Context(), key)
-	if result.Err() != nil {
+	if result.Err() != nil && !errors.Is(result.Err(), redis.Nil) {
 		return "", result.Err()
 	}
 

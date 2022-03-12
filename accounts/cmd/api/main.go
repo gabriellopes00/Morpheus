@@ -3,6 +3,7 @@ package main
 import (
 	"accounts/config/env"
 	"accounts/pkg/api"
+	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"accounts/pkg/queue"
 	"context"
@@ -53,8 +54,15 @@ func main() {
 		}
 	}()
 
+	redis, err := cache.NewRedisClient()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	defer redis.Close()
+
 	e := echo.New()
-	api.SetupServer(e, database, rabbitmq, nil)
+	api.SetupServer(e, database, rabbitmq, redis)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
 			logger.Fatal(err.Error())

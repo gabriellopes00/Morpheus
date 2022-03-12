@@ -2,7 +2,9 @@ package application
 
 import (
 	"accounts/domain/entities"
+	"accounts/pkg/cache"
 	"accounts/pkg/db"
+	"encoding/json"
 	"time"
 )
 
@@ -13,12 +15,14 @@ type UpdateAccountDTO struct {
 }
 
 type UpdateAccount struct {
-	Repository db.Repository
+	Repository      db.Repository
+	CacheRepository cache.Repository
 }
 
-func NewUpdateAccount(Repository db.Repository) *UpdateAccount {
+func NewUpdateAccount(Repository db.Repository, CacheRepo cache.Repository) *UpdateAccount {
 	return &UpdateAccount{
-		Repository: Repository,
+		Repository:      Repository,
+		CacheRepository: CacheRepo,
 	}
 }
 
@@ -38,6 +42,16 @@ func (c *UpdateAccount) Update(accountId string, data *UpdateAccountDTO) (*entit
 	account.UpdatedAt = time.Now()
 
 	err = c.Repository.Update(account)
+	if err != nil {
+		return nil, err
+	}
+
+	value, err := json.Marshal(account)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.CacheRepository.Set(account.Id, string(value), time.Minute*10)
 	if err != nil {
 		return nil, err
 	}

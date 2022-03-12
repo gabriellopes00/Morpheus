@@ -5,6 +5,7 @@ import (
 	"accounts/pkg/api/handlers"
 	"accounts/pkg/api/middlewares"
 	"accounts/pkg/auth"
+	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
@@ -24,12 +25,13 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 	jwtEncrypter := encrypter.NewEncrypter()
 	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
+	redisCache := cache.NewRedisCacheRepository(client)
 
 	// init usecases
 	createAccount := application.NewCreateAccount(accountRepo, keycloack)
-	deleteAccount := application.NewDeleteAccount(accountRepo)
-	findAccount := application.NewFindAccount(accountRepo)
-	updateAccount := application.NewUpdateAccount(accountRepo)
+	deleteAccount := application.NewDeleteAccount(accountRepo, redisCache)
+	findAccount := application.NewFindAccount(accountRepo, redisCache)
+	updateAccount := application.NewUpdateAccount(accountRepo, redisCache)
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(*createAccount, rabbitMQ, keycloack)

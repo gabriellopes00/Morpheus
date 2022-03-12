@@ -1,17 +1,21 @@
 package application
 
 import (
+	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"errors"
+	"fmt"
 )
 
 type DeleteAccount struct {
-	Repository db.Repository
+	Repository      db.Repository
+	CacheRepository cache.Repository
 }
 
-func NewDeleteAccount(Repository db.Repository) *DeleteAccount {
+func NewDeleteAccount(Repository db.Repository, CacheRepo cache.Repository) *DeleteAccount {
 	return &DeleteAccount{
-		Repository: Repository,
+		Repository:      Repository,
+		CacheRepository: CacheRepo,
 	}
 }
 
@@ -19,8 +23,8 @@ var (
 	ErrIdNotFound = errors.New("id not found")
 )
 
-func (u *DeleteAccount) Delete(accountId string) error {
-	existingAccount, err := u.Repository.ExistsId(accountId)
+func (d *DeleteAccount) Delete(accountId string) error {
+	existingAccount, err := d.Repository.ExistsId(accountId)
 	if err != nil {
 		return err
 	}
@@ -29,10 +33,12 @@ func (u *DeleteAccount) Delete(accountId string) error {
 		return ErrIdNotFound
 	}
 
-	err = u.Repository.Delete(accountId)
+	err = d.Repository.Delete(accountId)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	err = d.CacheRepository.Delete("asdf")
+	fmt.Println(err)
+	return err
 }
