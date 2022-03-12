@@ -6,6 +6,7 @@ import (
 	"accounts/pkg/api/middlewares"
 	"accounts/pkg/auth"
 	"accounts/pkg/db"
+	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
 	"database/sql"
 	"net/http"
@@ -21,7 +22,8 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
-	keycloack := auth.NewKeycloackauthProvider()
+	jwtEncrypter := encrypter.NewEncrypter()
+	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
 
 	// init usecases
 	createAccount := application.NewCreateAccount(accountRepo, keycloack)

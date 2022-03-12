@@ -2,6 +2,7 @@ package auth
 
 import (
 	"accounts/config/env"
+	"accounts/pkg/encrypter"
 	"context"
 	"fmt"
 	"strings"
@@ -17,11 +18,15 @@ var (
 )
 
 type KeyclaockAuthProvider struct {
-	Client gocloak.GoCloak
+	Client    gocloak.GoCloak
+	Encrypter encrypter.Encrypter
 }
 
-func NewKeycloackauthProvider() *KeyclaockAuthProvider {
-	return &KeyclaockAuthProvider{Client: gocloak.NewClient(hostname)}
+func NewKeycloackauthProvider(Encrypter encrypter.Encrypter) *KeyclaockAuthProvider {
+	return &KeyclaockAuthProvider{
+		Client:    gocloak.NewClient(hostname),
+		Encrypter: Encrypter,
+	}
 }
 
 func (k *KeyclaockAuthProvider) CreateUser(user AuthProviderUser) error {
@@ -85,14 +90,13 @@ func (k *KeyclaockAuthProvider) SignInUser(credentials AuthUserCredentials) (Tok
 }
 
 func (k *KeyclaockAuthProvider) AuthUser(accessToken string) (AuthUserInfo, error) {
-
-	keycloackUserInfo, err := k.Client.GetRawUserInfo(context.Background(), accessToken, realm)
+	accountId, err := k.Encrypter.DecryptToken(accessToken)
 	if err != nil {
 		return AuthUserInfo{}, err
 	}
 
 	userInfo := AuthUserInfo{
-		Id: keycloackUserInfo["account_id"].(string),
+		Id: accountId,
 	}
 
 	return userInfo, nil
