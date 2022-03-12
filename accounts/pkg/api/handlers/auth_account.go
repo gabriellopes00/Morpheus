@@ -33,12 +33,7 @@ func (h *authHandler) Handle(c echo.Context) error {
 			map[string]string{"error": ErrUnprocessableEntity.Error()})
 	}
 
-	token, err := h.AuthProvider.SignInUser(
-		auth.AuthUserCredentials{
-			Email:    params.Email,
-			Password: params.Password,
-		},
-	)
+	token, err := h.AuthProvider.SignInUser(params.Email, params.Password)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, application.ErrUnregisteredEmail) {

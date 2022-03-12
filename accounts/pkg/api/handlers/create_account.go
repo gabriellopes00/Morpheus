@@ -56,12 +56,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 		}
 	}
 
-	token, err := h.AuthProvider.SignInUser(
-		auth.AuthUserCredentials{
-			Email:    account.Email,
-			Password: params.Password,
-		},
-	)
+	token, err := h.AuthProvider.SignInUser(params.Email, params.Password)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(

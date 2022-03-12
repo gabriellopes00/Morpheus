@@ -10,11 +10,6 @@ type AuthProviderUser struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
-type AuthUserCredentials struct {
-	Email    string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
-}
-
 type Token struct {
 	AccessToken      string `json:"access_token,omitempty"`
 	ExpiresIn        int    `json:"expires_in,omitempty"`
@@ -28,7 +23,7 @@ type AuthUserInfo struct {
 
 type AuthProvider interface {
 	CreateUser(user AuthProviderUser) error
-	SignInUser(credentials AuthUserCredentials) (Token, error)
+	SignInUser(email, password string) (Token, error)
 	AuthUser(accessToken string) (AuthUserInfo, error)
 	RefreshAuth(refreshToken string) (Token, error)
 }

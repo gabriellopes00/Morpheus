@@ -37,10 +37,7 @@ func (f *FindAccount) FindById(accountId string) (*entities.Account, error) {
 			return nil, nil
 		}
 
-		value, err := json.Marshal(result)
-		if err != nil {
-			return nil, err
-		}
+		value, _ := json.Marshal(result)
 
 		err = f.CacheRepository.Set(result.Id, string(value), time.Minute*10)
 		if err != nil {
@@ -51,10 +48,7 @@ func (f *FindAccount) FindById(accountId string) (*entities.Account, error) {
 	}
 
 	var account entities.Account
-	err = json.Unmarshal([]byte(data), &account)
-	if err != nil {
-		return nil, err
-	}
+	json.Unmarshal([]byte(data), &account)
 
 	return &account, nil
 }

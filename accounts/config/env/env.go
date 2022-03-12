@@ -19,7 +19,8 @@ var (
 	DB_SSL_MODE  = ""
 	DB_TIME_ZONE = ""
 
-	REDIS_URL = ""
+	REDIS_HOST = ""
+	REDIS_PORT = 0
 
 	AUTH_TOKEN_KEY             = ""
 	AUTH_TOKEN_EXPIRATION_TIME = 0
@@ -67,7 +68,11 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	REDIS_URL = os.Getenv("REDIS_URL")
+	REDIS_HOST = os.Getenv("REDIS_HOST")
+	REDIS_PORT, err = strconv.Atoi(os.Getenv("REDIS_PORT"))
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	AUTH_TOKEN_KEY = os.Getenv("AUTH_TOKEN_KEY")
 	AUTH_TOKEN_EXPIRATION_TIME, err = strconv.Atoi(os.Getenv("AUTH_TOKEN_EXPIRATION_TIME"))

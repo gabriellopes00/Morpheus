@@ -31,8 +31,6 @@ func NewKeycloackauthProvider(Encrypter encrypter.Encrypter) *KeyclaockAuthProvi
 
 func (k *KeyclaockAuthProvider) CreateUser(user AuthProviderUser) error {
 
-	fmt.Println(user)
-
 	clientToken, err := k.Client.LoginClient(context.Background(), clientId, clientSecret, realm)
 	if err != nil {
 		return err
@@ -51,31 +49,28 @@ func (k *KeyclaockAuthProvider) CreateUser(user AuthProviderUser) error {
 
 	newUserId, err := k.Client.CreateUser(context.Background(), clientToken.AccessToken, realm, keycloackUser)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	err = k.Client.SetPassword(context.Background(), clientToken.AccessToken, newUserId, realm, user.Password, false)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	return nil
 }
 
-func (k *KeyclaockAuthProvider) SignInUser(credentials AuthUserCredentials) (Token, error) {
+func (k *KeyclaockAuthProvider) SignInUser(email, password string) (Token, error) {
 
 	keycloackToken, err := k.Client.Login(
 		context.Background(),
 		clientId,
 		clientSecret,
 		realm,
-		strings.Split(credentials.Email, "@")[0],
-		credentials.Password,
+		strings.Split(email, "@")[0],
+		password,
 	)
 	if err != nil {
-		fmt.Println(err)
 		return Token{}, err
 	}
 
