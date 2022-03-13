@@ -39,10 +39,7 @@ func (h *authHandler) Handle(c echo.Context) error {
 		if errors.Is(err, application.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()},
-			)
+			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
 

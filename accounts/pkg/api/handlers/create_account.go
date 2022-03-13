@@ -4,6 +4,7 @@ import (
 	"accounts/application"
 	app_error "accounts/domain/errors"
 	"accounts/pkg/auth"
+	"accounts/pkg/logger"
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
@@ -11,6 +12,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type createAccountHandler struct {
@@ -35,9 +37,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 	var params *application.CreateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.JSON(
-			http.StatusUnprocessableEntity,
-			map[string]string{"error": "invalid request params"})
+		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
 	account, err := h.Usecase.Create(params)
@@ -50,32 +50,25 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest,
 				map[string]string{"error": err.Error()})
 		} else {
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()})
+			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
 
 	token, err := h.AuthProvider.SignInUser(params.Email, params.Password)
 	if err != nil {
 		fmt.Println(err)
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	payload, err := json.Marshal(account)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, payload)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
+		logger.Logger.Error("error while publishing message to the queue", zap.String("rabbitmq", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	return c.JSON(

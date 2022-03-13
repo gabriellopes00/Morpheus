@@ -5,6 +5,7 @@ import (
 	"accounts/pkg/api"
 	"accounts/pkg/cache"
 	"accounts/pkg/db"
+	"accounts/pkg/logger"
 	"accounts/pkg/queue"
 	"accounts/pkg/storage"
 	"context"
@@ -16,20 +17,13 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 )
 
 func main() {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalf("cannot initialize zap logger: %v", err)
-	}
-
-	defer logger.Sync()
 
 	database, err := db.NewPostgresDb()
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Logger.Fatal(err.Error())
 	}
 
 	err = db.AutoMigrate(database)
@@ -39,7 +33,7 @@ func main() {
 
 	defer func() {
 		if err := database.Close(); err != nil {
-			logger.Fatal(err.Error())
+			logger.Logger.Fatal(err.Error())
 		}
 	}()
 
@@ -51,27 +45,27 @@ func main() {
 
 	defer func() {
 		if err := rabbitmq.Close(); err != nil {
-			logger.Fatal(err.Error())
+			logger.Logger.Fatal(err.Error())
 		}
 	}()
 
 	redis, err := cache.NewRedisClient()
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Logger.Fatal(err.Error())
 	}
 
 	defer redis.Close()
 
 	awsSession, err := storage.CreateAWSSession()
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Logger.Fatal(err.Error())
 	}
 
 	e := echo.New()
 	api.SetupServer(e, database, rabbitmq, redis, awsSession)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
-			logger.Fatal(err.Error())
+			logger.Logger.Fatal(err.Error())
 		}
 	}()
 
@@ -82,6 +76,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		logger.Fatal(err.Error())
+		logger.Logger.Fatal(err.Error())
 	}
 }

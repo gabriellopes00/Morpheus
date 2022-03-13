@@ -53,18 +53,12 @@ func (h *deleteAccountHandler) Handle(c echo.Context) error {
 
 	payload, err := json.Marshal(map[string]string{"id": accountId})
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountDeleted, payload)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	return c.JSON(http.StatusNoContent, nil)
