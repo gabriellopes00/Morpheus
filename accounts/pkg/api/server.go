@@ -35,6 +35,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(*createAccount, rabbitMQ, keycloack)
+	avatarUploadHandler := handlers.NewAvatarUploadHandler(*updateAccount)
 	authHandler := handlers.NewAuthHandler(keycloack)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(keycloack)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(*deleteAccount, rabbitMQ)
@@ -65,6 +66,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 	r.POST("", createAccountHandler.Handle)
 	r.POST("/auth", authHandler.Handle)
 	r.POST("/auth/refresh", refreshAuthHandler.Handle)
+	r.PUT("/:id/avatar/upload", avatarUploadHandler.Handle, authMiddleware.Auth)
 	r.GET("/:id", getAccountHandler.Handle, authMiddleware.Auth)
 	r.DELETE("/:id", deleteAccountHandler.Handle, authMiddleware.Auth)
 	r.PUT("/:id", updateAccountHandler.Handle, authMiddleware.Auth)

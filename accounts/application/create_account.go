@@ -31,7 +31,7 @@ func NewCreateAccount(Repository db.Repository, AuthProvider auth.AuthProvider) 
 }
 
 func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error) {
-	accountExists, err := c.Repository.Exists(data.Email)
+	accountExists, err := c.Repository.Exists(data.Email) // pq: duplicate key value violates unique constraint "accounts_document_key"
 	if err != nil {
 		return nil, err
 	}
