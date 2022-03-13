@@ -9,23 +9,26 @@ import (
 	"accounts/pkg/db"
 	"accounts/pkg/encrypter"
 	"accounts/pkg/queue"
+	"accounts/pkg/storage"
 	"database/sql"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/streadway/amqp"
 )
 
-func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, client *redis.Client) {
+func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, redis *redis.Client, awsSession *session.Session) {
 
 	// init adapters
 	accountRepo := db.NewPgAccountRepository(database)
 	rabbitMQ := queue.NewRabbitMQ(rabbitmq)
 	jwtEncrypter := encrypter.NewEncrypter()
 	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
-	redisCache := cache.NewRedisCacheRepository(client)
+	redisCache := cache.NewRedisCacheRepository(redis)
+	s3Storage := storage.NewS3StorageProvider(awsSession)
 
 	// init usecases
 	createAccount := application.NewCreateAccount(accountRepo, keycloack)
@@ -35,7 +38,7 @@ func SetupServer(router *echo.Echo, database *sql.DB, rabbitmq *amqp.Channel, cl
 
 	// init handlers
 	createAccountHandler := handlers.NewCreateAccountHandler(*createAccount, rabbitMQ, keycloack)
-	avatarUploadHandler := handlers.NewAvatarUploadHandler(*updateAccount)
+	avatarUploadHandler := handlers.NewAvatarUploadHandler(*updateAccount, s3Storage)
 	authHandler := handlers.NewAuthHandler(keycloack)
 	refreshAuthHandler := handlers.NewRefreshAuthHandler(keycloack)
 	deleteAccountHandler := handlers.NewDeleteAccountHandler(*deleteAccount, rabbitMQ)

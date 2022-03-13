@@ -2,45 +2,24 @@ package handlers
 
 import (
 	"accounts/application"
-	"accounts/config/env"
+	"accounts/pkg/storage"
+	"errors"
 	"fmt"
-	"log"
 	"net/http"
+	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/labstack/echo/v4"
 )
 
-var AccessKeyID string
-var SecretAccessKey string
-var MyRegion string
-
-func ConnectAws() *session.Session {
-	sess, err := session.NewSession(
-		&aws.Config{
-			Region: aws.String(env.AWS_S3_REGION),
-			Credentials: credentials.NewStaticCredentials(
-				env.AWS_S3_ACCESS_KEY_ID,
-				env.AWS_S3_SECRET_ACCESS_KEY,
-				"",
-			),
-		})
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return sess
-}
-
 type AvatarUploadHandler struct {
-	Usecase application.UpdateAccount
+	usecase         application.UpdateAccount
+	storageProvider storage.Provider
 }
 
-func NewAvatarUploadHandler(usecase application.UpdateAccount) *AvatarUploadHandler {
+func NewAvatarUploadHandler(usecase application.UpdateAccount, storageProvider storage.Provider) *AvatarUploadHandler {
 	return &AvatarUploadHandler{
-		Usecase: usecase,
+		usecase:         usecase,
+		storageProvider: storageProvider,
 	}
 }
 
@@ -62,49 +41,40 @@ func (h *AvatarUploadHandler) Handle(c echo.Context) error {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, nil)
+		return c.NoContent(http.StatusBadRequest)
 	}
 	defer src.Close()
 
-	buff := make([]byte, 512)
-	_, err = src.Read(buff)
+	err = h.validateFileType(file.Header.Get("Content-Type"))
 	if err != nil {
 		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, nil)
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	// allow only image files
-	switch http.DetectContentType(buff) {
-	case "image/jpeg", "image/jpg", "image/png":
-	default:
-		return c.JSON(http.StatusBadRequest,
-			map[string]string{"error": "invalid file type. Accounts avatar must be either jpeg, jpg or png files"})
-	}
-
-	sess := ConnectAws()
-	uploader := s3manager.NewUploader(sess)
-	up, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(env.AWS_S3_BUCKET_NAME),
-		Key:    aws.String("avatar-" + accountId),
-		Body:   src,
-	})
-
+	fileName := "avatar-" + accountId + "." + strings.Split(file.Header.Get("Content-Type"), "/")[1]
+	fileUrl, err := h.storageProvider.UploadFile(src, fileName)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	_, err = h.Usecase.Update(
+	_, err = h.usecase.Update(
 		accountId,
-		&application.UpdateAccountDTO{AvatarUrl: up.Location},
+		&application.UpdateAccountDTO{AvatarUrl: fileUrl},
 	)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(
-		http.StatusOK,
-		map[string]interface{}{
-			"message": "avatar uploaded successfully " + up.Location,
-		},
-	)
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (*AvatarUploadHandler) validateFileType(fileType string) error {
+	switch fileType {
+	case "image/jpeg", "image/jpg", "image/png":
+		return nil
+	default:
+		return errors.New("invalid file type. Allowed file types are: \"image/jpeg\", \"image/jpg\", \"image/png\"")
+	}
 }

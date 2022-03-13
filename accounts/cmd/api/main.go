@@ -6,6 +6,7 @@ import (
 	"accounts/pkg/cache"
 	"accounts/pkg/db"
 	"accounts/pkg/queue"
+	"accounts/pkg/storage"
 	"context"
 	"fmt"
 	"log"
@@ -61,8 +62,13 @@ func main() {
 
 	defer redis.Close()
 
+	awsSession, err := storage.CreateAWSSession()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
 	e := echo.New()
-	api.SetupServer(e, database, rabbitmq, redis)
+	api.SetupServer(e, database, rabbitmq, redis, awsSession)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
 			logger.Fatal(err.Error())
