@@ -36,6 +36,7 @@ services:
   #     - morpheus
 
   keycloack:
+    container_name: keycloack
     image: quay.io/keycloak/keycloak:legacy
     environment:
       DB_VENDOR: POSTGRES
@@ -55,6 +56,7 @@ services:
       - morpheus
 
   keycloack_db:
+    container_name: keycloack_db
     image: postgres:13.6-alpine
     volumes:
       - keycloack_db_data:/var/lib/postgresql/data
