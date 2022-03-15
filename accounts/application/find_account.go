@@ -9,26 +9,26 @@ import (
 )
 
 type FindAccount struct {
-	Repository      db.Repository
-	CacheRepository cache.Repository
+	repository      db.Repository
+	cacheRepository cache.Repository
 }
 
 func NewFindAccount(repo db.Repository, cacheRepo cache.Repository) *FindAccount {
 	return &FindAccount{
-		Repository:      repo,
-		CacheRepository: cacheRepo,
+		repository:      repo,
+		cacheRepository: cacheRepo,
 	}
 }
 
 func (f *FindAccount) FindById(accountId string) (*entities.Account, error) {
 
-	data, err := f.CacheRepository.Get(accountId)
+	data, err := f.cacheRepository.Get(accountId)
 	if err != nil {
 		return nil, err
 	}
 
 	if data == "" {
-		result, err := f.Repository.FindById(accountId)
+		result, err := f.repository.FindById(accountId)
 		if err != nil {
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func (f *FindAccount) FindById(accountId string) (*entities.Account, error) {
 
 		value, _ := json.Marshal(result)
 
-		err = f.CacheRepository.Set(result.Id, string(value), time.Minute*10)
+		err = f.cacheRepository.Set(result.Id, string(value), time.Minute*10)
 		if err != nil {
 			return nil, err
 		}

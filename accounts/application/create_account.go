@@ -19,19 +19,19 @@ type CreateAccountDTO struct {
 }
 
 type CreateAccount struct {
-	Repository   db.Repository
-	AuthProvider auth.AuthProvider
+	repository   db.Repository
+	authProvider auth.AuthProvider
 }
 
-func NewCreateAccount(Repository db.Repository, AuthProvider auth.AuthProvider) *CreateAccount {
+func NewCreateAccount(repository db.Repository, authProvider auth.AuthProvider) *CreateAccount {
 	return &CreateAccount{
-		Repository:   Repository,
-		AuthProvider: AuthProvider,
+		repository:   repository,
+		authProvider: authProvider,
 	}
 }
 
 func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error) {
-	accountExists, err := c.Repository.Exists(data.Email) // pq: duplicate key value violates unique constraint "accounts_document_key"
+	accountExists, err := c.repository.Exists(data.Email) // pq: duplicate key value violates unique constraint "accounts_document_key"
 	if err != nil {
 		return nil, err
 	}
@@ -57,12 +57,12 @@ func (c *CreateAccount) Create(data *CreateAccountDTO) (*entities.Account, error
 		return nil, app_error.NewAppError("Invalid iput", "password must have at least 4 characters")
 	}
 
-	err = c.Repository.Create(account)
+	err = c.repository.Create(account)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.AuthProvider.CreateUser(
+	err = c.authProvider.CreateUser(
 		auth.AuthProviderUser{
 			Id:        account.Id,
 			Name:      account.Name,

@@ -1,12 +1,14 @@
 package env
 
 import (
+	"accounts/pkg/logger"
 	"errors"
 	"log"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 var (
@@ -54,7 +56,10 @@ func init() {
 
 	PORT, err = strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Error(ErrLoadingEnvVars.Error(),
+			zap.String("error_message", err.Error()),
+			zap.String("variable", "PORT"),
+		)
 	}
 
 	DB_USER = os.Getenv("DB_USER")
@@ -66,14 +71,20 @@ func init() {
 	DB_TIME_ZONE = os.Getenv("DB_TIME_ZONE")
 	DB_PORT, err = strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Error(ErrLoadingEnvVars.Error(),
+			zap.String("error_message", err.Error()),
+			zap.String("variable", "DB_PORT"),
+		)
 	}
 
 	REDIS_HOST = os.Getenv("REDIS_HOST")
 	REDIS_PASS = os.Getenv("REDIS_PASS")
 	REDIS_PORT, err = strconv.Atoi(os.Getenv("REDIS_PORT"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Error(ErrLoadingEnvVars.Error(),
+			zap.String("error_message", err.Error()),
+			zap.String("variable", "REDIS_PORT"),
+		)
 	}
 
 	RABBITMQ_HOST = os.Getenv("RABBITMQ_HOST")
@@ -82,7 +93,10 @@ func init() {
 	RABBITMQ_VHOST = os.Getenv("RABBITMQ_VHOST")
 	RABBITMQ_PORT, err = strconv.Atoi(os.Getenv("RABBITMQ_PORT"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Error(ErrLoadingEnvVars.Error(),
+			zap.String("error_message", err.Error()),
+			zap.String("variable", "RABBITMQ_PORT"),
+		)
 	}
 
 	KEYCLOACK_CLIENT_ID = os.Getenv("KEYCLOACK_CLIENT_ID")
@@ -92,7 +106,10 @@ func init() {
 	KEYCLOACK_PUBLIC_RSA_KEY = os.Getenv("KEYCLOACK_PUBLIC_RSA_KEY")
 	KEYCLOACK_PORT, err = strconv.Atoi(os.Getenv("KEYCLOACK_PORT"))
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Error(ErrLoadingEnvVars.Error(),
+			zap.String("error_message", err.Error()),
+			zap.String("variable", "KEYCLOACK_PORT"),
+		)
 	}
 
 	AWS_S3_REGION = os.Getenv("AWS_S3_REGION")

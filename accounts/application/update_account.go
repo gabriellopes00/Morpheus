@@ -15,19 +15,19 @@ type UpdateAccountDTO struct {
 }
 
 type UpdateAccount struct {
-	Repository      db.Repository
-	CacheRepository cache.Repository
+	repository      db.Repository
+	cacheRepository cache.Repository
 }
 
-func NewUpdateAccount(Repository db.Repository, CacheRepo cache.Repository) *UpdateAccount {
+func NewUpdateAccount(repository db.Repository, cacheRepo cache.Repository) *UpdateAccount {
 	return &UpdateAccount{
-		Repository:      Repository,
-		CacheRepository: CacheRepo,
+		repository:      repository,
+		cacheRepository: cacheRepo,
 	}
 }
 
 func (c *UpdateAccount) Update(accountId string, data *UpdateAccountDTO) (*entities.Account, error) {
-	account, err := c.Repository.FindById(accountId)
+	account, err := c.repository.FindById(accountId)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *UpdateAccount) Update(accountId string, data *UpdateAccountDTO) (*entit
 	account.BirthDate, _ = time.Parse(time.RFC3339, data.BirthDate)
 	account.UpdatedAt = time.Now()
 
-	err = c.Repository.Update(account)
+	err = c.repository.Update(account)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *UpdateAccount) Update(accountId string, data *UpdateAccountDTO) (*entit
 		return nil, err
 	}
 
-	err = c.CacheRepository.Set(account.Id, string(value), time.Minute*10)
+	err = c.cacheRepository.Set(account.Id, string(value), time.Minute*10)
 	if err != nil {
 		return nil, err
 	}

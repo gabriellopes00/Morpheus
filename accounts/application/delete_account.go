@@ -7,14 +7,14 @@ import (
 )
 
 type DeleteAccount struct {
-	Repository      db.Repository
-	CacheRepository cache.Repository
+	repository      db.Repository
+	cacheRepository cache.Repository
 }
 
-func NewDeleteAccount(Repository db.Repository, CacheRepo cache.Repository) *DeleteAccount {
+func NewDeleteAccount(repository db.Repository, cacheRepo cache.Repository) *DeleteAccount {
 	return &DeleteAccount{
-		Repository:      Repository,
-		CacheRepository: CacheRepo,
+		repository:      repository,
+		cacheRepository: cacheRepo,
 	}
 }
 
@@ -23,7 +23,7 @@ var (
 )
 
 func (d *DeleteAccount) Delete(accountId string) error {
-	existingAccount, err := d.Repository.ExistsId(accountId)
+	existingAccount, err := d.repository.ExistsId(accountId)
 	if err != nil {
 		return err
 	}
@@ -32,12 +32,12 @@ func (d *DeleteAccount) Delete(accountId string) error {
 		return ErrIdNotFound
 	}
 
-	err = d.Repository.Delete(accountId)
+	err = d.repository.Delete(accountId)
 	if err != nil {
 		return err
 	}
 
-	err = d.CacheRepository.Delete(accountId)
+	err = d.cacheRepository.Delete(accountId)
 	if err != nil {
 		return err
 	}
