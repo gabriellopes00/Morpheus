@@ -5,21 +5,23 @@ import (
 	"events/application"
 	domainErrs "events/domain/errors"
 	"events/domain/usecases"
+	"events/framework/logger"
 	"events/framework/queue"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type createEventHandler struct {
-	Usecase      usecases.CreateEvent
-	MessageQueue queue.MessageQueue
+	usecase      usecases.CreateEvent
+	messageQueue queue.MessageQueue
 }
 
 func NewCreateEventHandler(usecase usecases.CreateEvent, messageQueue queue.MessageQueue) *createEventHandler {
 	return &createEventHandler{
-		Usecase:      usecase,
-		MessageQueue: messageQueue,
+		usecase:      usecase,
+		messageQueue: messageQueue,
 	}
 }
 
@@ -27,10 +29,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 	var params application.CreateEventParams
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.JSON(
-			http.StatusUnprocessableEntity,
-			map[string]string{"error": ErrUnprocessableEntity.Error()},
-		)
+		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
 	accountId := c.Request().Header.Get("account_id")
@@ -43,7 +42,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 	params.OrganizerAccountId = accountId
 
-	event, err := handler.Usecase.Create(&params)
+	event, err := handler.usecase.Create(&params)
 	if err != nil {
 		if !domainErrs.IsDomainError(err) {
 			return c.JSON(
@@ -52,31 +51,17 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 			)
 		}
 
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+		logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 
 	}
 
-	payload, err := json.Marshal(event)
+	payload, _ := json.Marshal(event)
+	err = handler.messageQueue.PublishMessage(queue.ExchangeEvents, queue.KeyEventCreated, payload)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+		logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	err = handler.MessageQueue.PublishMessage(queue.ExchangeEvents, queue.KeyEventCreated, payload)
-	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
-	}
-
-	return c.JSON(
-		http.StatusCreated,
-		map[string]interface{}{"event": event},
-	)
+	return c.JSON(http.StatusCreated, map[string]interface{}{"event": event})
 }

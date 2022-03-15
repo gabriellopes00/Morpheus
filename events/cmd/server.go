@@ -57,10 +57,4 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		log.Fatal(err.Error())
 	}
-	if err := amqpConn.Close(); err != nil {
-		log.Fatal(err.Error())
-	}
-	if err := database.Close(); err != nil {
-		log.Fatal(err.Error())
-	}
 }

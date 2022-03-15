@@ -5,11 +5,17 @@ import (
 	"log"
 )
 
-type DeleteAccountUsecase struct {
-	Repository repositories.AccountRepository
+type deleteAccount struct {
+	repository repositories.AccountRepository
 }
 
-func (c DeleteAccountUsecase) Delete(accountId string) error {
+func NewDeleteAccount(repo repositories.AccountRepository) *deleteAccount {
+	return &deleteAccount{
+		repository: repo,
+	}
+}
+
+func (c deleteAccount) Delete(accountId string) error {
 	log.Println(accountId)
-	return c.Repository.Delete(accountId)
+	return c.repository.Delete(accountId)
 }

@@ -2,50 +2,47 @@ package handlers
 
 import (
 	"events/domain/usecases"
-	"log"
+	"events/framework/logger"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
-type findAccountEventsHandler struct {
-	Usecase usecases.FindEvents
+type findEventsHandler struct {
+	usecase usecases.FindEvents
 }
 
-func NewFindAccountEventsHandler(usecase usecases.FindEvents) *findAccountEventsHandler {
-	return &findAccountEventsHandler{
-		Usecase: usecase,
+func NewFindEventsHandler(usecase usecases.FindEvents) *findEventsHandler {
+	return &findEventsHandler{
+		usecase: usecase,
 	}
 }
 
-func (handler *findAccountEventsHandler) Handle(c echo.Context) error {
+func (handler *findEventsHandler) Handle(c echo.Context) error {
 
-	accountId := c.Param("account_id")
-	if accountId == "" {
+	eventId := c.Param("id")
+	if eventId == "" {
 		return c.JSON(
 			http.StatusBadRequest,
-			map[string]string{"error": ErrBadRequest.Error()},
-		)
+			map[string]string{"error": ErrBadRequest.Error()})
 	}
 
-	if c.Request().Header.Get("account_id") != accountId {
-		return c.JSON(
-			http.StatusUnauthorized,
-			map[string]string{"error": ErrUnauthorized.Error()},
-		)
+	if c.Request().Header.Get("account_id") == "" {
+		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	events, err := handler.Usecase.FindAccountEvents(accountId)
+	event, err := handler.usecase.FindEventById(eventId)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()},
-		)
+		logger.Logger.Error("error while finding event", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(
-		http.StatusCreated,
-		map[string]interface{}{"events": events},
-	)
+	if event == nil {
+		return c.JSON(
+			http.StatusNotFound,
+			map[string]string{"error": "No events found with given id"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"event": event})
 }

@@ -38,7 +38,7 @@ func (u *updateEventUsecase) UpdateStatus(eventId string, status interface{}) er
 type UpdateEventDTO struct {
 	Name            string                 `json:"name,omitempty"`
 	Description     string                 `json:"description,omitempty"`
-	IsAvailable     bool                   `json:"is_available,omitempty"`
+	IsAvailable     bool                   `json:"is_available,omitempty"` // remove
 	AgeGroup        int                    `json:"age_group,omitempty"`
 	MaximumCapacity int                    `json:"maximum_capacity,omitempty"`
 	Location        entities.EventLocation `json:"location"`

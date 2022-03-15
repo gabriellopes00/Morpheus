@@ -2,19 +2,21 @@ package handlers
 
 import (
 	"events/domain/usecases"
+	"events/framework/logger"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type findAllEventsHandler struct {
-	Usecase usecases.FindEvents
+	usecase usecases.FindEvents
 }
 
 func NewFindAllEventsHandler(usecase usecases.FindEvents) *findAllEventsHandler {
 	return &findAllEventsHandler{
-		Usecase: usecase,
+		usecase: usecase,
 	}
 }
 
@@ -32,16 +34,13 @@ func (handler *findAllEventsHandler) Handle(c echo.Context) error {
 	}
 
 	if c.Request().Header.Get("account_id") == "" {
-		return c.JSON(
-			http.StatusUnauthorized,
-			map[string]string{"error": ErrUnauthorized.Error()})
+		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	events, err := handler.Usecase.FindAll(state, month, ageGroup)
+	events, err := handler.usecase.FindAll(state, month, ageGroup)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
+		logger.Logger.Error("error while finding events", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if len(events) == 0 {
@@ -50,7 +49,5 @@ func (handler *findAllEventsHandler) Handle(c echo.Context) error {
 			map[string]string{"error": "No events found with given id"})
 	}
 
-	return c.JSON(
-		http.StatusOK,
-		map[string]interface{}{"events": events})
+	return c.JSON(http.StatusOK, map[string]interface{}{"events": events})
 }

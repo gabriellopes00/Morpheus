@@ -6,12 +6,12 @@ import (
 )
 
 type createEventUsecase struct {
-	Repository repositories.EventsRepository
+	repository repositories.EventsRepository
 }
 
 func NewCreateEventUsecase(repo repositories.EventsRepository) *createEventUsecase {
 	return &createEventUsecase{
-		Repository: repo,
+		repository: repo,
 	}
 }
 
@@ -57,7 +57,7 @@ func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event,
 		return nil, err
 	}
 
-	if err = c.Repository.Create(event); err != nil {
+	if err = c.repository.Create(event); err != nil {
 		return nil, err
 	}
 

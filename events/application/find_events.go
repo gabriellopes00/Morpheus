@@ -7,21 +7,21 @@ import (
 )
 
 type FindEvents struct {
-	Repository repositories.EventsRepository
+	repository repositories.EventsRepository
 }
 
 func NewFindEvents(repo repositories.EventsRepository) *FindEvents {
 	return &FindEvents{
-		Repository: repo,
+		repository: repo,
 	}
 }
 
 func (u *FindEvents) FindAccountEvents(accountId string) ([]*entities.Event, error) {
-	return u.Repository.FindAccountEvents(accountId)
+	return u.repository.FindAccountEvents(accountId)
 }
 
 func (u *FindEvents) FindEventById(eventId string) (*entities.Event, error) {
-	return u.Repository.FindById(eventId)
+	return u.repository.FindById(eventId)
 }
 
 func (u *FindEvents) FindAll(state string, month, ageGroup int) ([]entities.Event, error) {
@@ -41,5 +41,5 @@ func (u *FindEvents) FindAll(state string, month, ageGroup int) ([]entities.Even
 
 	}
 
-	return u.Repository.FindAll(state, month, ageGroup)
+	return u.repository.FindAll(state, month, ageGroup)
 }
