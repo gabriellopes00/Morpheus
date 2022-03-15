@@ -8,12 +8,12 @@ import (
 )
 
 type refreshAuthHandler struct {
-	AuthProvider auth.AuthProvider
+	authProvider auth.AuthProvider
 }
 
-func NewRefreshAuthHandler(AuthProvider auth.AuthProvider) *refreshAuthHandler {
+func NewRefreshAuthHandler(authProvider auth.AuthProvider) *refreshAuthHandler {
 	return &refreshAuthHandler{
-		AuthProvider: AuthProvider,
+		authProvider: authProvider,
 	}
 }
 
@@ -23,14 +23,11 @@ func (h *refreshAuthHandler) Handle(c echo.Context) error {
 	}
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.JSON(
-			http.StatusUnprocessableEntity,
-			map[string]string{"error": ErrUnprocessableEntity.Error()},
-		)
+		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	tokens, err := h.AuthProvider.RefreshAuth(params.RefreshToken)
-	if err != nil {
+	tokens, err := h.authProvider.RefreshAuth(params.RefreshToken)
+	if err != nil { // internal error?
 		return c.JSON(
 			http.StatusUnauthorized,
 			map[string]string{"error": err.Error()},

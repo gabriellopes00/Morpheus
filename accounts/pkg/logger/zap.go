@@ -14,6 +14,6 @@ func init() {
 	var err error
 	Logger, err = zap.NewProduction()
 	if err != nil {
-		log.Fatalln("error while starting logger")
+		log.Fatalln("error while starting logger..." + err.Error())
 	}
 }

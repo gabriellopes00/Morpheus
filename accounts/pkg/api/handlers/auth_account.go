@@ -3,20 +3,22 @@ package handlers
 import (
 	"accounts/application"
 	"accounts/pkg/auth"
+	"accounts/pkg/logger"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type authHandler struct {
-	AuthProvider auth.AuthProvider
+	authProvider auth.AuthProvider
 }
 
-func NewAuthHandler(AuthProvider auth.AuthProvider) *authHandler {
+func NewAuthHandler(authProvider auth.AuthProvider) *authHandler {
 	return &authHandler{
-		AuthProvider: AuthProvider,
+		authProvider: authProvider,
 	}
 }
 
@@ -28,17 +30,16 @@ func (h *authHandler) Handle(c echo.Context) error {
 	}
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.JSON(
-			http.StatusUnprocessableEntity,
-			map[string]string{"error": ErrUnprocessableEntity.Error()})
+		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	token, err := h.AuthProvider.SignInUser(params.Email, params.Password)
+	token, err := h.authProvider.SignInUser(params.Email, params.Password)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, application.ErrUnregisteredEmail) {
 			return c.JSON(http.StatusConflict, err.Error())
 		} else {
+			logger.Logger.Error("error while signin in account", zap.String("error_message", err.Error()))
 			return c.NoContent(http.StatusInternalServerError)
 		}
 	}

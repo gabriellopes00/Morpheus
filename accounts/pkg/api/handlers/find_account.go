@@ -2,18 +2,20 @@ package handlers
 
 import (
 	"accounts/application"
+	"accounts/pkg/logger"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type findAccountHandler struct {
-	Usecase application.FindAccount
+	usecase application.FindAccount
 }
 
 func NewFindAccountHandler(usecase application.FindAccount) *findAccountHandler {
 	return &findAccountHandler{
-		Usecase: usecase,
+		usecase: usecase,
 	}
 }
 
@@ -21,23 +23,18 @@ func (h *findAccountHandler) Handle(c echo.Context) error {
 
 	accountId := c.Param("id")
 
-	account, err := h.Usecase.FindById(accountId)
+	account, err := h.usecase.FindById(accountId)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": "unexpected internal server error"},
-		)
+		logger.Logger.Error("error whilefinding account by id", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if account == nil {
 		return c.JSON(
-			http.StatusConflict,
+			http.StatusNotFound,
 			map[string]string{"error": "account not found"},
 		)
 	}
 
-	return c.JSON(
-		http.StatusCreated,
-		map[string]interface{}{"account": account},
-	)
+	return c.JSON(http.StatusOK, map[string]interface{}{"account": account})
 }

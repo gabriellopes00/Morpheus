@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"accounts/application"
+	"accounts/pkg/logger"
 	"accounts/pkg/storage"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type AvatarUploadHandler struct {
@@ -35,26 +36,24 @@ func (h *AvatarUploadHandler) Handle(c echo.Context) error {
 
 	file, err := c.FormFile("avatar")
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "ivalid file upload")
+		return c.JSON(http.StatusBadRequest, "error while uploading file")
 	}
 
 	src, err := file.Open()
 	if err != nil {
-		fmt.Println(err)
 		return c.NoContent(http.StatusBadRequest)
 	}
 	defer src.Close()
 
 	err = h.validateFileType(file.Header.Get("Content-Type"))
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	fileName := "avatar-" + accountId + "." + strings.Split(file.Header.Get("Content-Type"), "/")[1]
 	fileUrl, err := h.storageProvider.UploadFile(src, fileName)
 	if err != nil {
-		fmt.Println(err)
+		logger.Logger.Error("error while uploading file in provider", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -63,7 +62,7 @@ func (h *AvatarUploadHandler) Handle(c echo.Context) error {
 		&application.UpdateAccountDTO{AvatarUrl: fileUrl},
 	)
 	if err != nil {
-		fmt.Println(err)
+		logger.Logger.Error("error while updating account", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
 	}
 

@@ -16,9 +16,9 @@ import (
 )
 
 type createAccountHandler struct {
-	Usecase      application.CreateAccount
-	AuthProvider auth.AuthProvider
-	MessageQueue queue.MessageQueue
+	usecase      application.CreateAccount
+	authProvider auth.AuthProvider
+	messageQueue queue.MessageQueue
 }
 
 func NewCreateAccountHandler(
@@ -27,9 +27,9 @@ func NewCreateAccountHandler(
 	authProvider auth.AuthProvider,
 ) *createAccountHandler {
 	return &createAccountHandler{
-		Usecase:      usecase,
-		MessageQueue: messageQueue,
-		AuthProvider: authProvider,
+		usecase:      usecase,
+		messageQueue: messageQueue,
+		authProvider: authProvider,
 	}
 }
 
@@ -40,7 +40,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	account, err := h.Usecase.Create(params)
+	account, err := h.usecase.Create(params)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, application.ErrEmailAlreadyInUse) {
@@ -50,11 +50,12 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest,
 				map[string]string{"error": err.Error()})
 		} else {
+			logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
 			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
 
-	token, err := h.AuthProvider.SignInUser(params.Email, params.Password)
+	token, err := h.authProvider.SignInUser(params.Email, params.Password)
 	if err != nil {
 		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
@@ -65,9 +66,9 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, payload)
+	err = h.messageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountCreated, payload)
 	if err != nil {
-		logger.Logger.Error("error while publishing message to the queue", zap.String("rabbitmq", err.Error()))
+		logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
 	}
 

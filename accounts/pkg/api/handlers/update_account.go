@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"accounts/application"
+	"accounts/pkg/logger"
 	"accounts/pkg/queue"
 	"encoding/json"
 	"errors"
@@ -9,65 +10,53 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type updateAccountHandler struct {
-	Usecase      application.UpdateAccount
-	MessageQueue queue.MessageQueue
+	usecase      application.UpdateAccount
+	messageQueue queue.MessageQueue
 }
 
 func NewUpdateAccountHandler(usecase application.UpdateAccount, messageQueue queue.MessageQueue) *updateAccountHandler {
 	return &updateAccountHandler{
-		Usecase:      usecase,
-		MessageQueue: messageQueue,
+		usecase:      usecase,
+		messageQueue: messageQueue,
 	}
 }
 
 func (h *updateAccountHandler) Handle(c echo.Context) error {
 	accountId := c.Request().Header.Get("account_id")
 	paramId := c.Param("id")
+
 	if accountId != paramId {
-		return c.JSON(
-			http.StatusForbidden,
-			map[string]string{"error": "forbidden accout update"})
+		return c.NoContent(http.StatusForbidden)
 	}
 
 	var params *application.UpdateAccountDTO
 
 	if err := (&echo.DefaultBinder{}).BindBody(c, &params); err != nil {
-		return c.JSON(
-			http.StatusUnprocessableEntity,
-			map[string]string{"error": "invalid request data"})
+		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	account, err := h.Usecase.Update(accountId, params)
+	account, err := h.usecase.Update(accountId, params)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, application.ErrIdNotFound) {
 			return c.JSON(http.StatusConflict,
 				map[string]string{"error": err.Error()})
 		} else {
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{"error": ErrInternalServer.Error()})
+			logger.Logger.Error("error while updating account data", zap.String("error_message", err.Error()))
+			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
 
-	payload, err := json.Marshal(account)
+	payload, _ := json.Marshal(account)
+	err = h.messageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountUpdated, payload)
 	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
+		logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	err = h.MessageQueue.PublishMessage(queue.ExchangeAccounts, queue.KeyAccountUpdated, payload)
-	if err != nil {
-		return c.JSON(
-			http.StatusInternalServerError,
-			map[string]string{"error": ErrInternalServer.Error()})
-	}
-
-	return c.JSON(
-		http.StatusOK,
-		map[string]interface{}{"account": account})
+	return c.JSON(http.StatusOK, map[string]interface{}{"account": account})
 }
