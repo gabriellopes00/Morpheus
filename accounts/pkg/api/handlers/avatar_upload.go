@@ -6,7 +6,6 @@ import (
 	"accounts/pkg/storage"
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -45,13 +44,14 @@ func (h *AvatarUploadHandler) Handle(c echo.Context) error {
 	}
 	defer src.Close()
 
-	err = h.validateFileType(file.Header.Get("Content-Type"))
+	filetype := file.Header.Get("Content-Type")
+	err = h.validateFileType(filetype)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	fileName := "avatar-" + accountId + "." + strings.Split(file.Header.Get("Content-Type"), "/")[1]
-	fileUrl, err := h.storageProvider.UploadFile(src, fileName)
+	fileName := "avatar-" + accountId
+	fileUrl, err := h.storageProvider.UploadFile(src, fileName, filetype)
 	if err != nil {
 		logger.Logger.Error("error while uploading file in provider", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
