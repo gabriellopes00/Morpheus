@@ -1,5 +1,5 @@
 package encrypter
 
 type Encrypter interface {
-	Decrypt(token string) (accountId string, err error)
+	DecryptToken(token, key string) (accountId string, err error)
 }

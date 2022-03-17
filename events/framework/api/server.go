@@ -7,6 +7,7 @@ import (
 	"events/framework/api/middlewares"
 	"events/framework/auth"
 	"events/framework/db/repositories"
+	"events/framework/encrypter"
 	"events/framework/queue"
 	"net/http"
 
@@ -20,7 +21,8 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 	// init adapters
 	eventsRepo := repositories.NewPgEventsRepository(database)
 	rabbitMQ := queue.NewRabbitMQ(amqpConn)
-	keycloack := auth.NewKeycloackauthProvider()
+	jwtEncrypter := encrypter.NewJwtEncrypter()
+	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
 
 	// init usecases
 	createEvent := application.NewCreateEventUsecase(eventsRepo)

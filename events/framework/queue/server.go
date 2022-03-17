@@ -18,7 +18,6 @@ func SetUpQueueServer(amqpConn *amqp.Channel, database *sql.DB) {
 
 	rabbitmq.Consume("account_created_events", accountCreatedChan)
 	rabbitmq.Consume("account_deleted_events", accountDeletedChan)
-	rabbitmq.Consume("event_sold_out", soldOutChan)
 
 	accountsRepository := repositories.NewPgAccountRepository(database)
 	eventsRepository := repositories.NewPgEventsRepository(database)

@@ -1,37 +1,37 @@
 package auth
 
 import (
-	"context"
 	"events/config/env"
+	"events/framework/encrypter"
 	"fmt"
 
 	"github.com/Nerzal/gocloak/v7"
 )
 
 var (
-	clientId     = env.KEYCLOACK_CLIENT_ID
-	clientSecret = env.KEYCLOACK_CLIENT_SECRET
-	realm        = env.KEYCLOACK_REALM
-	hostname     = fmt.Sprintf("http://%s:%d", env.KEYCLOACK_HOST, env.KEYCLOACK_PORT)
+	hostname = fmt.Sprintf("http://%s:%d", env.KEYCLOACK_HOST, env.KEYCLOACK_PORT)
 )
 
 type KeyclaockAuthProvider struct {
-	Client gocloak.GoCloak
+	client    gocloak.GoCloak
+	encrypter encrypter.Encrypter
 }
 
-func NewKeycloackauthProvider() *KeyclaockAuthProvider {
-	return &KeyclaockAuthProvider{Client: gocloak.NewClient(hostname)}
+func NewKeycloackauthProvider(encrypter encrypter.Encrypter) *KeyclaockAuthProvider {
+	return &KeyclaockAuthProvider{
+		client:    gocloak.NewClient(hostname),
+		encrypter: encrypter,
+	}
 }
 
 func (k *KeyclaockAuthProvider) AuthUser(accessToken string) (AuthUserInfo, error) {
-
-	keycloackUserInfo, err := k.Client.GetRawUserInfo(context.Background(), accessToken, realm)
+	accountId, err := k.encrypter.DecryptToken(accessToken, env.KEYCLOACK_PUBLIC_RSA_KEY)
 	if err != nil {
 		return AuthUserInfo{}, err
 	}
 
 	userInfo := AuthUserInfo{
-		Id: keycloackUserInfo["account_id"].(string),
+		Id: accountId,
 	}
 
 	return userInfo, nil

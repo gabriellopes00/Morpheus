@@ -2,29 +2,42 @@ package encrypter
 
 import (
 	"errors"
-	"events/config/env"
 
 	"github.com/golang-jwt/jwt"
 )
 
-type jwtEncrypter struct{}
+var (
+	ErrInvalidToken        = errors.New("invalid authentication token")
+	ErrExpiredToken        = errors.New("authentication token expired")
+	ErrInvalidRefreshToken = errors.New("invalid refresh token")
+)
+
+type jwtEncrypter struct {
+}
 
 func NewJwtEncrypter() *jwtEncrypter {
 	return &jwtEncrypter{}
 }
 
-var ErrInvalidToken = errors.New("invalid authentication token")
+func (jwtEncrypter) DecryptToken(token, key string) (string, error) {
 
-func (jwtEncrypter) Decrypt(token string) (accountId string, err error) {
 	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, ErrInvalidToken
 		}
-		return []byte(env.AUTH_TOKEN_KEY), nil
+
+		// generate key using keyclaock public rsa key
+		secretKey := "-----BEGIN CERTIFICATE-----\n" + key + "\n-----END CERTIFICATE-----"
+		key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(secretKey))
+		if err != nil {
+			return "", err
+		}
+
+		return key, nil
 	})
 
 	if err != nil {
-		return "", ErrInvalidToken
+		return "", err
 	}
 
 	claims, ok := jwtToken.Claims.(jwt.MapClaims)
@@ -36,7 +49,11 @@ func (jwtEncrypter) Decrypt(token string) (accountId string, err error) {
 		return "", ErrInvalidToken
 	}
 
-	accountId = claims["account_id"].(string)
+	accountId, ok := claims["account_id"].(string)
+	if !ok {
+		return "", ErrInvalidToken
+	}
+
 	if accountId == "" {
 		return "", ErrInvalidToken
 	}
