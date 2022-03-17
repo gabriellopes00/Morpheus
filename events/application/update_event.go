@@ -59,12 +59,10 @@ func (u *updateEventUsecase) UpdateData(eventId string, data *UpdateEventDTO) (*
 
 	event.Name = data.Name
 	event.Description = data.Description
-	event.IsAvailable = data.IsAvailable
 	event.AgeGroup = data.AgeGroup
 	event.MaximumCapacity = data.MaximumCapacity
 	event.Location = data.Location
 	event.Duration = data.Duration
-	event.TicketPrice = data.TicketPrice
 	event.Date = data.Date
 
 	err = u.Repository.Update(event)

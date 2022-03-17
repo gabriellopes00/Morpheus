@@ -18,27 +18,25 @@ const (
 )
 
 type Event struct {
-	Id                 string        `json:"id,omitempty"`
-	Name               string        `json:"name,omitempty"`
-	Description        string        `json:"description,omitempty"`
-	IsAvailable        bool          `json:"is_available,omitempty"`
-	OrganizerAccountId string        `json:"organizer_account_id,omitempty"`
-	AgeGroup           int           `json:"age_group,omitempty"`
-	MaximumCapacity    int           `json:"maximum_capacity,omitempty"`
-	Status             EventStatus   `json:"status,omitempty"`
-	Location           EventLocation `json:"location"`
-	Duration           int           `json:"duration,omitempty"`
-	TicketPrice        float32       `json:"ticket_price,omitempty"`
-	Date               time.Time     `json:"date,omitempty"`
-	UpdatedAt          time.Time     `json:"updated_at,omitempty"`
-	CreatedAt          time.Time     `json:"created_at,omitempty"`
-	DeletedAt          time.Time     `json:"deleted_at,omitempty"`
+	Id                 string         `json:"id,omitempty"`
+	Name               string         `json:"name,omitempty"`
+	Description        string         `json:"description,omitempty"`
+	OrganizerAccountId string         `json:"organizer_account_id,omitempty"`
+	AgeGroup           int            `json:"age_group,omitempty"`
+	MaximumCapacity    int            `json:"maximum_capacity,omitempty"`
+	Status             EventStatus    `json:"status,omitempty"`
+	Location           EventLocation  `json:"location"`
+	Duration           int            `json:"duration,omitempty"`
+	TycketOptions      []TycketOption `json:"tycket_options,omitempty"`
+	Date               time.Time      `json:"date,omitempty"`
+	CreatedAt          time.Time      `json:"created_at,omitempty"`
+	UpdatedAt          time.Time      `json:"updated_at,omitempty"`
 }
 
 func NewEvent(
-	name, description string, isAvailable bool, organizerAccountId string,
-	ageGroup, maximumCapacity int, status string, location *EventLocation,
-	duration int, ticketPrice float32, date string,
+	name, description string, organizerAccountId string,
+	ageGroup, maximumCapacity int, location *EventLocation,
+	duration int, tycketOptions []TycketOption, date string,
 ) (*Event, domain_errors.DomainErr) {
 	var err error
 
@@ -46,12 +44,12 @@ func NewEvent(
 		Id:                 gouuid.NewV4().String(),
 		Name:               strings.TrimSpace(name),
 		Description:        strings.TrimSpace(description),
-		IsAvailable:        isAvailable,
 		OrganizerAccountId: organizerAccountId,
-		TicketPrice:        ticketPrice,
 		AgeGroup:           ageGroup,
 		MaximumCapacity:    maximumCapacity,
 		Location:           *location,
+		Status:             StatusAvailable,
+		TycketOptions:      tycketOptions, // TODO: validate maximum capacity
 		Duration:           duration,
 		UpdatedAt:          time.Now().Local(),
 		CreatedAt:          time.Now().Local(),
@@ -62,21 +60,6 @@ func NewEvent(
 		return nil, domain_errors.NewValidationError(
 			`Event's dates must be in "RFC3339" format`,
 			"Date", date)
-	}
-
-	switch status {
-	case string(StatusAvailable):
-		event.Status = StatusAvailable
-	case string(StatusCanceled):
-		event.Status = StatusCanceled
-	case string(StatusFinished):
-		event.Status = StatusFinished
-	case string(StatusSoldOut):
-		event.Status = StatusSoldOut
-	default:
-		return nil, domain_errors.NewValidationError(
-			`Events' status must be "available", "sold_out", "canceled" or "finished"`,
-			"Status", status)
 	}
 
 	if err = event.validate(); err != nil {
@@ -111,13 +94,6 @@ func (e *Event) validate() domain_errors.DomainErr {
 			"Events' maximum capacity must be greather than 0",
 			"MaximumAge",
 			e.MaximumCapacity)
-	}
-
-	if e.TicketPrice <= 0 {
-		return domain_errors.NewValidationError(
-			"Events' ticket price must be greather than 0",
-			"TicketPrice",
-			e.TicketPrice)
 	}
 
 	if e.Duration <= 0 {

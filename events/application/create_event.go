@@ -18,11 +18,9 @@ func NewCreateEventUsecase(repo repositories.EventsRepository) *createEventUseca
 type CreateEventParams struct {
 	Name               string `json:"name,omitempty"`
 	Description        string `json:"description,omitempty"`
-	IsAvailable        bool   `json:"is_available,omitempty"`
 	OrganizerAccountId string `json:"organizer_account_id,omitempty"`
 	AgeGroup           int    `json:"age_group,omitempty"`
 	MaximumCapacity    int    `json:"maximum_capacity,omitempty"`
-	Status             string `json:"status,omitempty"`
 	Location           struct {
 		Street      string  `json:"street,omitempty"`
 		District    string  `json:"district,omitempty"`
@@ -34,9 +32,16 @@ type CreateEventParams struct {
 		Latitude    float64 `json:"latitude,omitempty"`
 		Longitude   float64 `json:"longitude,omitempty"`
 	} `json:"location,omitempty"`
-	TicketPrice float32 `json:"ticket_price,omitempty"`
-	Date        string  `json:"date,omitempty"`
-	Duration    int     `json:"duration,omitempty"`
+	TycketOptions []struct {
+		Title string `json:"title,omitempty"`
+		Lots  []struct {
+			Number       int     `json:"number,omitempty"`
+			TycketPrice  float64 `json:"tycket_price,omitempty"`
+			TycketAmount int     `json:"tycket_amount,omitempty"`
+		} `json:"lots,omitempty"`
+	} `json:"tycket_options,omitempty"`
+	Date     string `json:"date,omitempty"`
+	Duration int    `json:"duration,omitempty"`
 }
 
 func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event, error) {
@@ -50,9 +55,26 @@ func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event,
 		return nil, err
 	}
 
+	options := params.TycketOptions
+	var tycketOptions []entities.TycketOption
+
+	for _, option := range options {
+
+		lots := option.Lots
+		var tycketLots []entities.TycketLot
+
+		for _, lot := range lots {
+			tycketLot := entities.NewTycketLot(lot.Number, "", lot.TycketPrice, lot.TycketAmount)
+			tycketLots = append(tycketLots, *tycketLot)
+		}
+
+		tycketOption := entities.NewTycketOption("", option.Title, tycketLots)
+		tycketOptions = append(tycketOptions, *tycketOption)
+	}
+
 	event, err := entities.NewEvent(
-		params.Name, params.Description, params.IsAvailable, params.OrganizerAccountId, params.AgeGroup,
-		params.MaximumCapacity, params.Status, eventLocation, params.Duration, params.TicketPrice, params.Date)
+		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
+		params.MaximumCapacity, eventLocation, params.Duration, tycketOptions, params.Date)
 	if err != nil {
 		return nil, err
 	}
