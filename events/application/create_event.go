@@ -55,33 +55,37 @@ func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event,
 		return nil, err
 	}
 
+	event, err := entities.NewEvent(
+		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
+		params.MaximumCapacity, eventLocation, params.Duration, nil, params.Date)
+	if err != nil {
+		return nil, err
+	}
+
 	options := params.TycketOptions
 	var tycketOptions []entities.TycketOption
 
 	for _, option := range options {
 
+		tycketOption := entities.NewTycketOption(event.Id, option.Title, nil)
+
 		lots := option.Lots
 		var tycketLots []entities.TycketLot
 
 		for _, lot := range lots {
-			tycketLot := entities.NewTycketLot(lot.Number, "", lot.TycketPrice, lot.TycketAmount)
+			tycketLot := entities.NewTycketLot(lot.Number, tycketOption.Id, lot.TycketPrice, lot.TycketAmount)
 			tycketLots = append(tycketLots, *tycketLot)
 		}
 
-		tycketOption := entities.NewTycketOption("", option.Title, tycketLots)
+		tycketOption.Lots = tycketLots
 		tycketOptions = append(tycketOptions, *tycketOption)
 	}
 
-	event, err := entities.NewEvent(
-		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
-		params.MaximumCapacity, eventLocation, params.Duration, tycketOptions, params.Date)
-	if err != nil {
-		return nil, err
-	}
+	event.TycketOptions = tycketOptions
 
-	if err = c.repository.Create(event); err != nil {
-		return nil, err
-	}
+	// if err = c.repository.Create(event); err != nil {
+	// 	return nil, err
+	// }
 
 	return event, nil
 }

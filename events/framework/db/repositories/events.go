@@ -1,10 +1,17 @@
 package repositories
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"events/domain/entities"
+	"events/framework/logger"
+	"fmt"
 	"strconv"
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+	"go.uber.org/zap"
 )
 
 type EventsRepository interface {
@@ -26,16 +33,21 @@ func NewPgEventsRepository(connection *sql.DB) *pgEventsRepository {
 }
 
 func (repo *pgEventsRepository) Create(event *entities.Event) error {
-	stm, err := repo.Db.Prepare(`
-		INSERT INTO EVENTS (id,
+
+	tx, err := repo.Db.BeginTx(context.Background(), nil)
+	if err != nil {
+		logger.Logger.Error("error while creating a new transaction", zap.String("error_message", err.Error()))
+		return err
+	}
+
+	stm, err := tx.Prepare(`
+		INSERT INTO events (id,
 							name,
 							description,
-							is_available,
 							organizer_account_id,
 							age_group,
 							maximum_capacity,
 							status,
-							ticket_price,
 							date,
 							duration,
 							location_street,
@@ -50,9 +62,12 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 							created_at,
 							updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-		$16, $17, $18, $19, $20, $21, $22);
+		$16, $17, $18, $19, $20);
 	`)
 	if err != nil {
+		logger.Logger.Error("error while preparing a query", zap.String("error_message", err.Error()))
+		logger.Logger.Info("rolling back transacion", zap.Error(tx.Rollback()))
+
 		return err
 	}
 
@@ -62,12 +77,10 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		event.Id,
 		event.Name,
 		event.Description,
-		event.IsAvailable,
 		event.OrganizerAccountId,
 		strconv.Itoa(event.AgeGroup),
 		event.MaximumCapacity,
 		event.Status,
-		event.TicketPrice,
 		event.Date,
 		event.Duration,
 		event.Location.Street,
@@ -81,7 +94,82 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		event.Location.Longitude,
 		event.CreatedAt,
 		event.UpdatedAt)
+	if err != nil {
+		logger.Logger.Error("error while executing a query", zap.String("error_message", err.Error()))
+		logger.Logger.Info("rolling back transacion", zap.String("error", tx.Rollback().Error()))
 
+		return err
+	}
+
+	for _, tycketOption := range event.TycketOptions {
+
+		stm, err = tx.Prepare(`
+			INSERT INTO event_tycket_options (id,
+											event_id,
+											title,
+											created_at)
+			VALUES ($1, $2, $3, $4);
+		`)
+		if err != nil {
+			logger.Logger.Error("error while preparing a query", zap.String("error_message", err.Error()))
+			logger.Logger.Info("rolling back transacion", zap.String("error", tx.Rollback().Error()))
+
+			return err
+		}
+
+		defer stm.Close()
+
+		_, err = stm.Exec(
+			tycketOption.Id,
+			tycketOption.EventId,
+			tycketOption.Title,
+			time.Now(),
+		)
+		if err != nil {
+			logger.Logger.Error("error while executing a query", zap.String("error_message", err.Error()))
+			logger.Logger.Info("rolling back transacion", zap.String("error", tx.Rollback().Error()))
+
+			return err
+		}
+
+		lotQuery := `
+			INSERT INTO event_tycket_lots (id,
+											event_tycket_option_id,
+											number,
+											tycket_price,
+											tycket_amount,
+											created_at)
+			VALUES ($1, $2, $3, $4, $5, $6);
+		`
+
+		for _, lot := range tycketOption.Lots {
+			stm, err = tx.Prepare(lotQuery)
+			if err != nil {
+				logger.Logger.Error("error while preparing a query", zap.String("error_message", err.Error()))
+				logger.Logger.Info("rolling back transacion", zap.String("error", tx.Rollback().Error()))
+
+				return err
+			}
+			_, err = stm.Exec(
+				uuid.NewV4(),
+				lot.TycketOptionId,
+				lot.Number,
+				lot.TycketPrice,
+				lot.TycketAmount,
+				time.Now(),
+			)
+			if err != nil {
+				logger.Logger.Error("error while executing a query", zap.String("error_message", err.Error()))
+				logger.Logger.Info("rolling back transacion", zap.String("error", tx.Rollback().Error()))
+
+				return err
+			}
+
+		}
+	}
+
+	err = tx.Commit()
+	fmt.Println(err)
 	return err
 }
 
@@ -131,11 +219,9 @@ func (repo *pgEventsRepository) Update(event *entities.Event) error {
 	_, err = stm.Exec(
 		event.Name,
 		event.Description,
-		event.IsAvailable,
 		event.AgeGroup,
 		event.MaximumCapacity,
 		event.Duration,
-		event.TicketPrice,
 		event.Date,
 		event.Location.Street,
 		event.Location.District,
@@ -200,12 +286,10 @@ func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]*entities
 			&event.Id,
 			&event.Name,
 			&event.Description,
-			&event.IsAvailable,
 			&event.OrganizerAccountId,
 			&event.AgeGroup,
 			&event.MaximumCapacity,
 			&event.Status,
-			&event.TicketPrice,
 			&event.Date,
 			&event.Duration,
 			&event.Location.Street,
@@ -269,12 +353,10 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 		&event.Id,
 		&event.Name,
 		&event.Description,
-		&event.IsAvailable,
 		&event.OrganizerAccountId,
 		&event.AgeGroup,
 		&event.MaximumCapacity,
 		&event.Status,
-		&event.TicketPrice,
 		&event.Date,
 		&event.Duration,
 		&event.Location.Street,
@@ -349,12 +431,10 @@ func (repo *pgEventsRepository) FindAll(state string, month, ageGroup int) ([]en
 			&event.Id,
 			&event.Name,
 			&event.Description,
-			&event.IsAvailable,
 			&event.OrganizerAccountId,
 			&event.AgeGroup,
 			&event.MaximumCapacity,
 			&event.Status,
-			&event.TicketPrice,
 			&event.Date,
 			&event.Duration,
 			&event.Location.Street,

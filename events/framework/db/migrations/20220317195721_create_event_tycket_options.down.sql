@@ -1,1 +1,1 @@
-DROP TABLE "event_tycket_options";
+DROP TABLE IF EXISTS "event_tycket_options";

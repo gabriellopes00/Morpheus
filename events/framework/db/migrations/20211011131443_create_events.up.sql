@@ -14,12 +14,10 @@ CREATE TABLE IF NOT EXISTS "events" (
     id UUID UNIQUE NOT NULL,
     name VARCHAR NOT NULL,
     description TEXT DEFAULT NULL,
-    is_available BOOLEAN NOT NULL,
     organizer_account_id UUID NOT NULL,
     age_group EVENT_AGE_GROUP NOT NULL,
     maximum_capacity INTEGER NOT NULL CHECK (maximum_capacity >= 1),
     status EVENT_STATUS NOT NULL,
-    ticket_price REAL NOT NULL CHECK (ticket_price >= 0),
     date TIMESTAMP WITH TIME ZONE NOT NULL,
     duration SMALLINT NOT NULL CHECK (duration >= 1),
     location_street VARCHAR NOT NULL,
@@ -33,7 +31,6 @@ CREATE TABLE IF NOT EXISTS "events" (
     location_longitude FLOAT DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (organizer_account_id) REFERENCES accounts(id) ON DELETE SET NULL
