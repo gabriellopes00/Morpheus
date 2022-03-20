@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"events/application"
 	domainErrs "events/domain/errors"
-	"events/domain/usecases"
 	"events/framework/logger"
 	"events/framework/queue"
 	"net/http"
@@ -14,13 +13,13 @@ import (
 )
 
 type createEventHandler struct {
-	usecase      usecases.CreateEvent
+	createEvent  *application.CreateEvent
 	messageQueue queue.MessageQueue
 }
 
-func NewCreateEventHandler(usecase usecases.CreateEvent, messageQueue queue.MessageQueue) *createEventHandler {
+func NewCreateEventHandler(createEvent *application.CreateEvent, messageQueue queue.MessageQueue) *createEventHandler {
 	return &createEventHandler{
-		usecase:      usecase,
+		createEvent:  createEvent,
 		messageQueue: messageQueue,
 	}
 }
@@ -42,7 +41,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 	params.OrganizerAccountId = accountId
 
-	event, err := handler.usecase.Create(&params)
+	event, err := handler.createEvent.Create(&params)
 	if err != nil {
 		if !domainErrs.IsDomainError(err) {
 			return c.JSON(

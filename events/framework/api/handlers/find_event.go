@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"events/domain/usecases"
+	"events/application"
 	"events/framework/logger"
 	"net/http"
 
@@ -10,12 +10,12 @@ import (
 )
 
 type findEventsHandler struct {
-	usecase usecases.FindEvents
+	findEvent *application.FindEvents
 }
 
-func NewFindEventsHandler(usecase usecases.FindEvents) *findEventsHandler {
+func NewFindEventsHandler(findEvent *application.FindEvents) *findEventsHandler {
 	return &findEventsHandler{
-		usecase: usecase,
+		findEvent: findEvent,
 	}
 }
 
@@ -32,7 +32,7 @@ func (handler *findEventsHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	event, err := handler.usecase.FindEventById(eventId)
+	event, err := handler.findEvent.FindEventById(eventId)
 	if err != nil {
 		logger.Logger.Error("error while finding event", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)

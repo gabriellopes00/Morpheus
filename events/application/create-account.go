@@ -5,16 +5,16 @@ import (
 	"events/framework/db/repositories"
 )
 
-type createAccount struct {
+type CreateAccount struct {
 	repository repositories.AccountRepository
 }
 
-func NewCreateAccount(repo repositories.AccountRepository) *createAccount {
-	return &createAccount{
+func NewCreateAccount(repo repositories.AccountRepository) *CreateAccount {
+	return &CreateAccount{
 		repository: repo,
 	}
 }
 
-func (c createAccount) Create(account *entities.Account) error {
+func (c CreateAccount) Create(account *entities.Account) error {
 	return c.repository.Create(account)
 }

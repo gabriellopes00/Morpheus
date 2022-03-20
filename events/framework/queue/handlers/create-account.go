@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"events/application"
 	"events/domain/entities"
-	"events/domain/usecases"
 )
 
 type createAccounthandler struct {
 	Channel <-chan []byte
-	Usecase usecases.CreateAccount
+	Usecase *application.CreateAccount
 }
 
-func NewCreateAccountHandler(channel <-chan []byte, usecase usecases.CreateAccount) *createAccounthandler {
+func NewCreateAccountHandler(channel <-chan []byte, usecase *application.CreateAccount) *createAccounthandler {
 	return &createAccounthandler{
 		Channel: channel,
 		Usecase: usecase,

@@ -23,7 +23,7 @@ func SetUpQueueServer(amqpConn *amqp.Channel, database *sql.DB) {
 	eventsRepository := repositories.NewPgEventsRepository(database)
 	createAccount := application.NewCreateAccount(accountsRepository)
 	deleteAccount := application.NewDeleteAccount(accountsRepository)
-	updateEvent := application.NewUpdateEventUsecase(eventsRepository)
+	updateEvent := application.NewUpdateEvent(eventsRepository)
 
 	go func() {
 		createHandler := handlers.NewCreateAccountHandler(accountCreatedChan, createAccount)

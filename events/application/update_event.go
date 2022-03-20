@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-type updateEventUsecase struct {
+type UpdateEvent struct {
 	Repository repositories.EventsRepository
 }
 
-func NewUpdateEventUsecase(repo repositories.EventsRepository) *updateEventUsecase {
-	return &updateEventUsecase{
+func NewUpdateEvent(repo repositories.EventsRepository) *UpdateEvent {
+	return &UpdateEvent{
 		Repository: repo,
 	}
 }
 
-func (u *updateEventUsecase) UpdateStatus(eventId string, status interface{}) error {
+func (u *UpdateEvent) UpdateStatus(eventId string, status interface{}) error {
 	stts, ok := status.(entities.EventStatus)
 	if !ok {
 		return errors.New("invalid status")
@@ -47,7 +47,7 @@ type UpdateEventDTO struct {
 	Date            time.Time              `json:"date,omitempty"`
 }
 
-func (u *updateEventUsecase) UpdateData(eventId string, data *UpdateEventDTO) (*entities.Event, error) {
+func (u *UpdateEvent) UpdateData(eventId string, data *UpdateEventDTO) (*entities.Event, error) {
 	event, err := u.Repository.FindById(eventId)
 	if err != nil {
 		return nil, err

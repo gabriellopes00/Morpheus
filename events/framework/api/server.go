@@ -25,9 +25,9 @@ func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
 	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
 
 	// init usecases
-	createEvent := application.NewCreateEventUsecase(eventsRepo)
+	createEvent := application.NewCreateEvent(eventsRepo)
 	findEvents := application.NewFindEvents(eventsRepo)
-	updateEvents := application.NewUpdateEventUsecase(eventsRepo)
+	updateEvents := application.NewUpdateEvent(eventsRepo)
 
 	// init handlers
 	createEventHandler := handlers.NewCreateEventHandler(createEvent, rabbitMQ)

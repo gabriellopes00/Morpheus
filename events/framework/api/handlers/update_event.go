@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"events/application"
-	"events/domain/usecases"
 	"events/framework/logger"
 	"events/framework/queue"
 	"net/http"
@@ -13,13 +12,13 @@ import (
 )
 
 type updateEventHandler struct {
-	usecase      usecases.UpdateEvents
+	updateEvent  *application.UpdateEvent
 	MessageQueue queue.MessageQueue
 }
 
-func NewUpdateEventHandler(usecase usecases.UpdateEvents, messageQueue queue.MessageQueue) *updateEventHandler {
+func NewUpdateEventHandler(updateEvent *application.UpdateEvent, messageQueue queue.MessageQueue) *updateEventHandler {
 	return &updateEventHandler{
-		usecase:      usecase,
+		updateEvent:  updateEvent,
 		MessageQueue: messageQueue,
 	}
 }
@@ -38,7 +37,7 @@ func (handler *updateEventHandler) Handle(c echo.Context) error {
 
 	eventId := c.Param("id")
 
-	event, err := handler.usecase.UpdateData(eventId, &params)
+	event, err := handler.updateEvent.UpdateData(eventId, &params)
 	if err != nil {
 		logger.Logger.Error("error while updating event", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)

@@ -5,12 +5,12 @@ import (
 	"events/framework/db/repositories"
 )
 
-type createEventUsecase struct {
+type CreateEvent struct {
 	repository repositories.EventsRepository
 }
 
-func NewCreateEventUsecase(repo repositories.EventsRepository) *createEventUsecase {
-	return &createEventUsecase{
+func NewCreateEvent(repo repositories.EventsRepository) *CreateEvent {
+	return &CreateEvent{
 		repository: repo,
 	}
 }
@@ -44,7 +44,7 @@ type CreateEventParams struct {
 	Duration int    `json:"duration,omitempty"`
 }
 
-func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event, error) {
+func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error) {
 
 	location := params.Location
 	eventLocation, err := entities.NewEventLocation(

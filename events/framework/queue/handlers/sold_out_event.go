@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"events/application"
 	"events/domain/entities"
-	"events/domain/usecases"
 )
 
 type soldOutEventHandler struct {
 	Channel <-chan []byte
-	Usecase usecases.UpdateEvents
+	Usecase application.UpdateEvent
 }
 
-func NewsoldOutEventHandler(channel <-chan []byte, usecase usecases.UpdateEvents) *soldOutEventHandler {
+func NewsoldOutEventHandler(channel <-chan []byte, usecase application.UpdateEvent) *soldOutEventHandler {
 	return &soldOutEventHandler{
 		Channel: channel,
 		Usecase: usecase,

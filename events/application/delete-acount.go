@@ -5,17 +5,17 @@ import (
 	"log"
 )
 
-type deleteAccount struct {
+type DeleteAccount struct {
 	repository repositories.AccountRepository
 }
 
-func NewDeleteAccount(repo repositories.AccountRepository) *deleteAccount {
-	return &deleteAccount{
+func NewDeleteAccount(repo repositories.AccountRepository) *DeleteAccount {
+	return &DeleteAccount{
 		repository: repo,
 	}
 }
 
-func (c deleteAccount) Delete(accountId string) error {
+func (c DeleteAccount) Delete(accountId string) error {
 	log.Println(accountId)
 	return c.repository.Delete(accountId)
 }

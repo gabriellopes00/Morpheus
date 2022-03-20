@@ -2,15 +2,15 @@ package handlers
 
 import (
 	"encoding/json"
-	"events/domain/usecases"
+	"events/application"
 )
 
 type deleteAccountHandler struct {
 	Channel <-chan []byte
-	Usecase usecases.DeleteAccount
+	Usecase *application.DeleteAccount
 }
 
-func NewDeleteAccountHandler(channel <-chan []byte, usecase usecases.DeleteAccount) *deleteAccountHandler {
+func NewDeleteAccountHandler(channel <-chan []byte, usecase *application.DeleteAccount) *deleteAccountHandler {
 	return &deleteAccountHandler{
 		Channel: channel,
 		Usecase: usecase,
