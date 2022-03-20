@@ -18,16 +18,16 @@ const (
 )
 
 type Event struct {
-	Id                 string         `json:"id,omitempty"`
+	Id                 string         `json:"id,omitempty" gorm:"primaryKey"`
 	Name               string         `json:"name,omitempty"`
 	Description        string         `json:"description,omitempty"`
 	OrganizerAccountId string         `json:"organizer_account_id,omitempty"`
 	AgeGroup           int            `json:"age_group,omitempty"`
 	MaximumCapacity    int            `json:"maximum_capacity,omitempty"`
 	Status             EventStatus    `json:"status,omitempty"`
-	Location           EventLocation  `json:"location"`
+	Location           EventLocation  `json:"location" gorm:"foreignKey:Id"`
 	Duration           int            `json:"duration,omitempty"`
-	TycketOptions      []TycketOption `json:"tycket_options,omitempty"`
+	TycketOptions      []TycketOption `json:"tycket_options,omitempty" gorm:"foreignKey:Id"`
 	Date               time.Time      `json:"date,omitempty"`
 	CreatedAt          time.Time      `json:"created_at,omitempty"`
 	UpdatedAt          time.Time      `json:"updated_at,omitempty"`
@@ -47,7 +47,7 @@ func NewEvent(
 		OrganizerAccountId: organizerAccountId,
 		AgeGroup:           ageGroup,
 		MaximumCapacity:    maximumCapacity,
-		Location:           *location,
+		Location:           EventLocation{},
 		Status:             StatusAvailable,
 		TycketOptions:      tycketOptions, // TODO: validate maximum capacity
 		Duration:           duration,

@@ -46,21 +46,23 @@ type CreateEventParams struct {
 
 func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error) {
 
+	event, err := entities.NewEvent(
+		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
+		params.MaximumCapacity, nil, params.Duration, nil, params.Date)
+	if err != nil {
+		return nil, err
+	}
+
 	location := params.Location
 	eventLocation, err := entities.NewEventLocation(
-		location.Street, location.District, location.State, location.City,
+		location.Street, event.Id, location.District, location.State, location.City,
 		location.PostalCode, location.Description, location.Number,
 		location.Latitude, params.Location.Longitude)
 	if err != nil {
 		return nil, err
 	}
 
-	event, err := entities.NewEvent(
-		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
-		params.MaximumCapacity, eventLocation, params.Duration, nil, params.Date)
-	if err != nil {
-		return nil, err
-	}
+	event.Location = *eventLocation
 
 	options := params.TycketOptions
 	var tycketOptions []entities.TycketOption

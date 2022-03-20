@@ -6,13 +6,15 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
+	pgMigration "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func NewPostgresDb() (*sql.DB, error) {
+func NewPostgresDb() (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		env.DB_HOST,
@@ -24,12 +26,9 @@ func NewPostgresDb() (*sql.DB, error) {
 		env.DB_TIME_ZONE,
 	)
 
-	db, err := sql.Open(env.DB_DRIVER, dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		// Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +37,7 @@ func NewPostgresDb() (*sql.DB, error) {
 }
 
 func AutoMigrate(db *sql.DB) error {
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := pgMigration.WithInstance(db, &pgMigration.Config{})
 	if err != nil {
 		return err
 	}

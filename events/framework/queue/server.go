@@ -1,15 +1,15 @@
 package queue
 
 import (
-	"database/sql"
 	"events/application"
 	"events/framework/db/repositories"
 	"events/framework/queue/handlers"
 
 	"github.com/streadway/amqp"
+	"gorm.io/gorm"
 )
 
-func SetUpQueueServer(amqpConn *amqp.Channel, database *sql.DB) {
+func SetUpQueueServer(amqpConn *amqp.Channel, database *gorm.DB) {
 	rabbitmq := NewRabbitMQ(amqpConn)
 
 	accountCreatedChan := make(chan []byte)
@@ -40,7 +40,7 @@ func SetUpQueueServer(amqpConn *amqp.Channel, database *sql.DB) {
 	}()
 
 	go func() {
-		soldOutEventHandler := handlers.NewsoldOutEventHandler(soldOutChan, updateEvent)
+		soldOutEventHandler := handlers.NewsoldOutEventHandler(soldOutChan, *updateEvent)
 		if err := soldOutEventHandler.Handle(); err != nil {
 			panic(err.Error())
 		}

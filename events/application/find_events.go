@@ -16,7 +16,7 @@ func NewFindEvents(repo repositories.EventsRepository) *FindEvents {
 	}
 }
 
-func (u *FindEvents) FindAccountEvents(accountId string) ([]*entities.Event, error) {
+func (u *FindEvents) FindAccountEvents(accountId string) ([]entities.Event, error) {
 	return u.repository.FindAccountEvents(accountId)
 }
 

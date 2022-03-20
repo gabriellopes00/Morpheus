@@ -25,12 +25,17 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	err = db.AutoMigrate(database)
+	sqlDb, err := database.DB()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = db.AutoMigrate(sqlDb)
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		log.Fatalln(err)
 	}
 
-	defer database.Close()
+	// defer database.DB
 
 	amqpConn, err := queue.NewRabbitMQConnection()
 	if err != nil {

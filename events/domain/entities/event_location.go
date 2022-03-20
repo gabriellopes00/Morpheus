@@ -5,25 +5,34 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type EventLocation struct {
-	Street      string  `json:"street,omitempty"`
-	District    string  `json:"district,omitempty"`
-	State       string  `json:"state,omitempty"`
-	City        string  `json:"city,omitempty"`
-	Number      int     `json:"number,omitempty"`
-	PostalCode  string  `json:"postal_code,omitempty"`
-	Description string  `json:"description,omitempty"`
-	Latitude    float64 `json:"latitude,omitempty"`
-	Longitude   float64 `json:"longitude,omitempty"`
+	Id          string    `json:"id,omitempty" gorm:"primaryKey"`
+	EventId     string    `json:"event_id,omitempty"`
+	Street      string    `json:"street,omitempty"`
+	District    string    `json:"district,omitempty"`
+	State       string    `json:"state,omitempty"`
+	City        string    `json:"city,omitempty"`
+	Number      int       `json:"number,omitempty"`
+	PostalCode  string    `json:"postal_code,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Latitude    float64   `json:"latitude,omitempty"`
+	Longitude   float64   `json:"longitude,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_At,omitempty"`
 }
 
 func NewEventLocation(
-	street, district, state, city, postalCode, description string,
+	street, eventId, district, state, city, postalCode, description string,
 	number int, latitude, longitude float64,
 ) (*EventLocation, error) {
 	location := &EventLocation{
+		Id:          uuid.NewV4().String(),
+		EventId:     eventId,
 		Street:      strings.TrimSpace(street),
 		District:    strings.TrimSpace(district),
 		State:       strings.TrimSpace(state),
@@ -33,6 +42,8 @@ func NewEventLocation(
 		Description: strings.TrimSpace(description),
 		Latitude:    latitude,
 		Longitude:   longitude,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 	err := location.validate()
 	if err != nil {

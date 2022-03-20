@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"events/application"
 	"events/framework/api/handlers"
 	"events/framework/api/middlewares"
@@ -14,9 +13,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/streadway/amqp"
+	"gorm.io/gorm"
 )
 
-func SetupServer(router *echo.Echo, database *sql.DB, amqpConn *amqp.Channel) {
+func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 
 	// init adapters
 	eventsRepo := repositories.NewPgEventsRepository(database)

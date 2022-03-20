@@ -2,3 +2,4 @@
 .dockerignore
 Dockerfile
 docker-compose.yml
+tests/

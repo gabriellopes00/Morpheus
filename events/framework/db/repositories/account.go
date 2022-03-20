@@ -1,8 +1,9 @@
 package repositories
 
 import (
-	"database/sql"
 	"events/domain/entities"
+
+	"gorm.io/gorm"
 )
 
 type AccountRepository interface {
@@ -11,35 +12,19 @@ type AccountRepository interface {
 }
 
 type pgAccountRepository struct {
-	Db *sql.DB
+	Db *gorm.DB
 }
 
-func NewPgAccountRepository(connection *sql.DB) *pgAccountRepository {
+func NewPgAccountRepository(connection *gorm.DB) *pgAccountRepository {
 	return &pgAccountRepository{connection}
 }
 
 func (repo *pgAccountRepository) Create(account *entities.Account) error {
-	stm, err := repo.Db.Prepare("INSERT INTO accounts VALUES ($1)")
-	if err != nil {
-		return err
-	}
-
-	defer stm.Close()
-
-	_, err = stm.Exec(account.Id)
-
+	err := repo.Db.Create(&account).Error
 	return err
 }
 
 func (repo *pgAccountRepository) Delete(accountId string) error {
-	stm, err := repo.Db.Prepare("DELETE FROM accounts WHERE id = $1")
-	if err != nil {
-		return err
-	}
-
-	defer stm.Close()
-
-	_, err = stm.Exec(accountId)
-
+	err := repo.Db.Where("id = ?", accountId).Delete(&entities.Account{}).Error
 	return err
 }
