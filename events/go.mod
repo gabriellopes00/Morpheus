@@ -3,6 +3,7 @@ module events
 go 1.17
 
 require (
+	github.com/aws/aws-sdk-go v1.17.7
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/lib/pq v1.10.4
 	github.com/satori/go.uuid v1.2.0
@@ -11,6 +12,7 @@ require (
 require (
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1 // indirect
 	github.com/go-resty/resty/v2 v2.3.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/segmentio/ksuid v1.0.3 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

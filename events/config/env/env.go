@@ -33,6 +33,11 @@ var (
 	KEYCLOACK_CLIENT_ID      = ""
 	KEYCLOACK_CLIENT_SECRET  = ""
 	KEYCLOACK_PUBLIC_RSA_KEY = ""
+
+	AWS_S3_REGION            = ""
+	AWS_S3_ACCESS_KEY_ID     = ""
+	AWS_S3_SECRET_ACCESS_KEY = ""
+	AWS_S3_BUCKET_NAME       = ""
 )
 
 var ErrLoadingEnvVars = errors.New("error on loading environment variables")
@@ -78,5 +83,10 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	AWS_S3_REGION = os.Getenv("AWS_S3_REGION")
+	AWS_S3_ACCESS_KEY_ID = os.Getenv("AWS_S3_ACCESS_KEY_ID")
+	AWS_S3_SECRET_ACCESS_KEY = os.Getenv("AWS_S3_SECRET_ACCESS_KEY")
+	AWS_S3_BUCKET_NAME = os.Getenv("AWS_S3_BUCKET_NAME")
 
 }

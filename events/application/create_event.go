@@ -83,9 +83,9 @@ func (c *createEventUsecase) Create(params *CreateEventParams) (*entities.Event,
 
 	event.TycketOptions = tycketOptions
 
-	// if err = c.repository.Create(event); err != nil {
-	// 	return nil, err
-	// }
+	if err = c.repository.Create(event); err != nil {
+		return nil, err
+	}
 
 	return event, nil
 }
