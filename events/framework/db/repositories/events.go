@@ -3,6 +3,7 @@ package repositories
 import (
 	"events/domain/entities"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -27,6 +28,8 @@ func NewPgEventsRepository(connection *gorm.DB) *pgEventsRepository {
 }
 
 func (repo *pgEventsRepository) Create(event *entities.Event) error {
+
+	event.Location.PostalCode = strings.ReplaceAll(event.Location.PostalCode, "-", "")
 
 	err := repo.Db.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&event).Error
@@ -105,15 +108,18 @@ func (repo *pgEventsRepository) Update(event *entities.Event) error {
 
 func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]entities.Event, error) {
 
-	var events []entities.Event
-	err := repo.Db.Model(&events).Preload(clause.Associations).Find(&events).Error
+	var models []entities.Event
+
+	query := repo.Db.Table("events AS event")
+	query.Where("event.organizer_account_id = ?", accountId).Find(&models)
+	query.Preload("TycketOptions.Lots").Preload(clause.Associations).Find(&models)
+	err := query.Error
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
-	fmt.Println(events)
-
-	return events, nil
+	return models, nil
 }
 
 func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error) {
@@ -121,226 +127,36 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 	var model entities.Event
 
 	query := repo.Db.Table("events AS event")
-	query.Joins("INNER JOIN event_locations AS location ON location.event_id = event.id").Scan(&model.Location)
-	query.Joins("INNER JOIN event_tycket_options AS tckt_opts ON tckt_opts.event_id = event.id").Scan(&model.TycketOptions)
-	query.Where("event.id = ?", eventId)
-	query.Find(&model)
-
-	if query.Error != nil {
-		return nil, query.Error
+	query.Where("event.id = ?", eventId).First(&model)
+	// query.Preload("Location").Find(&model)
+	// query.Preload("TycketOptions").Find(&model)
+	// query.Preload("TycketOptions.Lots").Find(&model)
+	query.Preload("TycketOptions.Lots").Preload(clause.Associations).Find(&model)
+	err := query.Error
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
-	fmt.Println(model)
-
-	// stm, err := repo.Db.Prepare(`
-	// 	SELECT (
-	// 		event.id,
-	// 		event.name,
-	// 		event.description,
-	// 		event.organizer_account_id,
-	// 		event.age_group,
-	// 		event.maximum_capacity,
-	// 		event.status,
-	// 		event.date,
-	// 		event.duration,
-	// 		event.location_street,
-	// 		event.location_district,
-	// 		event.location_state,
-	// 		event.location_city,
-	// 		event.location_postal_code,
-	// 		event.location_description,
-	// 		event.location_number,
-	// 		event.location_latitude,
-	// 		event.location_longitude,
-	// 		event.created_at,
-	// 		event.updated_attckt_opt.id,
-
-	// 		tckt_opt.event_id,
-	// 		tckt_opt.title,
-	// 		-- tckt_opt.created_at,
-
-	// 		tckt_lot.id,
-	// 		tckt_lot.event_tycket_option_id,
-	// 		tckt_lot.number,
-	// 		tckt_lot.tycket_price,
-	// 		tckt_lot.tycket_amount
-	// 		-- tckt_lot.created_at,
-	// 	)
-	// 	FROM events AS event
-
-	// 	INNER JOIN event_tycket_options AS tckt_opt
-	// 	ON tckt_opt.event_id = event.id
-
-	// 	INNER JOIN event_tycket_lots AS tckt_lot
-	// 	ON tckt_lot.event_tycket_option_id = tckt_opt.id
-
-	// 	WHERE event.id = $1;
-	// `)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// defer stm.Close()
-
-	// rows, err := stm.Query(eventId)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// var event entities.Event
-
-	// for rows.Next() {
-
-	// 	var eventTycketOption entities.TycketOption
-	// 	var eventTycketLot entities.TycketLot
-
-	// 	err = rows.Scan(
-	// 		&event.Id,
-	// 		&event.Name,
-	// 		&event.Description,
-	// 		&event.OrganizerAccountId,
-	// 		&event.AgeGroup,
-	// 		&event.MaximumCapacity,
-	// 		&event.Status,
-	// 		&event.Date,
-	// 		&event.Duration,
-	// 		&event.Location.Street,
-	// 		&event.Location.District,
-	// 		&event.Location.State,
-	// 		&event.Location.City,
-	// 		&event.Location.PostalCode,
-	// 		&event.Location.Description,
-	// 		&event.Location.Number,
-	// 		&event.Location.Latitude,
-	// 		&event.Location.Longitude,
-	// 		&event.CreatedAt,
-	// 		&event.UpdatedAt,
-
-	// 		// &eventTycketOption.Id,
-	// 		// &eventTycketOption.EventId,
-	// 		// &eventTycketOption.Title,
-
-	// 		// &eventTycketLot.Id,
-	// 		// &eventTycketLot.TycketOptionId,
-	// 		// &eventTycketLot.Number,
-	// 		// &eventTycketLot.TycketPrice,
-	// 		// &eventTycketLot.TycketAmount,
-	// 	)
-
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	eventTycketOption.Lots = append(eventTycketOption.Lots, eventTycketLot)
-	// 	event.TycketOptions = append(event.TycketOptions, eventTycketOption)
-	// }
-
-	// // err = stm.QueryRow(eventId).Scan(
-	// // 	&event.Id,
-	// // 	&event.Name,
-	// // 	&event.Description,
-	// // 	&event.OrganizerAccountId,
-	// // 	&event.AgeGroup,
-	// // 	&event.MaximumCapacity,
-	// // 	&event.Status,
-	// // 	&event.Date,
-	// // 	&event.Duration,
-	// // 	&event.Location.Street,
-	// // 	&event.Location.District,
-	// // 	&event.Location.State,
-	// // 	&event.Location.City,
-	// // 	&event.Location.PostalCode,
-	// // 	&event.Location.Description,
-	// // 	&event.Location.Number,
-	// // 	&event.Location.Latitude,
-	// // 	&event.Location.Longitude,
-	// // 	&event.CreatedAt,
-	// // 	&event.UpdatedAt)
-	// // if err != nil {
-	// // 	if errors.Is(err, gorm.ErrNoRows) {
-	// // 		return nil, nil
-	// // 	}
-
-	// // 	return nil, err
-	// // }
-
-	// return &event, nil
 	return &model, nil
 }
 
 func (repo *pgEventsRepository) FindAll(state string, month, ageGroup int) ([]entities.Event, error) {
-	// stm, err := repo.Db.Prepare(`
-	// 	SELECT id,
-	// 			name,
-	// 			description,
-	// 			organizer_account_id,
-	// 			age_group,
-	// 			maximum_capacity,
-	// 			status,
-	// 			date,
-	// 			duration,
-	// 			location_street,
-	// 			location_district,
-	// 			location_state,
-	// 			location_city,
-	// 			location_postal_code,
-	// 			location_description,
-	// 			location_number,
-	// 			location_latitude,
-	// 			location_longitude,
-	// 			created_at,
-	// 			updated_at
-	// 	FROM events
-	// 	WHERE EXTRACT(MONTH FROM date) = $1
-	// 	OR state = $2 OR age_group = $3;
-	// `)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
-	// defer stm.Close()
+	var models []entities.Event
 
-	// events := []entities.Event{}
+	query := repo.Db.Table("events")
+	query.Where("events.age_group = ?", ageGroup).Find(&models)
+	query.Preload("Location").Find(&models)
+	query.Or(&entities.Event{Location: entities.EventLocation{State: state}}).Find(&models)
+	err := query.Error
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
-	// rows, err := stm.Query(state, month, ageGroup)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	return models, nil
 
-	// defer rows.Close()
-
-	// for rows.Next() {
-	// 	var event entities.Event
-	// 	err := rows.Scan(
-	// 		&event.Id,
-	// 		&event.Name,
-	// 		&event.Description,
-	// 		&event.OrganizerAccountId,
-	// 		&event.AgeGroup,
-	// 		&event.MaximumCapacity,
-	// 		&event.Status,
-	// 		&event.Date,
-	// 		&event.Duration,
-	// 		&event.Location.Street,
-	// 		&event.Location.District,
-	// 		&event.Location.State,
-	// 		&event.Location.City,
-	// 		&event.Location.PostalCode,
-	// 		&event.Location.Description,
-	// 		&event.Location.Number,
-	// 		&event.Location.Latitude,
-	// 		&event.Location.Longitude,
-	// 		&event.CreatedAt,
-	// 		&event.UpdatedAt)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	events = append(events, event)
-	// }
-
-	// return events, nil
-	return nil, nil
 }
 
 func (r *pgEventsRepository) ExistsId(eventId string) (bool, error) {

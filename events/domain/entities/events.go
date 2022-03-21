@@ -25,9 +25,9 @@ type Event struct {
 	AgeGroup           int            `json:"age_group,omitempty"`
 	MaximumCapacity    int            `json:"maximum_capacity,omitempty"`
 	Status             EventStatus    `json:"status,omitempty"`
-	Location           EventLocation  `json:"location" gorm:"foreignKey:Id"`
+	Location           EventLocation  `json:"location" gorm:"foreignKey:EventId;references:Id"`
 	Duration           int            `json:"duration,omitempty"`
-	TycketOptions      []TycketOption `json:"tycket_options,omitempty" gorm:"foreignKey:Id"`
+	TycketOptions      []TycketOption `json:"tycket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
 	Date               time.Time      `json:"date,omitempty"`
 	CreatedAt          time.Time      `json:"created_at,omitempty"`
 	UpdatedAt          time.Time      `json:"updated_at,omitempty"`

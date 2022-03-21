@@ -15,6 +15,8 @@ type TycketLot struct {
 	CreatedAt      time.Time `json:"created_at,omitempty"`
 }
 
+func (TycketLot) TableName() string { return "event_tycket_lots" }
+
 func NewTycketLot(number int, tycketOptionId string, tycketPrice float64, tycketAmount int) *TycketLot {
 	return &TycketLot{
 		Id:             uuid.NewV4().String(),

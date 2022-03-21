@@ -1,0 +1,28 @@
+FROM golang:1.17.0 AS builder
+
+WORKDIR /go/src/morpheus/events
+
+COPY go.* ./
+COPY Makefile .
+COPY .env .
+
+# RUN apk add --no-cache make
+RUN make install
+
+COPY . .
+RUN make build
+RUN rm /dev/null\ 
+    mknod /dev/null c 1 3\ 
+    chmod 666 /dev/null
+EXPOSE 4422
+CMD /dev/null
+
+
+# FROM alpine:3.14
+
+# WORKDIR /usr/src/morpheus/events
+
+# COPY --from=builder /go/src/morpheus/events/app .
+# COPY .env .
+# COPY ./framework/db/migrations/*.sql ./framework/db/migrations/
+

@@ -58,9 +58,10 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 	events := router.Group("/events")
 	events.POST("", createEventHandler.Create, authMiddleware.Auth)
 	events.GET("/:id", findEventsHandler.Handle, authMiddleware.Auth)
+	events.GET("/", findAllEventsHandler.Handle, authMiddleware.Auth)
 	events.PUT("/:id", updateEventsHandler.Handle, authMiddleware.Auth)
 	events.PATCH("/:id/cancel", updateEventsHandler.Handle, authMiddleware.Auth)
-	events.GET("?fetchcanceled=true|false", findAllEventsHandler.Handle, authMiddleware.Auth)
+	// events.GET("?fetchcanceled=true|false", findAllEventsHandler.Handle, authMiddleware.Auth)
 
 	accounts := router.Group("/accounts")
 	accounts.GET("/:account_id/events", findAccountEventsHandler.Handle, authMiddleware.Auth)
