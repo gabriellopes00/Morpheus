@@ -17,33 +17,17 @@ func NewUpdateEvent(repo repositories.EventsRepository) *UpdateEvent {
 	}
 }
 
-func (u *UpdateEvent) UpdateStatus(eventId string, status interface{}) error {
-	stts, ok := status.(entities.EventStatus)
-	if !ok {
-		return errors.New("invalid status")
-	}
-
-	eventExists, err := u.Repository.ExistsId(eventId)
-	if err != nil {
-		return err
-	}
-
-	if !eventExists {
-		return errors.New("event with given id does not exists")
-	}
-
-	return u.Repository.SetStatus(eventId, stts)
+func (u *UpdateEvent) SetStatus(eventId string, status entities.EventStatus) error {
+	return u.Repository.SetStatus(eventId, status)
 }
 
 type UpdateEventDTO struct {
 	Name            string                 `json:"name,omitempty"`
 	Description     string                 `json:"description,omitempty"`
-	IsAvailable     bool                   `json:"is_available,omitempty"` // remove
 	AgeGroup        int                    `json:"age_group,omitempty"`
 	MaximumCapacity int                    `json:"maximum_capacity,omitempty"`
 	Location        entities.EventLocation `json:"location"`
 	Duration        int                    `json:"duration,omitempty"`
-	TicketPrice     float32                `json:"ticket_price,omitempty"`
 	Date            time.Time              `json:"date,omitempty"`
 }
 
@@ -63,6 +47,11 @@ func (u *UpdateEvent) UpdateData(eventId string, data *UpdateEventDTO) (*entitie
 	event.MaximumCapacity = data.MaximumCapacity
 	event.Location = data.Location
 	event.Duration = data.Duration
+
+	if time.Until(event.Date) <= time.Hour*24 {
+		return nil, errors.New("the event date cannot be updated less than 24 hours before the event starts")
+	}
+
 	event.Date = data.Date
 
 	err = u.Repository.Update(event)

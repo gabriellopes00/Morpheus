@@ -6,9 +6,9 @@ import (
 	"events/config/env"
 	"events/framework/api"
 	"events/framework/db"
+	"events/framework/logger"
 	"events/framework/queue"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,30 +16,38 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 func main() {
 
+	// postgres connection
 	database, err := db.NewPostgresDb()
 	if err != nil {
-		log.Fatal(err.Error())
+		logger.Logger.Fatal("error initializing database", zap.String("error_message", err.Error()))
 	}
 
 	sqlDb, err := database.DB()
 	if err != nil {
-		log.Fatal(err.Error())
+		logger.Logger.Fatal("error getting sql db", zap.String("error_message", err.Error()))
 	}
 
+	defer sqlDb.Close()
+
+	// migrations run
 	err = db.AutoMigrate(sqlDb)
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		log.Fatalln(err)
+	if err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			logger.Logger.Info("no pending migrations")
+		} else {
+			logger.Logger.Fatal("error running migrations", zap.String("error_message", err.Error()))
+		}
 	}
 
-	// defer database.DB
-
+	// connecting to rabbitmq
 	amqpConn, err := queue.NewRabbitMQConnection()
 	if err != nil {
-		log.Fatalln(err.Error())
+		logger.Logger.Fatal("error connecting to rabbitmq", zap.String("error_message", err.Error()))
 	}
 
 	defer amqpConn.Close()
@@ -50,7 +58,7 @@ func main() {
 	api.SetupServer(e, database, amqpConn)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
-			log.Fatalln(err)
+			logger.Logger.Fatal("error starting web server", zap.String("error_message", err.Error()))
 		}
 	}()
 
@@ -60,6 +68,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		log.Fatal(err.Error())
+		logger.Logger.Fatal("error shutting down web server", zap.String("error_message", err.Error()))
 	}
 }

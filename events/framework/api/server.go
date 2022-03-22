@@ -35,6 +35,7 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 	findEventsHandler := handlers.NewFindEventsHandler(findEvents)
 	findAllEventsHandler := handlers.NewFindAllEventsHandler(findEvents)
 	updateEventsHandler := handlers.NewUpdateEventHandler(updateEvents, rabbitMQ)
+	cancelEventsHandler := handlers.NewCancelEventHandler(updateEvents, rabbitMQ)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(keycloack)
@@ -60,7 +61,7 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 	events.GET("/:id", findEventsHandler.Handle, authMiddleware.Auth)
 	events.GET("/", findAllEventsHandler.Handle, authMiddleware.Auth)
 	events.PUT("/:id", updateEventsHandler.Handle, authMiddleware.Auth)
-	events.PATCH("/:id/cancel", updateEventsHandler.Handle, authMiddleware.Auth)
+	events.PATCH("/:id/cancel", cancelEventsHandler.Handle, authMiddleware.Auth)
 	// events.GET("?fetchcanceled=true|false", findAllEventsHandler.Handle, authMiddleware.Auth)
 
 	accounts := router.Group("/accounts")

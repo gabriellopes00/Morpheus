@@ -6,23 +6,13 @@ COPY go.* ./
 COPY Makefile .
 COPY .env .
 
-# RUN apk add --no-cache make
 RUN make install
 
-COPY . .
+COPY cmd cmd
+COPY config config
+COPY domain domain
+COPY application application
+COPY framework framework
 RUN make build
-RUN rm /dev/null\ 
-    mknod /dev/null c 1 3\ 
-    chmod 666 /dev/null
 EXPOSE 4422
-CMD /dev/null
-
-
-# FROM alpine:3.14
-
-# WORKDIR /usr/src/morpheus/events
-
-# COPY --from=builder /go/src/morpheus/events/app .
-# COPY .env .
-# COPY ./framework/db/migrations/*.sql ./framework/db/migrations/
-
+CMD /go/src/morpheus/events/app

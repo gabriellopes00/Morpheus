@@ -33,10 +33,7 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 	accountId := c.Request().Header.Get("account_id")
 	if accountId == "" {
-		return c.JSON(
-			http.StatusUnauthorized,
-			map[string]string{"error": ErrUnauthorized.Error()},
-		)
+		return c.NoContent(http.StatusUnauthorized)
 	}
 
 	params.OrganizerAccountId = accountId
@@ -52,7 +49,6 @@ func (handler *createEventHandler) Create(c echo.Context) error {
 
 		logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
-
 	}
 
 	payload, _ := json.Marshal(event)

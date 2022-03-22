@@ -29,7 +29,7 @@ func (h *soldOutEventHandler) Handle() error {
 			return err
 		}
 
-		err = h.Usecase.UpdateStatus(data.Id, entities.StatusSoldOut)
+		err = h.Usecase.SetStatus(data.Id, entities.StatusSoldOut)
 		if err != nil {
 			return err
 		}
