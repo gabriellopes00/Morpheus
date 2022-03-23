@@ -66,5 +66,5 @@ func (*CreateEvent) setEventTyckets(event *entities.Event, params []TycketOption
 		tycketOptions = append(tycketOptions, *tycketOption)
 	}
 
-	event.TycketOptions = tycketOptions
+	// event.TycketOptions = tycketOptions
 }

@@ -44,15 +44,13 @@ func (u *UpdateEvent) UpdateData(eventId string, data *UpdateEventDTO) (*entitie
 	event.Name = data.Name
 	event.Description = data.Description
 	event.AgeGroup = data.AgeGroup
-	event.MaximumCapacity = data.MaximumCapacity
 	event.Location = data.Location
-	event.Duration = data.Duration
 
-	if time.Until(event.Date) <= time.Hour*24 {
+	if time.Until(event.StartDateTime) <= time.Hour*24 {
 		return nil, errors.New("the event date cannot be updated less than 24 hours before the event starts")
 	}
 
-	event.Date = data.Date
+	event.StartDateTime = data.Date
 
 	err = u.Repository.Update(event)
 	if err != nil {
