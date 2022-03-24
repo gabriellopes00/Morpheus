@@ -3,7 +3,6 @@ package entities
 import (
 	"events/domain"
 	domain_errors "events/domain/errors"
-	"strings"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -22,8 +21,8 @@ type EventVisibility string
 
 const (
 	VisibilityPrivate     EventVisibility = "private"
-	VisibilityPublic      EventVisibility = "private"
-	VisibilityInvitedOnly EventVisibility = "invitedonly"
+	VisibilityPublic      EventVisibility = "public"
+	VisibilityInvitedOnly EventVisibility = "invited_only"
 )
 
 type Event struct {
@@ -34,7 +33,7 @@ type Event struct {
 	OrganizerAccountId string          `json:"organizer_account_id,omitempty"`
 	AgeGroup           int             `json:"age_group,omitempty"`
 	Status             EventStatus     `json:"status,omitempty"`
-	Location           EventLocation   `json:"location" gorm:"foreignKey:EventId;references:Id"`
+	Location           *EventLocation  `json:"location" gorm:"foreignKey:EventId;references:Id"`
 	Tickets            []Ticket        `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
 	StartDateTime      time.Time       `json:"start_datetime,omitempty"`
 	EndDateTime        time.Time       `json:"end_datetime,omitempty"`
@@ -44,22 +43,53 @@ type Event struct {
 }
 
 func NewEvent(
-	name, description string, organizerAccountId string,
-	ageGroup, maximumCapacity int, location *EventLocation,
-	duration int, tycketOptions []TycketOption, date string,
+	name, description, coverUrl, organizerAccountId string,
+	ageGroup int, location *EventLocation,
+	tickets []Ticket, startDateTime, endDateTime string, categoryId,
+	subjectId, visibility string,
 ) (*Event, domain_errors.DomainErr) {
 	var err error
 
 	event := new(Event)
-	event.Id = uuid.NewV4().String()
-	event.Name = strings.TrimSpace(name)
-	event.Description = strings.TrimSpace(description)
 
-	event.StartDateTime, err = time.Parse(time.RFC3339, date)
+	event.Id = uuid.NewV4().String()
+	event.CreatedAt = time.Now()
+	event.UpdatedAt = time.Now()
+
+	event.Name = name
+	event.Description = description
+	event.CoverUrl = coverUrl
+	event.OrganizerAccountId = organizerAccountId
+	event.AgeGroup = ageGroup
+	event.Location = location
+	event.Tickets = tickets
+	event.CategoryId = categoryId
+	event.SubjectId = subjectId
+
+	event.StartDateTime, err = time.Parse(time.RFC3339, startDateTime)
 	if err != nil {
 		return nil, domain_errors.NewValidationError(
 			`Event's dates must be in "RFC3339" format`,
-			"Date", date)
+			"StartDateTime", startDateTime)
+	}
+
+	event.EndDateTime, err = time.Parse(time.RFC3339, endDateTime)
+	if err != nil {
+		return nil, domain_errors.NewValidationError(
+			`Event's dates must be in "RFC3339" format`,
+			"EndDateTime", endDateTime)
+	}
+
+	switch visibility {
+	case string(VisibilityPrivate), string(VisibilityPublic), string(VisibilityInvitedOnly):
+		event.Visibility = EventVisibility(visibility)
+		break
+	default:
+		{
+			return nil, domain_errors.NewValidationError(
+				"Events' visibility must be: private, public or invited_only",
+				"Visibility", visibility)
+		}
 	}
 
 	if err = event.validate(); err != nil {
@@ -75,18 +105,6 @@ func (e *Event) validate() domain_errors.DomainErr {
 			"Events name must have at least of 4 characters and at most of 255",
 			"name",
 			e.Name)
-	}
-
-	switch e.AgeGroup {
-	case 0, 10, 12, 14, 16, 18:
-		break
-	default:
-		{
-			return domain_errors.NewValidationError(
-				"Events' age group must be: 0, 10, 12, 14, 16 or 18",
-				"AgeGroup",
-				e.AgeGroup)
-		}
 	}
 
 	return nil

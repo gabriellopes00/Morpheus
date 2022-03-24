@@ -19,8 +19,9 @@ func NewCreateEvent(repo repositories.EventsRepository) *CreateEvent {
 func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error) {
 
 	event, err := entities.NewEvent(
-		params.Name, params.Description, params.OrganizerAccountId, params.AgeGroup,
-		params.MaximumCapacity, nil, params.Duration, nil, params.Date)
+		params.Name, params.Description, params.CoverUrl, params.OrganizerAccountId,
+		params.AgeGroup, nil, nil, params.StartDateTime, params.EndDateTime, params.CategoryId,
+		params.SubjectId, params.Visibility)
 	if err != nil {
 		return nil, err
 	}
@@ -34,9 +35,9 @@ func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error)
 		return nil, err
 	}
 
-	event.Location = *eventLocation
+	event.Location = eventLocation
 
-	c.setEventTyckets(event, params.TycketOptions)
+	c.setEventTickets(event, params.Tickets)
 
 	if err = c.repository.Create(event); err != nil {
 		return nil, err
@@ -45,26 +46,30 @@ func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error)
 	return event, nil
 }
 
-// setEventTyckets - creates an entity for all `TyketOption` and it's `TycketLot` and set those
-// etities into the event
-func (*CreateEvent) setEventTyckets(event *entities.Event, params []TycketOptionsParams) {
-	var tycketOptions []entities.TycketOption
+// setEventTickets - creates an entity for all `Ticket` and it's `TicketLot` and set those
+// entities into the event
+func (*CreateEvent) setEventTickets(event *entities.Event, params []TicketParams) error {
+	var tickets []entities.Ticket
 
-	for _, option := range params {
+	for _, param := range params {
 
-		tycketOption := entities.NewTycketOption(event.Id, option.Title, nil)
-
-		lots := option.Lots
-		var tycketLots []entities.TycketLot
+		lots := param.Lots
+		var ticketLots []entities.TicketLot
 
 		for _, lot := range lots {
-			tycketLot := entities.NewTycketLot(lot.Number, tycketOption.Id, lot.TycketPrice, lot.TycketAmount)
-			tycketLots = append(tycketLots, *tycketLot)
+			ticketLot := entities.NewTicketLot(lot.Number, lot.Quantity, lot.Price)
+			ticketLots = append(ticketLots, *ticketLot)
 		}
 
-		tycketOption.Lots = tycketLots
-		tycketOptions = append(tycketOptions, *tycketOption)
+		ticket, err := entities.NewTicket(param.Title, param.Description, param.SalesStartDateTime,
+			param.SalesEndDateTime, param.MaximumBuysQuantity, param.MinimumBuysQuantity, ticketLots)
+		if err != nil {
+			return err
+		}
+
+		tickets = append(tickets, *ticket)
 	}
 
-	// event.TycketOptions = tycketOptions
+	event.Tickets = tickets
+	return nil
 }
