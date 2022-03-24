@@ -51,5 +51,39 @@ func NewTicket(
 			"SalesEndDateTime", salesEndDateTime)
 	}
 
+	err = ticket.validate()
+	if err != nil {
+		return nil, err
+	}
+
 	return ticket, nil
+}
+
+func (ticket *Ticket) validate() error {
+	if len(ticket.Title) < 1 || len(ticket.Title) > 255 {
+		return domain_errors.NewValidationError(
+			"Ticket's title must have at least of 4 characters and at most of 255",
+			"title", ticket.Title)
+	}
+
+	if ticket.MinimumBuysQuantity < 1 {
+		return domain_errors.NewValidationError(
+			"Minimum buys tickets must be greather than 1",
+			"MinimumBuysQuantity", ticket.MinimumBuysQuantity)
+	}
+
+	if ticket.MaximumBuysQuantity < ticket.MinimumBuysQuantity {
+		return domain_errors.NewValidationError(
+			"Maximum buys tickets must be greather than Minimum buys tickets",
+			"MaximumBuysQuantity", ticket.MaximumBuysQuantity)
+	}
+
+	if time.Until(ticket.SalesEndDateTime) < time.Until(ticket.SalesStartDateTime) {
+		return domain_errors.NewValidationError(
+			"Date time to start ticket sales must be earlier then date time to end the sales",
+			"SalesStartDateTime", ticket.SalesStartDateTime)
+	}
+
+	return nil
+
 }
