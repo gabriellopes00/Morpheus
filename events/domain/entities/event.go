@@ -37,8 +37,8 @@ type Event struct {
 	Tickets            []Ticket        `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
 	StartDateTime      time.Time       `json:"start_datetime,omitempty"`
 	EndDateTime        time.Time       `json:"end_datetime,omitempty"`
-	CategoryId         string          `json:"category,omitempty"`
-	SubjectId          string          `json:"subject,omitempty"`
+	CategoryId         string          `json:"category,omitempty" gorm:"foreignKey:CategoryId"`
+	SubjectId          string          `json:"subject,omitempty" gorm:"foreignKey:SubjectId"`
 	Visibility         EventVisibility `json:"visibility,omitempty"`
 }
 
@@ -83,7 +83,6 @@ func NewEvent(
 	switch visibility {
 	case string(VisibilityPrivate), string(VisibilityPublic), string(VisibilityInvitedOnly):
 		event.Visibility = EventVisibility(visibility)
-		break
 	default:
 		{
 			return nil, domain_errors.NewValidationError(

@@ -35,11 +35,7 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 		return tx.Create(&event).Error
 	})
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (repo *pgEventsRepository) SetStatus(eventId string, status entities.EventStatus) error {
@@ -148,7 +144,7 @@ func (repo *pgEventsRepository) FindAll(state string, month, ageGroup int) ([]en
 	query := repo.Db.Table("events")
 	query.Where("events.age_group = ?", ageGroup).Find(&models)
 	query.Preload("Location").Find(&models)
-	query.Or(&entities.Event{Location: entities.EventLocation{State: state}}).Find(&models)
+	query.Or(&entities.Event{Location: &entities.EventLocation{State: state}}).Find(&models)
 	err := query.Error
 	if err != nil {
 		fmt.Println(err)
