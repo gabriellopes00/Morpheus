@@ -1,0 +1,3 @@
+ALTER TABLE IF EXISTS "events" DROP CONSTRAINT IF EXISTS "fk_category";
+ALTER TABLE IF EXISTS "events" DROP COLUMN IF EXISTS "categories_id";
+DROP TABLE IF EXISTS "categories";

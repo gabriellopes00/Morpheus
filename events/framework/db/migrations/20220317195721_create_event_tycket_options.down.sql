@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS "event_tycket_options";
