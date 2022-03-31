@@ -3,6 +3,7 @@ package entities
 import (
 	"events/domain"
 	domain_errors "events/domain/errors"
+	"fmt"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -10,17 +11,18 @@ import (
 
 type TicketOption struct {
 	domain.Entity
+	EventId             string            `json:"event_id,omitempty"`
 	Title               string            `json:"title,omitempty"`
 	Description         string            `json:"description,omitempty"`
-	SalesStartDateTime  time.Time         `json:"sales_start_datetime,omitempty"`
-	SalesEndDateTime    time.Time         `json:"sales_end_datetime,omitempty"`
+	SalesStartDateTime  time.Time         `json:"sales_start_datetime,omitempty" gorm:"column:sales_start_datetime"`
+	SalesEndDateTime    time.Time         `json:"sales_end_datetime,omitempty" gorm:"column:sales_end_datetime"`
 	MinimumBuysQuantity int               `json:"maximum_buys_quantity,omitempty"`
 	MaximumBuysQuantity int               `json:"minimum_buys_quantity,omitempty"`
-	Lots                []TicketOptionLot `json:"lots,omitempty"`
+	Lots                []TicketOptionLot `json:"lots,omitempty" gorm:"foreignKey:TicketOptionId;references:Id"`
 }
 
 func NewTicketOption(
-	title, description, salesStartDateTime, salesEndDateTime string,
+	title, description, salesStartDateTime, salesEndDateTime, eventId string,
 	maximumBuysQuantity, minimumBuysQuantity int, lots []TicketOptionLot) (*TicketOption, error) {
 
 	var err error
@@ -32,6 +34,7 @@ func NewTicketOption(
 	ticketOption.UpdatedAt = time.Now()
 
 	ticketOption.Title = title
+	ticketOption.EventId = eventId
 	ticketOption.Description = description
 	ticketOption.MaximumBuysQuantity = maximumBuysQuantity
 	ticketOption.MinimumBuysQuantity = minimumBuysQuantity
@@ -72,6 +75,10 @@ func (ticketOption *TicketOption) validate() error {
 			"MinimumBuysQuantity", ticketOption.MinimumBuysQuantity)
 	}
 
+	fmt.Println("")
+	fmt.Println(ticketOption.MaximumBuysQuantity, ticketOption.MinimumBuysQuantity)
+	fmt.Println("")
+
 	if ticketOption.MaximumBuysQuantity < ticketOption.MinimumBuysQuantity {
 		return domain_errors.NewValidationError(
 			"Maximum buys ticketOptions must be greather than Minimum buys ticketOptions",
@@ -86,4 +93,9 @@ func (ticketOption *TicketOption) validate() error {
 
 	return nil
 
+}
+
+// gorm required
+func (TicketOption) TableName() string {
+	return "event_ticket_options"
 }

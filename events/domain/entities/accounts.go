@@ -9,3 +9,8 @@ func NewAccount(id string) *Account {
 		Id: id,
 	}
 }
+
+// gorm required
+func (Account) TableName() string {
+	return "accounts"
+}

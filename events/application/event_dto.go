@@ -19,8 +19,8 @@ type TicketOptionsParams struct {
 	Description         string                  `json:"description,omitempty"`
 	SalesStartDateTime  string                  `json:"sales_start_datetime,omitempty"`
 	SalesEndDateTime    string                  `json:"sales_end_datetime,omitempty"`
-	MinimumBuysQuantity int                     `json:"maximum_buys_quantity,omitempty"`
-	MaximumBuysQuantity int                     `json:"minimum_buys_quantity,omitempty"`
+	MinimumBuysQuantity int                     `json:"minimum_buys_quantity,omitempty"`
+	MaximumBuysQuantity int                     `json:"maximum_buys_quantity,omitempty"`
 	Lots                []TicketOptionLotParams `json:"lots,omitempty"`
 }
 
@@ -39,11 +39,11 @@ type CreateEventParams struct {
 	OrganizerAccountId string                `json:"organizer_account_id,omitempty"`
 	AgeGroup           int                   `json:"age_group,omitempty"`
 	Status             string                `json:"status,omitempty"`
-	Location           LocationParams        `json:"location" gorm:"foreignKey:EventId;references:Id"`
-	TicketOptions      []TicketOptionsParams `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
+	Location           LocationParams        `json:"location"`
+	TicketOptions      []TicketOptionsParams `json:"ticket_options,omitempty"`
 	StartDateTime      string                `json:"start_datetime,omitempty"`
 	EndDateTime        string                `json:"end_datetime,omitempty"`
-	CategoryId         string                `json:"category,omitempty"`
-	SubjectId          string                `json:"subject,omitempty"`
+	CategoryId         string                `json:"category_id,omitempty"`
+	SubjectId          string                `json:"subject_id,omitempty"`
 	Visibility         string                `json:"visibility,omitempty"`
 }

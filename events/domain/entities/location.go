@@ -76,3 +76,8 @@ func (l *EventLocation) validate() error {
 
 	return nil
 }
+
+// gorm required
+func (EventLocation) TableName() string {
+	return "event_locations"
+}

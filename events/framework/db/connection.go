@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 
 	"github.com/golang-migrate/migrate/v4"
 	pgMigration "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -28,7 +27,7 @@ func NewPostgresDb() (*gorm.DB, error) {
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		// Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
 		return nil, err

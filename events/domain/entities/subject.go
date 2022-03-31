@@ -36,3 +36,8 @@ func (s *Subject) validate() error {
 
 	return nil
 }
+
+// gorm required
+func (Subject) TableName() string {
+	return "subjects"
+}

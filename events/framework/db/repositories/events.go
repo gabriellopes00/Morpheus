@@ -31,6 +31,17 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 
 	event.Location.PostalCode = strings.ReplaceAll(event.Location.PostalCode, "-", "")
 
+	fmt.Println(event.Id + " event_id")
+	fmt.Println(event.Id + " event_id")
+	for _, o := range event.TicketOptions {
+		fmt.Println("ticket option " + o.Id)
+
+		for _, l := range o.Lots {
+			fmt.Println("ticket option lots " + l.Id)
+
+		}
+	}
+
 	err := repo.Db.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&event).Error
 	})
@@ -108,7 +119,7 @@ func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]entities.
 
 	query := repo.Db.Table("events AS event")
 	query.Where("event.organizer_account_id = ?", accountId).Find(&models)
-	query.Preload("TycketOptions.Lots").Preload(clause.Associations).Find(&models)
+	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&models)
 	err := query.Error
 	if err != nil {
 		fmt.Println(err)
@@ -127,7 +138,7 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 	// query.Preload("Location").Find(&model)
 	// query.Preload("TycketOptions").Find(&model)
 	// query.Preload("TycketOptions.Lots").Find(&model)
-	query.Preload("TycketOptions.Lots").Preload(clause.Associations).Find(&model)
+	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&model)
 	err := query.Error
 	if err != nil {
 		fmt.Println(err)

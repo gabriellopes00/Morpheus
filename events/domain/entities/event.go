@@ -35,8 +35,8 @@ type Event struct {
 	Status             EventStatus     `json:"status,omitempty"`
 	Location           *EventLocation  `json:"location" gorm:"foreignKey:EventId;references:Id"`
 	TicketOptions      []TicketOption  `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
-	StartDateTime      time.Time       `json:"start_datetime,omitempty"`
-	EndDateTime        time.Time       `json:"end_datetime,omitempty"`
+	StartDateTime      time.Time       `json:"start_datetime,omitempty" gorm:"column:start_datetime"`
+	EndDateTime        time.Time       `json:"end_datetime,omitempty" gorm:"column:end_datetime"`
 	CategoryId         string          `json:"category,omitempty" gorm:"foreignKey:CategoryId"`
 	SubjectId          string          `json:"subject,omitempty" gorm:"foreignKey:SubjectId"`
 	Visibility         EventVisibility `json:"visibility,omitempty"`
@@ -65,6 +65,7 @@ func NewEvent(
 	event.TicketOptions = tickets
 	event.CategoryId = categoryId
 	event.SubjectId = subjectId
+	event.Status = StatusAvailable
 
 	event.StartDateTime, err = time.Parse(time.RFC3339, startDateTime)
 	if err != nil {
@@ -107,4 +108,9 @@ func (e *Event) validate() domain_errors.DomainErr {
 	}
 
 	return nil
+}
+
+// gorm required
+func (Event) TableName() string {
+	return "events"
 }

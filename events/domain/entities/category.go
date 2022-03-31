@@ -36,3 +36,8 @@ func (s *Category) validate() error {
 
 	return nil
 }
+
+// gorm required
+func (Category) TableName() string {
+	return "categories"
+}

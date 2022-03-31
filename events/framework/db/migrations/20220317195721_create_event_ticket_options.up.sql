@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "event_tickets" (
+CREATE TABLE IF NOT EXISTS "event_ticket_options" (
     id UUID UNIQUE NOT NULL,
     title VARCHAR NOT NULL,
     description TEXT DEFAULT NULL,
