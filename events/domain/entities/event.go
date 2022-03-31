@@ -34,7 +34,7 @@ type Event struct {
 	AgeGroup           int             `json:"age_group,omitempty"`
 	Status             EventStatus     `json:"status,omitempty"`
 	Location           *EventLocation  `json:"location" gorm:"foreignKey:EventId;references:Id"`
-	Tickets            []Ticket        `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
+	TicketOptions      []TicketOption  `json:"ticket_options,omitempty" gorm:"foreignKey:EventId;references:Id"`
 	StartDateTime      time.Time       `json:"start_datetime,omitempty"`
 	EndDateTime        time.Time       `json:"end_datetime,omitempty"`
 	CategoryId         string          `json:"category,omitempty" gorm:"foreignKey:CategoryId"`
@@ -45,7 +45,7 @@ type Event struct {
 func NewEvent(
 	name, description, coverUrl, organizerAccountId string,
 	ageGroup int, location *EventLocation,
-	tickets []Ticket, startDateTime, endDateTime string, categoryId,
+	tickets []TicketOption, startDateTime, endDateTime string, categoryId,
 	subjectId, visibility string,
 ) (*Event, domain_errors.DomainErr) {
 	var err error
@@ -62,7 +62,7 @@ func NewEvent(
 	event.OrganizerAccountId = organizerAccountId
 	event.AgeGroup = ageGroup
 	event.Location = location
-	event.Tickets = tickets
+	event.TicketOptions = tickets
 	event.CategoryId = categoryId
 	event.SubjectId = subjectId
 

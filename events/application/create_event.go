@@ -37,7 +37,7 @@ func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error)
 
 	event.Location = eventLocation
 
-	c.setEventTickets(event, params.Tickets)
+	c.setEventTicketOptions(event, params.TicketOptions)
 
 	if err = c.repository.Create(event); err != nil {
 		return nil, err
@@ -46,22 +46,22 @@ func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error)
 	return event, nil
 }
 
-// setEventTickets - creates an entity for all `Ticket` and it's `TicketLot` and set those
+// setEventTicketOptions - creates an entity for all `TicketOption` and it's `TicketOptionLot` and set those
 // entities into the event
-func (*CreateEvent) setEventTickets(event *entities.Event, params []TicketParams) error {
-	var tickets []entities.Ticket
+func (*CreateEvent) setEventTicketOptions(event *entities.Event, params []TicketOptionsParams) error {
+	var tickets []entities.TicketOption
 
 	for _, param := range params {
 
 		lots := param.Lots
-		var ticketLots []entities.TicketLot
+		var ticketLots []entities.TicketOptionLot
 
 		for _, lot := range lots {
-			ticketLot := entities.NewTicketLot(lot.Number, lot.Quantity, lot.Price)
+			ticketLot := entities.NewTicketOptionLot(lot.Number, lot.Quantity, lot.Price)
 			ticketLots = append(ticketLots, *ticketLot)
 		}
 
-		ticket, err := entities.NewTicket(param.Title, param.Description, param.SalesStartDateTime,
+		ticket, err := entities.NewTicketOption(param.Title, param.Description, param.SalesStartDateTime,
 			param.SalesEndDateTime, param.MaximumBuysQuantity, param.MinimumBuysQuantity, ticketLots)
 		if err != nil {
 			return err
@@ -70,6 +70,6 @@ func (*CreateEvent) setEventTickets(event *entities.Event, params []TicketParams
 		tickets = append(tickets, *ticket)
 	}
 
-	event.Tickets = tickets
+	event.TicketOptions = tickets
 	return nil
 }
