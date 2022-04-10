@@ -7,7 +7,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/lib/pq v1.10.4
 	github.com/satori/go.uuid v1.2.0
-	gorm.io/driver/postgres v1.3.1
+	gorm.io/driver/postgres v1.3.4
 	gorm.io/gorm v1.23.4
 )
 
