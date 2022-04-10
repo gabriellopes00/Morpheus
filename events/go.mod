@@ -8,7 +8,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/satori/go.uuid v1.2.0
 	gorm.io/driver/postgres v1.3.1
-	gorm.io/gorm v1.23.3
+	gorm.io/gorm v1.23.4
 )
 
 require (
