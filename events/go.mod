@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.17.7
 	github.com/golang-migrate/migrate/v4 v4.15.1
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.5
 	github.com/satori/go.uuid v1.2.0
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.4
