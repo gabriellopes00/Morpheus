@@ -50,7 +50,7 @@ func (h *createAccountHandler) Handle(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest,
 				map[string]string{"error": err.Error()})
 		} else {
-			logger.Logger.Error("error while publishing message to the queue", zap.String("error_message", err.Error()))
+			logger.Logger.Error("error while creating a new account", zap.String("error_message", err.Error()))
 			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
