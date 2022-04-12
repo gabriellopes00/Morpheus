@@ -15,7 +15,7 @@ type EventsRepository interface {
 	FindById(eventId string) (*entities.Event, error)
 	ExistsId(eventId string) (bool, error)
 	SetStatus(eventId string, status entities.EventStatus) error
-	FindAll(state string, month, ageGroup int) ([]entities.Event, error)
+	FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error)
 	Update(event *entities.Event) error
 }
 
@@ -30,18 +30,6 @@ func NewPgEventsRepository(connection *gorm.DB) *pgEventsRepository {
 func (repo *pgEventsRepository) Create(event *entities.Event) error {
 
 	event.Location.PostalCode = strings.ReplaceAll(event.Location.PostalCode, "-", "")
-
-	fmt.Println(event.Id + " event_id")
-	fmt.Println(event.Id + " event_id")
-	for _, o := range event.TicketOptions {
-		fmt.Println("ticket option " + o.Id)
-
-		for _, l := range o.Lots {
-			fmt.Println("ticket option lots " + l.Id)
-
-		}
-	}
-
 	err := repo.Db.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&event).Error
 	})
@@ -50,19 +38,10 @@ func (repo *pgEventsRepository) Create(event *entities.Event) error {
 }
 
 func (repo *pgEventsRepository) SetStatus(eventId string, status entities.EventStatus) error {
-	// stm, err := repo.Db.Prepare(`
-	// 	UPDATE events SET status = $1 WHERE id = $2;
-	// `)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// defer stm.Close()
-
-	// _, err = stm.Exec(eventId, status)
-
-	// return err
-	return nil
+	query := repo.Db.Model(&entities.Event{})
+	query.Where("id = ?", eventId)
+	query.Update("status", status)
+	return query.Error
 }
 
 func (repo *pgEventsRepository) Update(event *entities.Event) error {
@@ -118,7 +97,7 @@ func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]entities.
 	var models []entities.Event
 
 	query := repo.Db.Table("events AS event")
-	query.Where("event.organizer_account_id = ?", accountId).Find(&models)
+	query.Where("event.organizer_account_id = ?", accountId)
 	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&models)
 	err := query.Error
 	if err != nil {
@@ -134,10 +113,7 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 	var model entities.Event
 
 	query := repo.Db.Table("events AS event")
-	query.Where("event.id = ?", eventId).First(&model)
-	// query.Preload("Location").Find(&model)
-	// query.Preload("TycketOptions").Find(&model)
-	// query.Preload("TycketOptions.Lots").Find(&model)
+	query.Where("event.id = ?", eventId)
 	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&model)
 	err := query.Error
 	if err != nil {
@@ -148,17 +124,32 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 	return &model, nil
 }
 
-func (repo *pgEventsRepository) FindAll(state string, month, ageGroup int) ([]entities.Event, error) {
+func (repo *pgEventsRepository) FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error) {
 
 	var models []entities.Event
 
 	query := repo.Db.Table("events")
-	query.Where("events.age_group = ?", ageGroup).Find(&models)
-	query.Preload("Location").Find(&models)
-	query.Or(&entities.Event{Location: &entities.EventLocation{State: state}}).Find(&models)
+
+	query.Preload("Location")
+	query.Where(&entities.Event{Location: &entities.EventLocation{State: state}})
+
+	if ageGroup > 0 {
+		query.Where("events.age_group <= ?", ageGroup)
+	}
+
+	if month > 0 {
+		query.Where("EXTRACT(MONTH FROM events.start_datetime) = ?", month)
+	}
+
+	query.Order("events.start_datetime ASC")
+	query.Order("events.age_group DESC")
+
+	query.Limit(limit)
+	query.Offset(offset)
+
+	query.Find(&models)
 	err := query.Error
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

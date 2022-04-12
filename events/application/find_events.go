@@ -24,13 +24,17 @@ func (u *FindEvents) FindEventById(eventId string) (*entities.Event, error) {
 	return u.repository.FindById(eventId)
 }
 
-func (u *FindEvents) FindAll(state string, month, ageGroup int) ([]entities.Event, error) {
+func (u *FindEvents) FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error) {
 	if len(state) != 2 {
 		return nil, errors.New("invalid state abbreviation")
 	}
 
-	if month < 1 || month > 12 {
+	if month < 0 || month > 12 {
 		return nil, errors.New("invalid month")
+	}
+
+	if limit < 1 && limit > 30 {
+		return nil, errors.New("invalid results limit")
 	}
 
 	switch ageGroup {
@@ -41,5 +45,5 @@ func (u *FindEvents) FindAll(state string, month, ageGroup int) ([]entities.Even
 
 	}
 
-	return u.repository.FindAll(state, month, ageGroup)
+	return u.repository.FindAll(state, month, ageGroup, limit, offset)
 }

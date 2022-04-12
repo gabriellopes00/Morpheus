@@ -23,6 +23,17 @@ func NewFindAllEventsHandler(findEvents *application.FindEvents) *findAllEventsH
 func (handler *findAllEventsHandler) Handle(c echo.Context) error {
 
 	state := c.QueryParam("state")
+
+	limit, err := strconv.Atoi(c.QueryParam("limit"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+
+	offset, err := strconv.Atoi(c.QueryParam("offset"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+
 	month, err := strconv.Atoi(c.QueryParam("month"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
@@ -37,7 +48,7 @@ func (handler *findAllEventsHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	events, err := handler.findEvents.FindAll(state, month, ageGroup)
+	events, err := handler.findEvents.FindAll(state, month, ageGroup, limit, offset)
 	if err != nil {
 		logger.Logger.Error("error while finding events", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)

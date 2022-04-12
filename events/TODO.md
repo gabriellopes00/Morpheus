@@ -1,0 +1,3 @@
+- add `where not canceled` in events searches
+- add corruption layer for events searches
+- validate if event start date is valida for event update
