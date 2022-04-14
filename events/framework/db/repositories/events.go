@@ -132,6 +132,7 @@ func (repo *pgEventsRepository) FindAll(state string, month, ageGroup, limit, of
 
 	query.Preload("Location")
 	query.Where(&entities.Event{Location: &entities.EventLocation{State: state}})
+	query.Where("events.status != ?", entities.StatusCanceled) // ignore canceled events
 
 	if ageGroup > 0 {
 		query.Where("events.age_group <= ?", ageGroup)
@@ -159,7 +160,7 @@ func (repo *pgEventsRepository) FindAll(state string, month, ageGroup, limit, of
 
 func (r *pgEventsRepository) ExistsId(eventId string) (bool, error) {
 	var exists bool
-	err := r.Db.Raw("SELECT EXISTS(SELECT 1 FROM events WHERE id = ?);", eventId).Scan(&exists).Error
+	err := r.Db.Raw("SELECT EXISTS(SELECT 1 FROM events WHERE id = ?)", eventId).Scan(&exists).Error
 	if err != nil {
 		return false, err
 	}
