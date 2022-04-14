@@ -48,21 +48,26 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 	router.Use(middleware.Logger())
 	router.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(10)))
 
-	// setup routes
-	router.GET("/ping", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"status": "Ok"})
-	})
-	router.GET("/error", func(c echo.Context) error {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "Err"})
-	})
+	events := router.Group("/events", authMiddleware.Auth)
+	events.POST("", createEventHandler.Create)
+	events.GET("/:id", findEventsHandler.Handle)
+	events.GET("/", findAllEventsHandler.Handle)
+	events.PUT("/:id", updateEventsHandler.Handle)
+	events.PUT("/:id/cancel", cancelEventsHandler.Handle)
 
-	events := router.Group("/events")
-	events.POST("", createEventHandler.Create, authMiddleware.Auth)
-	events.GET("/:id", findEventsHandler.Handle, authMiddleware.Auth)
-	events.GET("/", findAllEventsHandler.Handle, authMiddleware.Auth)
-	events.PUT("/:id", updateEventsHandler.Handle, authMiddleware.Auth)
-	events.PATCH("/:id/cancel", cancelEventsHandler.Handle, authMiddleware.Auth)
-	// events.GET("?fetchcanceled=true|false", findAllEventsHandler.Handle, authMiddleware.Auth)
+	ticketOpts := events.Group("/:event_id/ticket_options")
+	ticketOpts.POST("", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	ticketOpts.DELETE("/:ticket_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	ticketOpts.PUT("/:ticket_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	ticketOpts.GET("", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	ticketOpts.GET("/:ticket_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+
+	lots := ticketOpts.Group("/:ticket_option_id/lots")
+	lots.POST("", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	lots.DELETE("/:lot_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	lots.PUT("/:lot_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	lots.GET("", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+	lots.GET("/:lot_id", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
 
 	accounts := router.Group("/accounts")
 	accounts.GET("/:account_id/events", findAccountEventsHandler.Handle, authMiddleware.Auth)

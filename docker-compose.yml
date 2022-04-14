@@ -14,30 +14,43 @@ services:
     ports:
       - '3792:3792'
 
-  # events:
-  #   container_name: events
-  #   restart: always
-  #   depends_on:
-  #     - rabbitmq
-  #   build: ./events/
-  #   networks:
-  #     - morpheus
-  #   ports:
-  #     - '4422:4422'
+  events:
+    container_name: events
+    restart: always
+    depends_on:
+      - rabbitmq
+    build:
+      context: ./events/
+      dockerfile: Dockerfile.dev
+    networks:
+      - morpheus
+    ports:
+      - '4422:4422'
 
-  # mailer:
-  #   container_name: mailer
-  #   restart: always
-  #   depends_on:
-  #     - redis
-  #     - rabbitmq
-  #   build: ./mailer/
-  #   networks:
-  #     - morpheus
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./.swagger/api.json:/api.json
+    environment:
+      SWAGGER_JSON: /api.json
+      # mailer:
+      #   container_name: mailer
+      #   restart: always
+      #   depends_on:
+      #     - redis
+      #     - rabbitmq
+      #   build: ./mailer/
+      #   networks:
+      #     - morpheus
 
   keycloack:
     container_name: keycloack
     image: quay.io/keycloak/keycloak:legacy
+    # env_file:
+    #   - ./.docker/keycloack/.env
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: keycloack_db
@@ -45,8 +58,8 @@ services:
       DB_USER: keycloak
       DB_SCHEMA: public
       DB_PASSWORD: password
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
+      # KEYCLOAK_USER: admin
+      # KEYCLOAK_PASSWORD: admin
       #JDBC_PARAMS: "ssl=true"
     ports:
       - 8080:8080
@@ -101,11 +114,9 @@ volumes:
   keycloack_db_data:
     driver: local
 
-
 networks:
   morpheus:
     driver: bridge
-
   # kong-migrations:
   #   image: kong:2.6.0-alpine
   #   command: kong migrations bootstrap
