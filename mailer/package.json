@@ -13,7 +13,7 @@
     "orm": "node ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
-    "@sentry/node": "^6.18.1",
+    "@sentry/node": "^6.19.6",
     "@sentry/tracing": "^6.19.3",
     "amqplib": "^0.8.0",
     "bull": "^4.7.0",
@@ -23,7 +23,7 @@
     "nodemailer": "^6.7.2",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.3.5",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

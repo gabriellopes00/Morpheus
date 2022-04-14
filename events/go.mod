@@ -3,9 +3,9 @@ module events
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.17.7
+	github.com/aws/aws-sdk-go v1.43.36
 	github.com/golang-migrate/migrate/v4 v4.15.1
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.5
 	github.com/satori/go.uuid v1.2.0
 	gorm.io/driver/postgres v1.3.4
 	gorm.io/gorm v1.23.4
@@ -53,8 +53,8 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20211103235746-7861aae1554b // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 )

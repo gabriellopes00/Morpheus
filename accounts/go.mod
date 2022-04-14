@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.0
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.5
 	github.com/streadway/amqp v1.0.0
 )
 
@@ -43,7 +43,7 @@ require (
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
-	github.com/go-redis/redis/v8 v8.11.4
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/satori/go.uuid v1.2.0
@@ -51,7 +51,7 @@ require (
 
 require (
 	github.com/Nerzal/gocloak/v7 v7.11.0
-	github.com/aws/aws-sdk-go v1.43.31
+	github.com/aws/aws-sdk-go v1.43.36
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/stretchr/testify v1.7.0
