@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@sentry/node": "^6.19.6",
-    "@sentry/tracing": "^6.19.3",
+    "@sentry/tracing": "^6.19.6",
     "amqplib": "^0.8.0",
     "bull": "^4.7.0",
     "dotenv": "^16.0.0",
