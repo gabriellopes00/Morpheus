@@ -3,7 +3,7 @@ module events
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.43.36
+	github.com/aws/aws-sdk-go v1.43.41
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/lib/pq v1.10.5
 	github.com/satori/go.uuid v1.2.0
