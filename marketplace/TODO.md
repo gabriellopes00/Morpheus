@@ -1,0 +1,1 @@
+- receive event when a user is created and then create a `connected account` on stripe
