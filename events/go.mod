@@ -3,7 +3,7 @@ module events
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.43.36
+	github.com/aws/aws-sdk-go v1.43.41
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/lib/pq v1.10.5
 	github.com/satori/go.uuid v1.2.0
@@ -38,7 +38,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/joho/godotenv v1.4.0
-	github.com/labstack/echo/v4 v4.7.0
+	github.com/labstack/echo/v4 v4.7.2
 	github.com/streadway/amqp v1.0.0
 )
 
