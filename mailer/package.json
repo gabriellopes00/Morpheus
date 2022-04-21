@@ -20,7 +20,7 @@
     "dotenv": "^16.0.0",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
-    "nodemailer": "^6.7.2",
+    "nodemailer": "^6.7.3",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.3.6",
