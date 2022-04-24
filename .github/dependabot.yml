@@ -39,3 +39,10 @@ updates:
       interval: weekly
     commit-message:
       prefix: 'chore:'
+
+   - package-ecosystem: npm
+    directory: /marketplace
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'chore:'
