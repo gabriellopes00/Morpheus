@@ -42,3 +42,13 @@
 - ok (return check-in date)
 - forbidden - check-in tried from another user
 - conflict - ticket already checked-in
+
+### problem solving
+
+- if the user reserves a ticket (10 min) and by some reason the ticket's lot has finished the sells... either:
+  - the ticket will be summed in the amount of the next lot, being available to the users buy it again
+  - if this is the last lot... the lot will "reopen" and the ticket amount will be the amount of tickets that have exceeded the time or the ones which the purchase has been canceled/rejected by any reason
+
+## marketplace
+
+POST:/marketplace/signup (or something like that)

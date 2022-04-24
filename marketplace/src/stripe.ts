@@ -47,14 +47,29 @@ app.get('/connect', async (req, res) => {
 
 app.get('/payment', async (req, res) => {
   const id = req.query['id'] as string
-  // const charge = await client.paymentIntents.create({
-  //   amount: 1000,
-  //   currency: 'brl',
-  //   payment_method: 'pm_card_visa',
-  //   transfer_data: {
-  //     destination: id,
-  //   },
+  const customer = await client.customers.create({ email: 'client@mail.com' })
+  const charge = await client.paymentIntents.create({
+    amount: 1000,
+    currency: 'brl',
+    payment_method: 'pm_card_visa_debit',
+    application_fee_amount: 10,
+    customer: customer.id,
+    receipt_email: 'gllopess011@gmail.com',
+    transfer_data: {
+      destination: id,
+    },
+  })
+
+  // client.charges.
+
+  // client.checkout.sessions.create({
+  //   success_url: 'https://example.com/success',
+  //   cancel_url: 'https://example.com/failure',
+
+  //   payment_intent_data: {},
   // })
+
+  // charge.
 
   // create checkout session
   // const charge = await client.charges.create({
@@ -66,33 +81,33 @@ app.get('/payment', async (req, res) => {
   //     account: id,
   //   },
   // })
-  const session = await client.checkout.sessions.create({
-    line_items: [
-      {
-        price_data: {
-          currency: 'brl',
-          product_data: {
-            name: 'Ticket Enrique e Juliano',
-          },
-          unit_amount: 2000,
-        },
-        quantity: 3,
-      },
-    ],
-    mode: 'payment',
-    success_url: 'https://example.com/success',
-    cancel_url: 'https://example.com/failure',
-    payment_intent_data: {
-      application_fee_amount: 123,
-      on_behalf_of: id,
-      transfer_data: {
-        destination: id,
-      },
-    },
-  })
+  // const session = await client.checkout.sessions.create({
+  //   line_items: [
+  //     {
+  //       price_data: {
+  //         currency: 'brl',
+  //         product_data: {
+  //           name: 'Ticket Enrique e Juliano',
+  //         },
+  //         unit_amount: 2000,
+  //       },
+  //       quantity: 3,
+  //     },
+  //   ],
+  //   mode: 'payment',
+  //   success_url: 'https://example.com/success',
+  //   cancel_url: 'https://example.com/failure',
+  //   payment_intent_data: {
+  //     application_fee_amount: 123,
+  //     on_behalf_of: id,
+  //     transfer_data: {
+  //       destination: id,
+  //     },
+  //   },
+  // })
 
-  res.redirect(session.url)
-  // res.json(charge)
+  // res.redirect(session.url)
+  res.json(charge)
 })
 
 app.get('/payout', async (req, res) => {
