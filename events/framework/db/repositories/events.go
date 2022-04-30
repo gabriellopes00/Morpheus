@@ -13,6 +13,7 @@ type EventsRepository interface {
 	Create(event *entities.Event) error
 	FindAccountEvents(accountId string) ([]entities.Event, error)
 	FindById(eventId string) (*entities.Event, error)
+	FindByLocation(state, city string) ([]entities.Event, error)
 	ExistsId(eventId string) (bool, error)
 	SetStatus(eventId string, status entities.EventStatus) error
 	FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error)
@@ -122,6 +123,29 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 	}
 
 	return &model, nil
+}
+
+func (repo *pgEventsRepository) FindByLocation(state, city string) ([]entities.Event, error) {
+
+	var models []entities.Event
+
+	fmt.Println(city)
+
+	query := repo.Db.Table("events")
+	query.Where("events.status != ?", entities.StatusCanceled) // ignore canceled events
+	query.Preload("Location")
+	query.Joins("JOIN event_locations Location ON events.id = Location.event_id AND Location.city = ?", city)
+
+	query.Limit(100)
+
+	query.Find(&models)
+	err := query.Error
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return models, nil
 }
 
 func (repo *pgEventsRepository) FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error) {
