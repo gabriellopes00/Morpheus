@@ -83,6 +83,7 @@ func (account *Account) validate() error {
 		return app_error.NewAppError("Invalid input", "invalid document format")
 	}
 
+	// phoneNumberPattern := `^\(\d{2,}\) \d{5,}\-\d{4}$` TODO: update regexp
 	phoneNumberPattern := `^\(\d{2,}\) \d{4,}\-\d{4}$`
 	if !govalidator.Matches(account.PhoneNumber, phoneNumberPattern) {
 		return app_error.NewAppError("Invalid input", "invalid phone number format")

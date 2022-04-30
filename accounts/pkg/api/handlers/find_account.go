@@ -21,7 +21,12 @@ func NewFindAccountHandler(usecase application.FindAccount) *findAccountHandler 
 
 func (h *findAccountHandler) Handle(c echo.Context) error {
 
-	accountId := c.Param("id")
+	accountId := c.Request().Header.Get("account_id")
+	paramId := c.Param("id")
+
+	if accountId != paramId {
+		return c.NoContent(http.StatusForbidden)
+	}
 
 	account, err := h.usecase.FindById(accountId)
 	if err != nil {
