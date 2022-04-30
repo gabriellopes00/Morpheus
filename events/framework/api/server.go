@@ -40,7 +40,7 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel, a
 	findEventsHandler := handlers.NewFindEventsHandler(findEvents)
 	findNearbyEvents := handlers.NewFindNearbyEventsHandler(findEvents)
 	findAllEventsHandler := handlers.NewFindAllEventsHandler(findEvents)
-	updateEventsHandler := handlers.NewUpdateEventHandler(updateEvents, rabbitMQ)
+	updateEventsHandler := handlers.NewUpdateEventHandler(updateEvents, findEvents, rabbitMQ)
 	cancelEventsHandler := handlers.NewCancelEventHandler(updateEvents, findEvents, rabbitMQ)
 	coverUploadHandler := handlers.NewCoverUploadHandler(findEvents, updateEvents, s3StorageProvider)
 

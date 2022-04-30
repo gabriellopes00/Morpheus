@@ -13,12 +13,14 @@ import (
 
 type updateEventHandler struct {
 	updateEvent  *application.UpdateEvent
+	findEvent    *application.FindEvents
 	MessageQueue queue.MessageQueue
 }
 
-func NewUpdateEventHandler(updateEvent *application.UpdateEvent, messageQueue queue.MessageQueue) *updateEventHandler {
+func NewUpdateEventHandler(updateEvent *application.UpdateEvent, findEvents *application.FindEvents, messageQueue queue.MessageQueue) *updateEventHandler {
 	return &updateEventHandler{
 		updateEvent:  updateEvent,
+		findEvent:    findEvents,
 		MessageQueue: messageQueue,
 	}
 }
@@ -31,17 +33,22 @@ func (handler *updateEventHandler) Handle(c echo.Context) error {
 	}
 
 	accountId := c.Request().Header.Get("account_id")
-	if accountId == "" {
-		return c.NoContent(http.StatusUnauthorized)
-	}
+	id := c.Param("id")
 
-	eventId := c.Param("id")
-
-	event, err := handler.updateEvent.UpdateData(eventId, &params)
+	event, err := handler.findEvent.FindEventById(id)
 	if err != nil {
 		logger.Logger.Error("error while updating event", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
+	}
 
+	if accountId != event.OrganizerAccountId {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	event, err = handler.updateEvent.UpdateData(id, &params)
+	if err != nil {
+		logger.Logger.Error("error while updating event", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	payload, _ := json.Marshal(event)
