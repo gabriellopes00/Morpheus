@@ -7,35 +7,42 @@ import (
 	"events/framework/auth"
 	"events/framework/db/repositories"
 	"events/framework/encrypter"
+	"events/framework/geocode"
 	"events/framework/queue"
+	"events/framework/storage"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/streadway/amqp"
 	"gorm.io/gorm"
 )
 
-func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
+func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel, awsSession *session.Session) {
 
 	// init adapters
 	eventsRepo := repositories.NewPgEventsRepository(database)
 	rabbitMQ := queue.NewRabbitMQ(amqpConn)
 	jwtEncrypter := encrypter.NewJwtEncrypter()
 	keycloack := auth.NewKeycloackauthProvider(jwtEncrypter)
+	geocodeProvider := geocode.NewGeocodeProvider()
+	s3StorageProvider := storage.NewS3StorageProvider(awsSession)
 
 	// init usecases
 	createEvent := application.NewCreateEvent(eventsRepo)
-	findEvents := application.NewFindEvents(eventsRepo)
+	findEvents := application.NewFindEvents(eventsRepo, *geocodeProvider)
 	updateEvents := application.NewUpdateEvent(eventsRepo)
 
 	// init handlers
 	createEventHandler := handlers.NewCreateEventHandler(createEvent, rabbitMQ)
 	findAccountEventsHandler := handlers.NewFindAccountEventsHandler(findEvents)
 	findEventsHandler := handlers.NewFindEventsHandler(findEvents)
+	findNearbyEvents := handlers.NewFindNearbyEventsHandler(findEvents)
 	findAllEventsHandler := handlers.NewFindAllEventsHandler(findEvents)
 	updateEventsHandler := handlers.NewUpdateEventHandler(updateEvents, rabbitMQ)
-	cancelEventsHandler := handlers.NewCancelEventHandler(updateEvents, rabbitMQ)
+	cancelEventsHandler := handlers.NewCancelEventHandler(updateEvents, findEvents, rabbitMQ)
+	coverUploadHandler := handlers.NewCoverUploadHandler(findEvents, updateEvents, s3StorageProvider)
 
 	// init middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(keycloack)
@@ -51,9 +58,11 @@ func SetupServer(router *echo.Echo, database *gorm.DB, amqpConn *amqp.Channel) {
 	events := router.Group("/events", authMiddleware.Auth)
 	events.POST("", createEventHandler.Create)
 	events.GET("/:id", findEventsHandler.Handle)
+	events.GET("/nearby", findNearbyEvents.Handle)
 	events.GET("/", findAllEventsHandler.Handle)
 	events.PUT("/:id", updateEventsHandler.Handle)
 	events.PUT("/:id/cancel", cancelEventsHandler.Handle)
+	events.PUT("/:id/cover", coverUploadHandler.Handle)
 
 	ticketOpts := events.Group("/:event_id/ticket_options")
 	ticketOpts.POST("", func(c echo.Context) error { return c.NoContent(http.StatusOK) })

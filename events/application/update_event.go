@@ -24,6 +24,7 @@ func (u *UpdateEvent) SetStatus(eventId string, status entities.EventStatus) err
 type UpdateEventDTO struct {
 	Name            string                 `json:"name,omitempty"`
 	Description     string                 `json:"description,omitempty"`
+	CoverUrl        string                 `json:"cover_url,omitempty"`
 	AgeGroup        int                    `json:"age_group,omitempty"`
 	MaximumCapacity int                    `json:"maximum_capacity,omitempty"`
 	Location        entities.EventLocation `json:"location"`

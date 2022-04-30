@@ -18,9 +18,10 @@ type CancelEventHandler struct {
 	messageQueue queue.MessageQueue
 }
 
-func NewCancelEventHandler(updateEvent *application.UpdateEvent, messageQueue queue.MessageQueue) *CancelEventHandler {
+func NewCancelEventHandler(updateEvent *application.UpdateEvent, findEvent *application.FindEvents, messageQueue queue.MessageQueue) *CancelEventHandler {
 	return &CancelEventHandler{
 		updateEvent:  updateEvent,
+		findEvent:    findEvent,
 		messageQueue: messageQueue,
 	}
 }
@@ -32,7 +33,7 @@ func (handler *CancelEventHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	eventId := c.Param("event_id")
+	eventId := c.Param("id")
 
 	event, err := handler.findEvent.FindEventById(eventId)
 	if err != nil {
@@ -58,5 +59,5 @@ func (handler *CancelEventHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{"event": event})
+	return c.JSON(http.StatusOK, map[string]interface{}{"event": event})
 }

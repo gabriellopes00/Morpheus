@@ -8,6 +8,7 @@ import (
 	"events/framework/db"
 	"events/framework/logger"
 	"events/framework/queue"
+	"events/framework/storage"
 	"fmt"
 	"os"
 	"os/signal"
@@ -54,8 +55,13 @@ func main() {
 
 	queue.SetUpQueueServer(amqpConn, database)
 
+	awsSession, err := storage.CreateAWSSession()
+	if err != nil {
+		logger.Logger.Fatal(err.Error())
+	}
+
 	e := echo.New()
-	api.SetupServer(e, database, amqpConn)
+	api.SetupServer(e, database, amqpConn, awsSession)
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.PORT)); err != nil {
 			logger.Logger.Fatal("error starting web server", zap.String("error_message", err.Error()))
