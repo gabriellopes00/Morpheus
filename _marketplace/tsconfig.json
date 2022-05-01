@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
-    "lib": ["ES6", "ES2020"],
+    "lib": ["ES6", "ES2020", "es2015.promise"],
     "allowJs": true,
     "outDir": "dist/",
     "rootDir": ".",
@@ -21,5 +21,5 @@
     }
   },
   "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules/", "dist/", "coverage/"]
+  "exclude": ["node_modules/", "dist/"]
 }
