@@ -48,7 +48,21 @@ func (repo *pgEventsRepository) SetStatus(eventId string, status entities.EventS
 func (repo *pgEventsRepository) Update(event *entities.Event) error {
 	query := repo.Db.Table("events AS event")
 	query.Where("event.id = ?", event.Id)
-	query.Save(event)
+	query.Updates(
+		map[string]interface{}{
+			"name":           event.Name,
+			"description":    event.Description,
+			"cover_url":      event.CoverUrl,
+			"age_group":      event.AgeGroup,
+			"status":         event.Status,
+			"start_datetime": event.StartDateTime,
+			"end_datetime":   event.EndDateTime,
+			"category_id":    event.CategoryId,
+			"subject_id":     event.SubjectId,
+			"visibility":     event.Visibility,
+			"updated_at":     event.UpdatedAt,
+		},
+	)
 
 	return query.Error
 }
