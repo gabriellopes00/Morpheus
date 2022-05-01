@@ -5,6 +5,7 @@ import (
 	"events/application"
 	"events/framework/logger"
 	"events/framework/queue"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -35,10 +36,16 @@ func (handler *updateEventHandler) Handle(c echo.Context) error {
 	accountId := c.Request().Header.Get("account_id")
 	id := c.Param("id")
 
-	event, err := handler.findEvent.FindEventById(id)
+	event, err := handler.findEvent.FindEventById(id, false)
 	if err != nil {
 		logger.Logger.Error("error while updating event", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	fmt.Println(event)
+
+	if event == nil {
+		return c.NoContent(http.StatusNotFound)
 	}
 
 	if accountId != event.OrganizerAccountId {

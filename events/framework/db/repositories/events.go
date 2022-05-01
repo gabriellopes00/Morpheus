@@ -11,8 +11,8 @@ import (
 
 type EventsRepository interface {
 	Create(event *entities.Event) error
-	FindAccountEvents(accountId string) ([]entities.Event, error)
-	FindById(eventId string) (*entities.Event, error)
+	FindAccountEvents(accountId string, deepFind bool) ([]entities.Event, error)
+	FindById(eventId string, deepFind bool) (*entities.Event, error)
 	FindByLocation(state, city string) ([]entities.Event, error)
 	ExistsId(eventId string) (bool, error)
 	SetStatus(eventId string, status entities.EventStatus) error
@@ -67,13 +67,15 @@ func (repo *pgEventsRepository) Update(event *entities.Event) error {
 	return query.Error
 }
 
-func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]entities.Event, error) {
+func (repo *pgEventsRepository) FindAccountEvents(accountId string, deepFind bool) ([]entities.Event, error) {
 
 	var models []entities.Event
 
 	query := repo.Db.Table("events AS event")
 	query.Where("event.organizer_account_id = ?", accountId)
-	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&models)
+	if deepFind {
+		query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&models)
+	}
 	err := query.Error
 	if err != nil {
 		fmt.Println(err)
@@ -83,17 +85,30 @@ func (repo *pgEventsRepository) FindAccountEvents(accountId string) ([]entities.
 	return models, nil
 }
 
-func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error) {
+func (repo *pgEventsRepository) FindById(eventId string, deepFind bool) (*entities.Event, error) {
 
 	var model entities.Event
 
 	query := repo.Db.Table("events AS event")
 	query.Where("event.id = ?", eventId)
-	query.Preload("TicketOptions.Lots").Preload(clause.Associations).Find(&model)
+
+	if deepFind {
+		query.Preload("TicketOptions.Lots").Preload(clause.Associations)
+	}
+
+	query.Find(&model)
+
+	if query.RowsAffected == 0 {
+		return nil, nil
+	}
+
 	err := query.Error
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
+	}
+
+	if !deepFind {
+		model.Location = nil
 	}
 
 	return &model, nil
@@ -102,8 +117,6 @@ func (repo *pgEventsRepository) FindById(eventId string) (*entities.Event, error
 func (repo *pgEventsRepository) FindByLocation(state, city string) ([]entities.Event, error) {
 
 	var models []entities.Event
-
-	fmt.Println(city)
 
 	query := repo.Db.Table("events")
 	query.Where("events.status != ?", entities.StatusCanceled) // ignore canceled events

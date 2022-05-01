@@ -1,8 +1,10 @@
 package application
 
 import (
+	"errors"
 	"events/domain/entities"
 	"events/framework/db/repositories"
+	"time"
 )
 
 type CreateEvent struct {
@@ -24,6 +26,14 @@ func (c *CreateEvent) Create(params *CreateEventParams) (*entities.Event, error)
 		params.SubjectId, params.Visibility)
 	if err != nil {
 		return nil, err
+	}
+
+	if time.Until(event.StartDateTime) <= time.Hour*24 {
+		return nil, errors.New("cannot create event withing less then 24 hours to start date")
+	}
+
+	if (time.Until(event.EndDateTime) - time.Until(event.StartDateTime)) <= time.Hour {
+		return nil, errors.New("events must have at least of 1 hour of duration")
 	}
 
 	location := params.Location

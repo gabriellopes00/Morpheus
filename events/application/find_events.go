@@ -20,11 +20,11 @@ func NewFindEvents(repo repositories.EventsRepository, geocodeProvider geocode.G
 }
 
 func (u *FindEvents) FindAccountEvents(accountId string) ([]entities.Event, error) {
-	return u.repository.FindAccountEvents(accountId)
+	return u.repository.FindAccountEvents(accountId, false)
 }
 
-func (u *FindEvents) FindEventById(eventId string) (*entities.Event, error) {
-	return u.repository.FindById(eventId)
+func (u *FindEvents) FindEventById(eventId string, deepFind bool) (*entities.Event, error) {
+	return u.repository.FindById(eventId, deepFind)
 }
 
 func (u *FindEvents) FindNearbyEvents(latitude, longitude string) ([]entities.Event, error) {

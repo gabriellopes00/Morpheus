@@ -35,7 +35,7 @@ func (handler *CancelEventHandler) Handle(c echo.Context) error {
 
 	eventId := c.Param("id")
 
-	event, err := handler.findEvent.FindEventById(eventId)
+	event, err := handler.findEvent.FindEventById(eventId, false)
 	if err != nil {
 		logger.Logger.Error("error while finding an event", zap.String("error_msg", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)

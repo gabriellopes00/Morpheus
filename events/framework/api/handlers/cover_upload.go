@@ -29,7 +29,7 @@ func (h *CoverUploadHandler) Handle(c echo.Context) error {
 	accountId := c.Request().Header.Get("account_id")
 	id := c.Param("id")
 
-	event, err := h.findEvents.FindEventById(id)
+	event, err := h.findEvents.FindEventById(id, false)
 	if err != nil {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "No events found with given id"})
 	}

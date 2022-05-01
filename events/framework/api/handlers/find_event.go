@@ -32,7 +32,7 @@ func (handler *findEventsHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	event, err := handler.findEvent.FindEventById(eventId)
+	event, err := handler.findEvent.FindEventById(eventId, true)
 	if err != nil {
 		logger.Logger.Error("error while finding event", zap.String("error_message", err.Error()))
 		return c.NoContent(http.StatusInternalServerError)

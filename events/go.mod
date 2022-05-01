@@ -45,6 +45,7 @@ require (
 
 require (
 	github.com/Nerzal/gocloak/v7 v7.11.0
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
