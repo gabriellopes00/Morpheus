@@ -1,23 +1,21 @@
 package application
 
 import (
-	"encoding/json"
 	"errors"
 	"events/domain/entities"
 	"events/framework/db/repositories"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"events/framework/geocode"
 )
 
 type FindEvents struct {
-	repository repositories.EventsRepository
+	repository      repositories.EventsRepository
+	geocodeProvider geocode.GeocodeProvider
 }
 
-func NewFindEvents(repo repositories.EventsRepository) *FindEvents {
+func NewFindEvents(repo repositories.EventsRepository, geocodeProvider geocode.GeocodeProvider) *FindEvents {
 	return &FindEvents{
-		repository: repo,
+		repository:      repo,
+		geocodeProvider: geocodeProvider,
 	}
 }
 
@@ -29,45 +27,21 @@ func (u *FindEvents) FindEventById(eventId string) (*entities.Event, error) {
 	return u.repository.FindById(eventId)
 }
 
-func (u *FindEvents) FindNearEvents(latitude, longitude float64) ([]entities.Event, error) {
-	// request https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=37.42159&longitude=-122.0837&localityLanguage=en
-	// get city name
-	// fetch events by this city name ==> cache it
+func (u *FindEvents) FindNearbyEvents(latitude, longitude string) ([]entities.Event, error) {
 
-	url := fmt.Sprintf("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=%flongitude=%f&localityLanguage=en", latitude, longitude)
-	res, err := http.Get(url)
+	data, err := u.geocodeProvider.Reverse(latitude, longitude)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// fetch event by city in cache
 
-	type Response struct {
-		Latitude                 string `json:"latitude"`
-		Longitude                string `json:"longitude"`
-		Continent                string `json:"continent"`
-		LookupSource             string `json:"lookupSource"`
-		ContinentCode            string `json:"continentCode"`
-		City                     string `json:"city"`
-		CountryName              string `json:"countryName"`
-		PostCode                 string `json:"postcode"`
-		CountryCode              string `json:"countryCode"`
-		PrincipalSubdivision     string `json:"principalSubdivision"`
-		PrincipalSubdivisionCode string `json:"principalSubdivisionCode"`
-	}
-
-	var data Response
-	err = json.Unmarshal(body, &data)
+	events, err := u.repository.FindByLocation("", data.City) // cache it
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(data)
-
-	return nil, nil
+	return events, nil
 }
 
 func (u *FindEvents) FindAll(state string, month, ageGroup, limit, offset int) ([]entities.Event, error) {

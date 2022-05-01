@@ -1,78 +1,81 @@
 package handlers
 
-// import (
-// 	"errors"
-// 	"events/framework/logger"
-// 	"events/framework/storage"
-// 	"net/http"
+import (
+	"errors"
+	"events/application"
+	"events/framework/logger"
+	"events/framework/storage"
+	"net/http"
 
-// 	"github.com/labstack/echo/v4"
-// 	"go.uber.org/zap"
-// )
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
+)
 
-// type AvatarUploadHandler struct {
-// 	usecase         application.
-// 	storageProvider storage.Provider
-// }
+type CoverUploadHandler struct {
+	findEvents      *application.FindEvents
+	updateEvent     *application.UpdateEvent
+	storageProvider storage.Provider
+}
 
-// func NewAvatarUploadHandler(usecase application.UpdateAccount, storageProvider storage.Provider) *AvatarUploadHandler {
-// 	return &AvatarUploadHandler{
-// 		usecase:         usecase,
-// 		storageProvider: storageProvider,
-// 	}
-// }
+func NewCoverUploadHandler(findEvents *application.FindEvents, updateEvent *application.UpdateEvent, storageProvider storage.Provider) *CoverUploadHandler {
+	return &CoverUploadHandler{
+		storageProvider: storageProvider,
+		updateEvent:     updateEvent,
+		findEvents:      findEvents,
+	}
+}
 
-// func (h *AvatarUploadHandler) Handle(c echo.Context) error {
-// 	accountId := c.Request().Header.Get("account_id")
-// 	paramId := c.Param("id")
+func (h *CoverUploadHandler) Handle(c echo.Context) error {
+	accountId := c.Request().Header.Get("account_id")
+	id := c.Param("id")
 
-// 	if accountId != paramId {
-// 		return c.JSON(
-// 			http.StatusForbidden,
-// 			map[string]string{"error": "forbidden access"})
-// 	}
+	event, err := h.findEvents.FindEventById(id)
+	if err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"error": "No events found with given id"})
+	}
 
-// 	file, err := c.FormFile("avatar")
-// 	if err != nil {
-// 		return c.JSON(http.StatusBadRequest, "error while uploading file")
-// 	}
+	if event.OrganizerAccountId != accountId {
+		return c.NoContent(http.StatusForbidden)
+	}
 
-// 	src, err := file.Open()
-// 	if err != nil {
-// 		return c.NoContent(http.StatusBadRequest)
-// 	}
-// 	defer src.Close()
+	file, err := c.FormFile("cover")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "error while uploading file")
+	}
 
-// 	filetype := file.Header.Get("Content-Type")
-// 	err = h.validateFileType(filetype)
-// 	if err != nil {
-// 		return c.JSON(http.StatusBadRequest, err)
-// 	}
+	src, err := file.Open()
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+	defer src.Close()
 
-// 	fileName := "avatar-" + accountId
-// 	fileUrl, err := h.storageProvider.UploadFile(src, fileName, filetype)
-// 	if err != nil {
-// 		logger.Logger.Error("error while uploading file in provider", zap.String("error_message", err.Error()))
-// 		return c.NoContent(http.StatusInternalServerError)
-// 	}
+	filetype := file.Header.Get("Content-Type")
+	err = h.validateFileType(filetype)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 
-// 	_, err = h.usecase.Update(
-// 		accountId,
-// 		&application.UpdateAccountDTO{AvatarUrl: fileUrl},
-// 	)
-// 	if err != nil {
-// 		logger.Logger.Error("error while updating account", zap.String("error_message", err.Error()))
-// 		return c.NoContent(http.StatusInternalServerError)
-// 	}
+	fileName := "event-cover-" + id
+	fileUrl, err := h.storageProvider.UploadFile(src, fileName, filetype)
+	if err != nil {
+		logger.Logger.Error("error while uploading file in provider", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
+	}
 
-// 	return c.NoContent(http.StatusNoContent)
-// }
+	_, err = h.updateEvent.UpdateData(id, &application.UpdateEventDTO{CoverUrl: fileUrl})
+	if err != nil {
+		logger.Logger.Error("error while updating account", zap.String("error_message", err.Error()))
+		return c.NoContent(http.StatusInternalServerError)
+	}
 
-// func (*AvatarUploadHandler) validateFileType(fileType string) error {
-// 	switch fileType {
-// 	case "image/jpeg", "image/jpg", "image/png":
-// 		return nil
-// 	default:
-// 		return errors.New("invalid file type. Allowed file types are: \"image/jpeg\", \"image/jpg\", \"image/png\"")
-// 	}
-// }
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (*CoverUploadHandler) validateFileType(fileType string) error {
+	switch fileType {
+	case "image/jpeg", "image/jpg", "image/png":
+		return nil
+	default:
+		return errors.New("invalid file type. Allowed file types are: \"image/jpeg\", \"image/jpg\", \"image/png\"")
+	}
+}
