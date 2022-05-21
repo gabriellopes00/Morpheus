@@ -24,4 +24,5 @@ ENV PATH /usr/src/morpheus_events/node_modules/.bin:$PATH
 ENV NODE_ENV=production
 COPY --chown=node:node --from=dependencies /app/node_modules /usr/src/morpheus_events/node_modules/
 COPY --from=build --chown=node:node /app/dist /usr/src/morpheus_events/dist/
+COPY --from=build --chown=node:node /app/package.json /usr/src/morpheus_events
 ENTRYPOINT yarn start
