@@ -40,7 +40,8 @@
     "pino": "^6.13.2",
     "pino-pretty": "^4.7.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.3.6"
+    "typeorm": "^0.3.6",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.2",
@@ -48,6 +49,7 @@
     "@types/module-alias": "^2.0.0",
     "@types/node": "^14.14.25",
     "@types/supertest": "^2.0.11",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.14.2",
     "eslint": "^7.12.1",
