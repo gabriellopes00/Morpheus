@@ -8,6 +8,6 @@ export class AccountEntity {
   @Column()
   public referencedId: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date
 }

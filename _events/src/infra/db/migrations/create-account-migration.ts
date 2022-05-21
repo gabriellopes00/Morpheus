@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm'
 
 export class CreateAccountMigration implements MigrationInterface {
-  name = this.constructor.name.concat('1653147077411')
+  name = this.constructor.name.concat('1653147077419')
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -9,7 +9,7 @@ export class CreateAccountMigration implements MigrationInterface {
         name: 'test_table',
         columns: [
           { name: 'id', type: 'uuid', isPrimary: true },
-          { name: 'referencedId', type: 'uuid', isNullable: false },
+          { name: 'referencedId', type: 'uuid', isNullable: false, isUnique: true },
           { name: 'created_at', type: 'timestamp', default: 'now()' }
         ]
       }),
