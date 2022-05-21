@@ -50,7 +50,9 @@ export class MessageQueue {
         queue === this.queues[0] ? 'account_created' : 'account_deleted'
       )
       channel.prefetch(1)
-      channel.consume(queue, async msg => await this.handleMessage(msg, queue), { noAck: true })
+      channel.consume(queue, async (msg: amqp.Message) => await this.handleMessage(msg, queue), {
+        noAck: true
+      })
     }
   }
 

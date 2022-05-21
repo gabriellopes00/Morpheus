@@ -2,13 +2,11 @@
 FROM node:lts-alpine AS dev_dependencies
 WORKDIR /app/
 COPY package.json yarn.* tsconfig.json ./
-COPY ./src ./src
 RUN yarn install --production=false --frozen-lockfile
 
 FROM node:lts-alpine AS dependencies
 WORKDIR /app/
 COPY package.json yarn.* ./
-COPY ./src ./src
 RUN yarn install --production=true --frozen-lockfile
 
 FROM node:lts-alpine AS build
