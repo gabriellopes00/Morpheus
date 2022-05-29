@@ -4,7 +4,8 @@ export interface TicketOptionLotData {
   number: number
   ticketOptionId: string
   price: number
-  quantity: number
+  total_quantity: number
+  remaining_quantity: number
 }
 
 export class TicketOptionLot extends Entity<TicketOptionLotData> {}

@@ -1,7 +1,7 @@
 import { Entity } from '@/shared/entity'
 
 export type EventStatus = 'available' | 'finished' | 'sold_out' | 'canceled'
-
+export type EventAgeGroup = 0 | 10 | 12 | 14 | 16 | 18
 export type EventVisibility = 'public' | 'private' | 'invited_only'
 
 export interface EventData {
@@ -9,7 +9,7 @@ export interface EventData {
   description: string
   coverUrl: string
   organizerAccountId: string
-  ageGroup: number
+  ageGroup: EventAgeGroup
   status: EventStatus
   locationId: string
   startDateTime: Date
@@ -22,6 +22,39 @@ export interface EventData {
 export class Event extends Entity<EventData> {
   constructor(data: EventData, id: string) {
     super(data, id)
+  }
+
+  static create(data: EventData, id: string): Event | Error {
+    const timeUntilStart = data.startDateTime.getTime() - new Date().getTime()
+    if (timeUntilStart < 0) {
+      return new Error('Event cannot start in the past')
+    }
+
+    if (data.startDateTime.getTime() > data.endDateTime.getTime()) {
+      return new Error('Event cannot start after it ends')
+    }
+
+    const duration = data.endDateTime.getTime() - data.startDateTime.getTime()
+    if (duration < 3600000) {
+      return new Error('Event must have at least one hour of duration')
+    }
+
+    if (data.status !== 'available') {
+      return new Error("New events' status must be 'available'")
+    }
+
+    if (
+      data.ageGroup !== 0 &&
+      data.ageGroup !== 10 &&
+      data.ageGroup !== 12 &&
+      data.ageGroup !== 14 &&
+      data.ageGroup !== 16 &&
+      data.ageGroup !== 18
+    ) {
+      return new Error('Invalid age group')
+    }
+
+    return new Event(data, id)
   }
 
   public get name(): string {
