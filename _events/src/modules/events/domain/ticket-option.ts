@@ -1,15 +1,51 @@
 import { Entity } from '@/shared/entity'
-import { TicketOptionLot } from './ticket-option-lot'
 
 export interface TicketOptionData {
   eventId: string
   title: string
   description: string
-  salesStartDateTime: Date
-  salesEndDateTime: Date
   minimumBuysQuantity: number
   maximumBuysQuantity: number
-  lots: TicketOptionLot[]
 }
 
-export class TicketOption extends Entity<TicketOptionData> {}
+export class TicketOption extends Entity<TicketOptionData> {
+  constructor(data: TicketOptionData, id: string) {
+    super(data, id)
+  }
+
+  static create(data: TicketOptionData, id: string): TicketOption | Error {
+    if (data.minimumBuysQuantity > data.maximumBuysQuantity) {
+      return new Error('Minimum buys quantity cannot be greater than maximum buys quantity')
+    }
+
+    if (data.minimumBuysQuantity < 1) {
+      return new Error('Minimum buys quantity cannot be less than 1')
+    }
+
+    return new TicketOption(data, id)
+  }
+
+  public get id(): string {
+    return this.id
+  }
+
+  public get eventId(): string {
+    return this.data.eventId
+  }
+
+  public get title(): string {
+    return this.data.title
+  }
+
+  public get description(): string {
+    return this.data.description
+  }
+
+  public get minimumBuysQuantity(): number {
+    return this.data.minimumBuysQuantity
+  }
+
+  public get maximumBuysQuantity(): number {
+    return this.data.maximumBuysQuantity
+  }
+}

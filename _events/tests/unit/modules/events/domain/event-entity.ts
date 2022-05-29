@@ -7,7 +7,6 @@ describe('Event', () => {
     categoryId: 'c923fe2f-6219-4446-b958-d224f744001f',
     coverUrl: 'https://random_image.png',
     description: 'lorem ipsum...',
-    locationId: '6f500e73-f96c-4821-a30c-28989af56a0b',
     name: 'My Test Event',
     status: 'available',
     visibility: 'public',
@@ -18,8 +17,8 @@ describe('Event', () => {
   }
 
   it('Should create an event successfully', async () => {
-    const event = new Event(eventData, 'e6677386-1792-416d-a3c4-0e424c367aab')
-    expect(event.name).toEqual(eventData.name)
+    const event = Event.create(eventData, 'e6677386-1792-416d-a3c4-0e424c367aab')
+    expect(event).toBeInstanceOf(Event)
   })
 
   test('Should not create an event if start date is in the past', async () => {

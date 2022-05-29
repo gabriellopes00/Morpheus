@@ -11,7 +11,6 @@ export interface EventData {
   organizerAccountId: string
   ageGroup: EventAgeGroup
   status: EventStatus
-  locationId: string
   startDateTime: Date
   endDateTime: Date
   categoryId: string
@@ -79,10 +78,6 @@ export class Event extends Entity<EventData> {
 
   public get status(): string {
     return this.data.status
-  }
-
-  public get locationId(): string {
-    return this.data.locationId
   }
 
   public get startDateTime(): Date {
