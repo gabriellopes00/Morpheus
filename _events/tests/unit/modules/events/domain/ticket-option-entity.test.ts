@@ -18,23 +18,10 @@ describe('Event Ticket Option Entity', () => {
   })
 
   test('Should return an error when minimum buys quantity is greater than maximum buys quantity', async () => {
-    const ticketOptionDataWithInvalidQuantity = {
+    const ticketOptionDataWithInvalidQuantity: TicketOptionData = {
       ...ticketOptionData,
       maximumBuysQuantity: 1,
       minimumBuysQuantity: 6
-    }
-    const ticketOption = new TicketOption(
-      ticketOptionDataWithInvalidQuantity,
-      '3a8a7a22-a1fc-4a73-96f3-4ac0ec944de5'
-    )
-    expect(ticketOption).toBeInstanceOf(Error)
-  })
-
-  test('Should return an error when minimum buys quantity is less than 1', async () => {
-    const ticketOptionDataWithInvalidQuantity = {
-      ...ticketOptionData,
-      maximumBuysQuantity: 1,
-      minimumBuysQuantity: 0
     }
     const ticketOption = TicketOption.create(
       ticketOptionDataWithInvalidQuantity,
@@ -43,11 +30,11 @@ describe('Event Ticket Option Entity', () => {
     expect(ticketOption).toBeInstanceOf(Error)
   })
 
-  test('Should return an error when minimum buys quantity is not a number', async () => {
-    const ticketOptionDataWithInvalidQuantity = {
+  test('Should return an error when minimum buys quantity is less than 1', async () => {
+    const ticketOptionDataWithInvalidQuantity: TicketOptionData = {
       ...ticketOptionData,
       maximumBuysQuantity: 1,
-      minimumBuysQuantity: ('a' as unknown) as number
+      minimumBuysQuantity: 0
     }
     const ticketOption = TicketOption.create(
       ticketOptionDataWithInvalidQuantity,

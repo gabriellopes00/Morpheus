@@ -25,10 +25,6 @@ export class TicketOption extends Entity<TicketOptionData> {
     return new TicketOption(data, id)
   }
 
-  public get id(): string {
-    return this.id
-  }
-
   public get eventId(): string {
     return this.data.eventId
   }
