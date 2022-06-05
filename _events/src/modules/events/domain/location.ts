@@ -18,8 +18,22 @@ export class Location extends Entity<LocationData> {
     super(data, id)
   }
 
-  static create(data: LocationData): Location | Error {
-    return new Location(data, 'uuid')
+  static create(data: LocationData, id: string): Location | Error {
+    const error = this.validate(data)
+    if (error) return error
+
+    return new Location(data, id)
+  }
+
+  private static validate(data: LocationData): Error {
+    const postalCodeRegex = /^\d{5}-\d{3}$/
+    if (!postalCodeRegex.test(data.postalCode)) {
+      return new Error('Invalid postal code')
+    }
+
+    if (data.state.length !== 2) {
+      return new Error('Invalid state abbr')
+    }
   }
 
   public get eventId(): string {
