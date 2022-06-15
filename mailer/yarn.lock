@@ -154,10 +154,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^17.0.40":
-  version "17.0.40"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.40.tgz#76ee88ae03650de8064a6cf75b8d95f9f4a16090"
-  integrity sha512-UXdBxNGqTMtm7hCwh9HtncFVLrXoqA3oJW30j6XWp5BH/wu3mVeaxo7cq5benFdBw34HB3XDT2TRPI7rXZ+mDg==
+"@types/node@*", "@types/node@^17.0.42":
+  version "17.0.42"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.42.tgz#d7e8f22700efc94d125103075c074396b5f41f9b"
+  integrity sha512-Q5BPGyGKcvQgAMbsr7qEGN/kIPN6zZecYYABeTDBizOsau+2NMdSVTar9UQw21A2+JyA2KRNDYaYrPB0Rpk2oQ==
 
 "@types/nodemailer@^6.4.4":
   version "6.4.4"
@@ -329,10 +329,10 @@ buffer@^6.0.3:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
-bull@^4.8.2:
-  version "4.8.2"
-  resolved "https://registry.yarnpkg.com/bull/-/bull-4.8.2.tgz#0d02fe389777abe29d50fd46d123bc62e074cfcd"
-  integrity sha512-S7CNIL9+vsbLKwOGkUI6mawY5iABKQJLZn5a7KPnxAZrDhFXkrxsHHXLCKUR/+Oqys3Vk5ElWdj0SLtK84b1Nw==
+bull@^4.8.3:
+  version "4.8.3"
+  resolved "https://registry.yarnpkg.com/bull/-/bull-4.8.3.tgz#4ab67029fee1183dcb7185895b20dc08c02d6bf2"
+  integrity sha512-oOHr+KTLu3JM5V9TXsg18/1xyVQceoYCFiGrXZOpu9abZn3W3vXJtMBrwB6Yvl/RxSKVVBpoa25RF/ya3750qg==
   dependencies:
     cron-parser "^4.2.1"
     debuglog "^1.0.0"
