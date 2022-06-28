@@ -17,7 +17,7 @@
     "@sentry/tracing": "^6.19.6",
     "amqplib": "^0.10.0",
     "bull": "^4.8.2",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.1",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.7.5",
