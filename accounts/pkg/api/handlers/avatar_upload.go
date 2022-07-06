@@ -66,7 +66,7 @@ func (h *AvatarUploadHandler) Handle(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.String(http.StatusOK, fileUrl)
 }
 
 func (*AvatarUploadHandler) validateFileType(fileType string) error {

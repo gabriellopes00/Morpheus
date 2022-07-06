@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Nerzal/gocloak/v7"
+	"go.uber.org/zap"
 )
 
 var (
@@ -87,6 +88,8 @@ func (k *KeyclaockAuthProvider) SignInUser(email, password string) (Token, error
 func (k *KeyclaockAuthProvider) AuthUser(accessToken string) (AuthUserInfo, error) {
 	accountId, err := k.Encrypter.DecryptToken(accessToken)
 	if err != nil {
+		zap.Error(err)
+		// return an custom error
 		return AuthUserInfo{}, err
 	}
 
@@ -101,6 +104,8 @@ func (k *KeyclaockAuthProvider) RefreshAuth(refreshToken string) (Token, error) 
 
 	keycloackToken, err := k.Client.RefreshToken(context.Background(), refreshToken, clientId, clientSecret, realm)
 	if err != nil {
+		zap.Error(err)
+		// return an custom error
 		return Token{}, err
 	}
 
