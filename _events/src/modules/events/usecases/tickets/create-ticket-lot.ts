@@ -3,9 +3,7 @@ import { TicketOption } from '../../domain/ticket-option'
 import { TicketOptionLot, TicketOptionLotData } from '../../domain/ticket-option-lot'
 import { FindRepository, SaveRepository } from '../../repositories/generic'
 
-export interface CreateTicketLotCredentials {
-  lots: TicketOptionLotData[]
-}
+export interface CreateTicketLotCredentials extends TicketOptionLotData {}
 
 export class CreateTicketLot {
   constructor(
@@ -14,15 +12,15 @@ export class CreateTicketLot {
     private readonly uuidGenerator: UUIDGenerator
   ) {}
 
-  public async execute(params: CreateTicketLotCredentials): Promise<TicketOptionLot[] | Error> {
-    if (!params.lots.every((t, _, arr) => t.ticketOptionId === arr[0].ticketOptionId)) {
+  public async execute(params: CreateTicketLotCredentials[]): Promise<TicketOptionLot[] | Error> {
+    if (!params.every((t, _, arr) => t.ticketOptionId === arr[0].ticketOptionId)) {
       return new Error('All ticket lots must have the same ticket option id')
     }
 
-    const optionExists = await this.optionRepository.exists({ id: params.lots[0].ticketOptionId })
+    const optionExists = await this.optionRepository.exists({ id: params[0].ticketOptionId })
     if (!optionExists) return new Error('Event not found')
 
-    const lots = params.lots.map(lot => {
+    const lots = params.map(lot => {
       const id = this.uuidGenerator.generate()
       const ticketLot = TicketOptionLot.create(lot, id)
       return ticketLot
