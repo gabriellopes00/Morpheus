@@ -1,19 +1,20 @@
 import { Account } from '@/modules/accounts/domain/account'
-import { CreateAccountRepository } from '@/modules/accounts/repositories/create-account-repository'
-import { DeleteAccountRepository } from '@/modules/accounts/repositories/delete-account-repository'
+import { FindRepository, SaveRepository } from '@/shared/repositories'
 import { DataSource } from 'typeorm'
 import { AccountEntity } from '../entities/account-entity'
 
-export class PgAccountRepository implements CreateAccountRepository, DeleteAccountRepository {
+export class PgAccountRepository
+implements Partial<FindRepository<Account>>, Partial<SaveRepository<Account>> {
   constructor(private readonly dataSource: DataSource) {}
 
-  public async create(data: Account): Promise<void> {
+  public async findBy(key: keyof Account, value: string): Promise<Account> {
     const repository = this.dataSource.getRepository(AccountEntity)
-    await repository.save(repository.create(data))
+    const entity = await repository.findOneBy({ [key]: value })
+    return new Account({ ...entity }, entity.id)
   }
 
-  public async delete(referencedId: string): Promise<void> {
+  public async save(data: Account): Promise<void> {
     const repository = this.dataSource.getRepository(AccountEntity)
-    await repository.delete(referencedId)
+    await repository.save(repository.create({ ...data }))
   }
 }

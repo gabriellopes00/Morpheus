@@ -1,6 +1,6 @@
 import { Controller } from '@/core/presentation/controller'
 import { HttpRequest, HttpResponse } from '@/core/presentation/http'
-import { badRequest, ok } from '@/presentation/http'
+import { badRequest, created } from '@/presentation/http'
 import { Event } from '../../domain/event'
 import {
   CreateEventCredentials,
@@ -30,10 +30,10 @@ interface Params extends CreateEventCredentials {
 
 export class CreateEventController implements Controller {
   constructor(
-    public readonly createEvent: CreateEventUseCase,
-    public readonly createLocation: CreateLocationUseCase,
-    public readonly createTicketOption: CreateTicketOption,
-    public readonly createTicketLot: CreateTicketLot
+    private readonly createEvent: CreateEventUseCase,
+    private readonly createLocation: CreateLocationUseCase,
+    private readonly createTicketOption: CreateTicketOption,
+    private readonly createTicketLot: CreateTicketLot
   ) {}
 
   public async handle(data: HttpRequest<Params>): Promise<HttpResponse<Event>> {
@@ -51,6 +51,6 @@ export class CreateEventController implements Controller {
       if (lotResult instanceof Error) return badRequest(lotResult)
     }
 
-    return ok(result)
+    return created(result)
   }
 }

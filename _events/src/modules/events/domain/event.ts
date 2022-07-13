@@ -2,7 +2,7 @@ import { Entity } from '@/shared/entity'
 
 export type EventStatus = 'available' | 'finished' | 'sold_out' | 'canceled'
 export type EventAgeGroup = 0 | 10 | 12 | 14 | 16 | 18
-export type EventVisibility = 'public' | 'private' | 'invited_only'
+export type EventVisibility = 'public' | 'private'
 
 export interface EventData {
   name: string

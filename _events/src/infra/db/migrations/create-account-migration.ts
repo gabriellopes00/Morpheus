@@ -9,8 +9,15 @@ export class CreateAccountMigration implements MigrationInterface {
         name: 'test_table',
         columns: [
           { name: 'id', type: 'uuid', isPrimary: true },
-          { name: 'referencedId', type: 'uuid', isNullable: false, isUnique: true },
-          { name: 'created_at', type: 'timestamp', default: 'now()' }
+          { name: 'name', type: 'varchar', isNullable: false },
+          { name: 'email', type: 'varchar', isNullable: false, isUnique: true },
+          { name: 'document', type: 'varchar', isNullable: false, isUnique: true },
+          { name: 'password', type: 'varchar', isNullable: false },
+          { name: 'avatar_url', type: 'varchar', isNullable: false },
+          { name: 'birth_date', type: 'varchar', isNullable: false },
+          { name: 'gender', type: 'varchar', isNullable: false },
+          { name: 'created_at', type: 'timestamp', default: 'now()' },
+          { name: 'updated_at', type: 'timestamp', default: 'now()' }
         ]
       }),
       true
