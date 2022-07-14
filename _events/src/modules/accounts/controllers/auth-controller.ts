@@ -19,9 +19,20 @@ export class AuthController {
       const loginResult = await this.loginAccount.execute({ email, password })
       if (loginResult instanceof Error) return res.status(400).json({ error: loginResult.message })
 
-      delete loginResult.account.password
-
-      return res.status(200).json({ auth: loginResult })
+      return res.status(200).json({
+        auth: {
+          accessToken: loginResult.accessToken,
+          account: {
+            id: loginResult.account.id,
+            name: loginResult.account.name,
+            email: loginResult.account.email,
+            document: loginResult.account.document,
+            gender: loginResult.account.gender,
+            birthDate: loginResult.account.birthDate,
+            avatarUrl: loginResult.account.avatarUrl
+          }
+        }
+      })
     } catch (error) {
       logger.error(error, 'internal server error')
       return res.status(500).json({ error: 'Error interno do servidor. Tente novamente...' })

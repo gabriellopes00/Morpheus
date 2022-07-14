@@ -1,7 +1,7 @@
 import { AccountData, AccountGender } from '@/modules/accounts/domain/account'
 import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm'
 
-@Entity({ name: 'accountss' })
+@Entity({ name: 'accounts' })
 export class AccountEntity implements AccountData {
   @PrimaryColumn({ type: 'uuid' })
   public id: string
@@ -18,13 +18,13 @@ export class AccountEntity implements AccountData {
   @Column({ type: 'varchar' })
   public password: string
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', name: 'avatar_url' })
   public avatarUrl: string
 
   @Column({ type: 'varchar' })
   public gender: AccountGender
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', name: 'birth_date' })
   public birthDate: string
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

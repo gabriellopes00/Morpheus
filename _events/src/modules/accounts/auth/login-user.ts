@@ -25,8 +25,6 @@ export class LoginAccount {
     const account = await this.repository.findBy('email', params.email)
     if (!account) return new Error('E-mail, login ou senha inválido(s)')
 
-    if (!account.password) return new Error('Conta de usuário ainda inativa')
-
     const isValidPassword = await this.hasher.compare(params.password, account.password)
     if (!isValidPassword) return new Error('E-mail, login ou senha inválido(s)')
 

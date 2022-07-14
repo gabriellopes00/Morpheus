@@ -2,8 +2,9 @@ import logger from '@/config/logger'
 import { env } from 'process'
 import { ConnectionNotFoundError, DataSource } from 'typeorm'
 import { AccountEntity } from './entities/account-entity'
+import { CreateAccountMigration } from './migrations/create-account-migration'
 
-const { DB_HOST, DB_USER, DB_NAME, DB_PASS, DB_PORT } = env
+const { DB_HOST, DB_USER, DB_NAME, DB_PASS, DB_PORT, DB_SSL_MODE } = env
 
 export class TypeORMDataSource {
   private static dataSource: DataSource
@@ -29,11 +30,13 @@ export class TypeORMDataSource {
       type: 'postgres',
       host: DB_HOST,
       port: Number(DB_PORT),
+      ssl: { rejectUnauthorized: false },
       username: DB_USER,
       password: DB_PASS,
       database: DB_NAME,
       entities: [AccountEntity],
-      migrationsTableName: '_migrations'
+      migrationsTableName: '_migrations',
+      migrations: [CreateAccountMigration]
     })
   }
 
