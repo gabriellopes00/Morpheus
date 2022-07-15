@@ -4,7 +4,7 @@ import { ConnectionNotFoundError, DataSource } from 'typeorm'
 import { AccountEntity } from './entities/account-entity'
 import { CreateAccountMigration } from './migrations/create-account-migration'
 
-const { DB_HOST, DB_USER, DB_NAME, DB_PASS, DB_PORT, DB_SSL_MODE } = env
+const { DB_HOST, DB_USER, DB_NAME, DB_PASS, DB_PORT } = env
 
 export class TypeORMDataSource {
   private static dataSource: DataSource

@@ -49,8 +49,12 @@ export class Account extends Entity<AccountData> {
     this.data.avatarUrl = value
   }
 
-  public get gender(): string {
+  public get gender(): AccountGender {
     return this.data.gender
+  }
+
+  public set gender(value: AccountGender) {
+    this.data.gender = value
   }
 
   public get birthDate(): string {

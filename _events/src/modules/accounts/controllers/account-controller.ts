@@ -52,38 +52,36 @@ export class AccountController {
 
   async update(req: AccountRequest<UpdateAccountParams>, res: Response) {
     try {
-      const accountId = req.headers.account_id as string
+      const accountId = String(req.headers.account_id)
       const id = req.params.id
 
       if (accountId !== id) return res.status(403).json({ error: 'Atualização não autorizada' })
 
-      const { name, avatarUrl } = req.body
+      const { name, avatarUrl, gender } = req.body
 
-      const updateResult = await this.updateAccount.execute({ id: accountId, name, avatarUrl })
-      if (updateResult instanceof Error) {
-        return res.status(400).json({ error: updateResult.message })
+      const result = await this.updateAccount.execute({
+        id: accountId,
+        name,
+        avatarUrl,
+        gender
+      })
+      if (result instanceof Error) {
+        return res.status(400).json({ error: result.message })
       }
 
-      delete updateResult.password
+      delete result.password
 
-      return res.status(200).json({ account: updateResult })
-    } catch (error) {
-      logger.error(error, 'internal server error')
-      return res.status(500).json({ error: 'Error interno do servidor. Tente novamente...' })
-    }
-  }
-
-  async findById(req: Request, res: Response) {
-    try {
-      const id = String(req.params.id)
-      const findResult = await this.findAccountById.execute({ id })
-
-      if (findResult instanceof Error) return res.status(404).json({ error: findResult.message })
-      else if (findResult === null) return res.status(404).json({ error: 'Usuário não encontrado' })
-
-      delete findResult.password
-
-      return res.status(200).json({ account: findResult })
+      return res.status(200).json({
+        account: {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          document: result.document,
+          gender: result.gender,
+          birthDate: result.birthDate,
+          avatarUrl: result.avatarUrl
+        }
+      })
     } catch (error) {
       logger.error(error, 'internal server error')
       return res.status(500).json({ error: 'Error interno do servidor. Tente novamente...' })
@@ -93,14 +91,24 @@ export class AccountController {
   async me(req: Request, res: Response) {
     try {
       const id = String(req.headers.account_id)
-      const findResult = await this.findAccountById.execute({ id })
+      const result = await this.findAccountById.execute({ id })
 
-      if (findResult instanceof Error) return res.status(404).json({ error: findResult.message })
-      else if (findResult === null) return res.status(404).json({ error: 'Usuário não encontrado' })
+      if (result instanceof Error) return res.status(404).json({ error: result.message })
+      else if (result === null) return res.status(404).json({ error: 'Usuário não encontrado' })
 
-      delete findResult.password
+      delete result.password
 
-      return res.status(200).json({ account: findResult })
+      return res.status(200).json({
+        account: {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          document: result.document,
+          gender: result.gender,
+          birthDate: result.birthDate,
+          avatarUrl: result.avatarUrl
+        }
+      })
     } catch (error) {
       logger.error(error, 'internal server error')
       return res.status(500).json({ error: 'Error interno do servidor. Tente novamente...' })
