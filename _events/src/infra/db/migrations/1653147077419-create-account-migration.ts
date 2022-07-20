@@ -25,6 +25,6 @@ export class CreateAccountMigration implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('test_table', true)
+    await queryRunner.dropTable('accounts', true)
   }
 }
