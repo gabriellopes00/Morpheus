@@ -6,6 +6,9 @@ export interface TicketOptionData {
   description: string
   minimumBuysQuantity: number
   maximumBuysQuantity: number
+  price: number
+  totalQuantity: number
+  remainingQuantity: number
 }
 
 export class TicketOption extends Entity<TicketOptionData> {
@@ -43,5 +46,17 @@ export class TicketOption extends Entity<TicketOptionData> {
 
   public get maximumBuysQuantity(): number {
     return this.data.maximumBuysQuantity
+  }
+
+  public get price(): number {
+    return this.data.price
+  }
+
+  public get totalQuantity(): number {
+    return this.data.totalQuantity
+  }
+
+  public get remainingQuantity(): number {
+    return this.data.remainingQuantity
   }
 }
