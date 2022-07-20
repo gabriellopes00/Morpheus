@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm'
 import { AccountEntity } from '../entities/account-entity'
 
 export class PgAccountRepository
-  implements Partial<FindRepository<Account>>, Partial<SaveRepository<Account>> {
+implements Partial<FindRepository<Account>>, Partial<SaveRepository<Account>> {
   constructor(private readonly dataSource: DataSource) {}
 
   public async findBy(key: keyof Account, value: string): Promise<Account> {

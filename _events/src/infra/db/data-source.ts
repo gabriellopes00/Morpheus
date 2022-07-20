@@ -2,7 +2,15 @@ import logger from '@/config/logger'
 import { env } from 'process'
 import { ConnectionNotFoundError, DataSource } from 'typeorm'
 import { AccountEntity } from './entities/account-entity'
-import { CreateAccountMigration } from './migrations/create-account-migration'
+import { EventEntity } from './entities/event-entity'
+import { FavoriteEntity } from './entities/favorite-entity'
+import { CreateAccountMigration } from './migrations/1653147077419-create-account-migration'
+import { CreateCategoriesMigration } from './migrations/1657896118944-create-categories-migration'
+import { CreateSubjectsMigration } from './migrations/1657896596925-create-subjects-migrations'
+import { CreateEventsMigration } from './migrations/1657896600958-create-events-migrations'
+import { CreateLocationsMigration } from './migrations/1657896603908-create-locations-migrations'
+import { CreateTicketOptionsMigration } from './migrations/1657896606712-create-ticket-options-migrations'
+import { CreateFavoritesMigration } from './migrations/1658315610357-create-favorites'
 
 const { DB_HOST, DB_USER, DB_NAME, DB_PASS, DB_PORT } = env
 
@@ -34,9 +42,17 @@ export class TypeORMDataSource {
       username: DB_USER,
       password: DB_PASS,
       database: DB_NAME,
-      entities: [AccountEntity],
+      entities: [AccountEntity, FavoriteEntity, EventEntity],
       migrationsTableName: '_migrations',
-      migrations: [CreateAccountMigration]
+      migrations: [
+        CreateAccountMigration,
+        CreateCategoriesMigration,
+        CreateSubjectsMigration,
+        CreateEventsMigration,
+        CreateLocationsMigration,
+        CreateTicketOptionsMigration,
+        CreateFavoritesMigration
+      ]
     })
   }
 

@@ -11,29 +11,20 @@ import {
   CreateLocationUseCase
 } from '../../usecases/events/create-location-usecase'
 import {
-  CreateTicketLot,
-  CreateTicketLotCredentials
-} from '../../usecases/tickets/create-ticket-lot'
-import {
   CreateTicketOption,
   CreateTicketOptionCredentials
 } from '../../usecases/tickets/create-ticket-option'
 
-interface ticketParams extends CreateTicketOptionCredentials {
-  lots: CreateTicketLotCredentials[]
-}
-
 interface Params extends CreateEventCredentials {
   location: CreateLocationCredentials
-  ticketOptions: ticketParams[]
+  ticketOptions: CreateTicketOptionCredentials[]
 }
 
 export class CreateEventController implements Controller {
   constructor(
     private readonly createEvent: CreateEventUseCase,
     private readonly createLocation: CreateLocationUseCase,
-    private readonly createTicketOption: CreateTicketOption,
-    private readonly createTicketLot: CreateTicketLot
+    private readonly createTicketOption: CreateTicketOption
   ) {}
 
   public async handle(data: HttpRequest<Params>): Promise<HttpResponse<Event>> {
@@ -45,11 +36,6 @@ export class CreateEventController implements Controller {
 
     const optionResult = await this.createTicketOption.execute(data.params.ticketOptions)
     if (optionResult instanceof Error) return badRequest(optionResult)
-
-    for (const option of data.params.ticketOptions) {
-      const lotResult = await this.createTicketLot.execute(option.lots)
-      if (lotResult instanceof Error) return badRequest(lotResult)
-    }
 
     return created(result)
   }
