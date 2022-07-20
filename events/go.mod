@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.43.45
 	github.com/golang-migrate/migrate/v4 v4.15.1
-	github.com/imdario/mergo v0.3.12
+	github.com/imdario/mergo v0.3.13
 	github.com/lib/pq v1.10.5
 	github.com/satori/go.uuid v1.2.0
 	gorm.io/driver/postgres v1.3.5
@@ -31,7 +31,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/ksuid v1.0.3 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
 
 require (
