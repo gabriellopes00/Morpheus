@@ -1,6 +1,6 @@
 import { UUIDGenerator } from '@/core/infra/uuid-generator'
+import { SaveRepository } from '@/shared/repositories'
 import { Location, LocationData } from '../../domain/location'
-import { SaveRepository } from '../../repositories/generic'
 
 export interface CreateLocationCredentials extends LocationData {}
 

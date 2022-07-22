@@ -13,7 +13,7 @@ export class MockLocationRepository implements SaveRepository {
   }
 
   public async save<T = Location>(data: T): Promise<void> {
-    const location = (data as unknown) as Location
+    const location = data as unknown as Location
     if (this._events.some(a => a.id === location.id)) {
       throw new Error('id must be unique')
     }

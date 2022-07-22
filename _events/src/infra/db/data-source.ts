@@ -4,6 +4,8 @@ import { ConnectionNotFoundError, DataSource } from 'typeorm'
 import { AccountEntity } from './entities/account-entity'
 import { EventEntity } from './entities/event-entity'
 import { FavoriteEntity } from './entities/favorite-entity'
+import { LocationEntity } from './entities/location-entity'
+import { TicketOptionEntity } from './entities/ticket-option-entity'
 import { CreateAccountMigration } from './migrations/1653147077419-create-account-migration'
 import { CreateCategoriesMigration } from './migrations/1657896118944-create-categories-migration'
 import { CreateSubjectsMigration } from './migrations/1657896596925-create-subjects-migrations'
@@ -42,7 +44,7 @@ export class TypeORMDataSource {
       username: DB_USER,
       password: DB_PASS,
       database: DB_NAME,
-      entities: [AccountEntity, FavoriteEntity, EventEntity],
+      entities: [AccountEntity, FavoriteEntity, EventEntity, TicketOptionEntity, LocationEntity],
       migrationsTableName: '_migrations',
       migrations: [
         CreateAccountMigration,

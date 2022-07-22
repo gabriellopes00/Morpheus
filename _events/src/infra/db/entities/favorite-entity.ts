@@ -8,6 +8,6 @@ export class FavoriteEntity {
   @Column({ name: 'account_id', type: 'uuid' })
   public accountId: string
 
-  @CreateDateColumn({ name: 'event_id', type: 'uuid' })
+  @Column({ name: 'event_id', type: 'uuid' })
   public eventId: string
 }

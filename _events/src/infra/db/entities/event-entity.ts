@@ -1,10 +1,11 @@
 import {
+  Event,
   EventAgeGroup,
   EventData,
   EventStatus,
   EventVisibility
 } from '@/modules/events/domain/event'
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'events' })
 export class EventEntity implements EventData {
@@ -51,6 +52,10 @@ export class EventEntity implements EventData {
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date
 
-  @CreateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   public updatedAt: Date
+
+  public map(): Event {
+    return Object.assign(new Event(this, this.id), this)
+  }
 }

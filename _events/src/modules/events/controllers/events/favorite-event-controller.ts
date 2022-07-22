@@ -2,7 +2,10 @@ import { PgFavoritesRepository } from '@/infra/db/repositories/favorites-reposit
 import { Request, Response } from 'express'
 
 export class FavoriteEventController {
-  constructor(private readonly repository: PgFavoritesRepository) {}
+  constructor(private readonly repository: PgFavoritesRepository) {
+    const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+    methods.filter(m => m !== 'constructor').forEach(m => (this[m] = this[m].bind(this)))
+  }
 
   public async favorite(req: Request, res: Response): Promise<Response> {
     try {

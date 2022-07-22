@@ -4,8 +4,7 @@ export interface SaveRepository<T = never> {
 }
 
 export interface FindRepository<T = never> {
-  find?<I = any, S = string>(term: S): Promise<I | T>
-  findBy?(key: keyof T, value: string): Promise<T>
-  exists?(term: T | { id: string }): Promise<boolean>
+  findBy?(key: keyof T, value: any): Promise<T>
+  exists?({ id: string }): Promise<boolean>
   findAll?(): Promise<T[]>
 }

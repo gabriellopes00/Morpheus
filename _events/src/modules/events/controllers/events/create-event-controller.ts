@@ -1,7 +1,4 @@
-import { Controller } from '@/core/presentation/controller'
-import { HttpRequest, HttpResponse } from '@/core/presentation/http'
-import { badRequest, created } from '@/presentation/http'
-import { Event } from '../../domain/event'
+import { Request, Response } from 'express'
 import {
   CreateEventCredentials,
   CreateEventUseCase
@@ -15,28 +12,48 @@ import {
   CreateTicketOptionCredentials
 } from '../../usecases/tickets/create-ticket-option'
 
-interface Params extends CreateEventCredentials {
+interface CreateParams extends CreateEventCredentials {
   location: CreateLocationCredentials
   ticketOptions: CreateTicketOptionCredentials[]
 }
 
-export class CreateEventController implements Controller {
+type EventRequest<T = any> = Modify<Request, { body: T }>
+
+export class EventController {
   constructor(
     private readonly createEvent: CreateEventUseCase,
     private readonly createLocation: CreateLocationUseCase,
     private readonly createTicketOption: CreateTicketOption
-  ) {}
+  ) {
+    const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+    methods.filter(m => m !== 'constructor').forEach(m => (this[m] = this[m].bind(this)))
+  }
 
-  public async handle(data: HttpRequest<Params>): Promise<HttpResponse<Event>> {
-    const result = await this.createEvent.execute(data.params)
-    if (result instanceof Error) return badRequest(result)
+  public async create(req: EventRequest<CreateParams>, res: Response): Promise<Response> {
+    try {
+      const data = req.body
+      const organizerAccountId = String(req.headers.account_id)
 
-    const locationResult = await this.createLocation.execute(data.params.location)
-    if (locationResult instanceof Error) return badRequest(locationResult)
+      const result = await this.createEvent.execute({ ...data, organizerAccountId })
+      if (result instanceof Error) return res.status(400).json({ error: result.message })
 
-    const optionResult = await this.createTicketOption.execute(data.params.ticketOptions)
-    if (optionResult instanceof Error) return badRequest(optionResult)
+      const locationResult = await this.createLocation.execute({
+        ...data.location,
+        eventId: result.id
+      })
+      if (locationResult instanceof Error) {
+        return res.status(400).json({ error: locationResult.message })
+      }
 
-    return created(result)
+      const options = data.ticketOptions.map(option => ({ ...option, eventId: result.id }))
+      const optionResult = await this.createTicketOption.execute(options)
+      if (optionResult instanceof Error) {
+        return res.status(400).json({ error: optionResult.message })
+      }
+
+      return res.status(201).json({ event: result })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
   }
 }

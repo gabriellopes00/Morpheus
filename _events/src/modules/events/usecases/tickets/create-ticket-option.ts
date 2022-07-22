@@ -1,7 +1,7 @@
 import { UUIDGenerator } from '@/core/infra/uuid-generator'
 import { Event } from '../../domain/event'
 import { TicketOption, TicketOptionData } from '../../domain/ticket-option'
-import { FindRepository, SaveRepository } from '../../repositories/generic'
+import { FindRepository, SaveRepository } from '@/shared/repositories'
 
 export interface CreateTicketOptionCredentials extends TicketOptionData {}
 

@@ -1,5 +1,5 @@
-import { AccountData, AccountGender } from '@/modules/accounts/domain/account'
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm'
+import { Account, AccountData, AccountGender } from '@/modules/accounts/domain/account'
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'accounts' })
 export class AccountEntity implements AccountData {
@@ -30,6 +30,10 @@ export class AccountEntity implements AccountData {
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   public createdAt: Date
 
-  @CreateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   public updatedAt: Date
+
+  public map(): Account {
+    return Object.assign(new Account(this, this.id), this)
+  }
 }
