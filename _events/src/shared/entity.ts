@@ -4,10 +4,10 @@ export abstract class Entity<T> {
 
   protected readonly data: T
 
-  constructor(data: T, id: string) {
+  constructor(data: T, id: string, createdAt?: Date) {
     this._id = id
     this.data = data
-    this._createdAt = new Date()
+    this._createdAt = createdAt || new Date()
   }
 
   get id() {

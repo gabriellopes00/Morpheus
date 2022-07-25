@@ -43,9 +43,6 @@ export class EventEntity implements EventData {
   @Column({ type: 'uuid', name: 'category_id' })
   public categoryId: string
 
-  @Column({ type: 'uuid', name: 'subject_id' })
-  public subjectId: string
-
   @Column({ type: 'varchar', name: 'visibility', enum: ['private', 'public'] })
   public visibility: EventVisibility
 
@@ -56,6 +53,21 @@ export class EventEntity implements EventData {
   public updatedAt: Date
 
   public map(): Event {
-    return Object.assign(new Event(this, this.id), this)
+    return new Event(
+      {
+        name: this.name,
+        description: this.description,
+        coverUrl: this.coverUrl,
+        organizerAccountId: this.organizerAccountId,
+        ageGroup: this.ageGroup,
+        status: this.status,
+        startDateTime: this.startDateTime,
+        endDateTime: this.endDateTime,
+        categoryId: this.categoryId,
+        visibility: this.visibility
+      },
+      this.id,
+      new Date(this.createdAt)
+    )
   }
 }

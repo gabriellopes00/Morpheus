@@ -14,13 +14,12 @@ export interface EventData {
   startDateTime: Date
   endDateTime: Date
   categoryId: string
-  subjectId: string
   visibility: EventVisibility
 }
 
 export class Event extends Entity<EventData> {
-  constructor(data: EventData, id: string) {
-    super(data, id)
+  constructor(data: EventData, id: string, date?: Date) {
+    super(data, id, date)
   }
 
   static create(data: EventData, id: string): Event | Error {
@@ -90,10 +89,6 @@ export class Event extends Entity<EventData> {
 
   public get categoryId(): string {
     return this.data.categoryId
-  }
-
-  public get subjectId(): string {
-    return this.data.subjectId
   }
 
   public get visibility(): string {

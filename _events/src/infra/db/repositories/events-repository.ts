@@ -21,7 +21,6 @@ export class PgEventsRepository implements SaveRepository<Event>, FindRepository
         endDateTime: event.endDateTime,
         status: event.status as 'available' | 'sold_out' | 'canceled',
         categoryId: event.categoryId,
-        subjectId: event.subjectId,
         visibility: event.visibility as 'private' | 'public',
         coverUrl: event.coverUrl,
         organizerAccountId: event.organizerAccountId,
@@ -43,6 +42,11 @@ export class PgEventsRepository implements SaveRepository<Event>, FindRepository
 
   public async findAll?(): Promise<Event[]> {
     const entities = await this.repository.find()
+    return entities.map(e => e.map())
+  }
+
+  public async findAllBy(key: keyof Event, value: any): Promise<Event[]> {
+    const entities = await this.repository.find({ where: { categoryId: value } })
     return entities.map(e => e.map())
   }
 }

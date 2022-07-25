@@ -7,10 +7,9 @@ export const event: CreateEventCredentials = {
   description: faker.lorem.lines(),
   ageGroup: faker.helpers.arrayElement([0, 10, 12, 16, 18]),
   coverUrl: faker.image.imageUrl(),
-  startDateTime: new Date('2022-05-29T13:21:36.639Z'),
-  organizerAccountId: crypto.randomUUID(),
-  endDateTime: new Date('2022-05-29T15:21:36.639Z'),
-  subjectId: crypto.randomUUID(),
-  categoryId: crypto.randomUUID(),
+  startDateTime: '2022-05-29T13:21:36.639Z',
+  organizerAccountId: faker.random.alpha(),
+  endDateTime: '2022-05-29T15:21:36.639Z',
+  categoryId: faker.random.alpha(),
   visibility: faker.helpers.arrayElement<EventVisibility>(['public', 'private'])
 }

@@ -7,6 +7,7 @@ import {
   CreateLocationCredentials,
   CreateLocationUseCase
 } from '../../usecases/events/create-location-usecase'
+import { FindEventsUseCase } from '../../usecases/events/find-events-usecase'
 import {
   CreateTicketOption,
   CreateTicketOptionCredentials
@@ -23,7 +24,8 @@ export class EventController {
   constructor(
     private readonly createEvent: CreateEventUseCase,
     private readonly createLocation: CreateLocationUseCase,
-    private readonly createTicketOption: CreateTicketOption
+    private readonly createTicketOption: CreateTicketOption,
+    private readonly findEvents: FindEventsUseCase
   ) {
     const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
     methods.filter(m => m !== 'constructor').forEach(m => (this[m] = this[m].bind(this)))
@@ -52,6 +54,15 @@ export class EventController {
       }
 
       return res.status(201).json({ event: result })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+  public async findAll(req: EventRequest, res: Response): Promise<Response> {
+    try {
+      const result = await this.findEvents.execute()
+      return res.status(200).json({ result })
     } catch (error) {
       return res.status(500).json({ error: error.message })
     }

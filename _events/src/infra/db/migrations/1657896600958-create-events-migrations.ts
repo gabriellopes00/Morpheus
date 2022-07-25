@@ -28,7 +28,6 @@ export class CreateEventsMigration implements MigrationInterface {
           { name: 'start_date_time', type: 'timestamp', isNullable: false },
           { name: 'end_date_time', type: 'timestamp', isNullable: false },
           { name: 'category_id', type: 'uuid', isNullable: false },
-          { name: 'subject_id', type: 'uuid', isNullable: false },
           { name: 'visibility', type: 'varchar', enum: ['private', 'public'], isNullable: false },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
           { name: 'updated_at', type: 'timestamp', default: 'now()' }
@@ -52,18 +51,6 @@ export class CreateEventsMigration implements MigrationInterface {
     await queryRunner.createForeignKey(
       'events',
       new TableForeignKey({
-        name: 'fk_events_subjects',
-        referencedTableName: 'subjects',
-        referencedColumnNames: ['id'],
-        columnNames: ['subject_id'],
-        onDelete: 'cascade',
-        onUpdate: 'cascade'
-      })
-    )
-
-    await queryRunner.createForeignKey(
-      'events',
-      new TableForeignKey({
         name: 'fk_events_categories',
         referencedTableName: 'categories',
         referencedColumnNames: ['id'],
@@ -76,6 +63,7 @@ export class CreateEventsMigration implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey('events', 'fk_events_organizer_account')
+    await queryRunner.dropForeignKey('events', 'fk_events_categories')
     await queryRunner.dropTable('events', true)
   }
 }

@@ -11,7 +11,6 @@ describe('Event', () => {
     status: 'available',
     visibility: 'public',
     organizerAccountId: '8402a14c-bc0c-48cb-856a-c1d15cd9ca9',
-    subjectId: '65ef5404-95ec-49fd-89f0-65cb158eec12',
     startDateTime: new Date(2025, 9, 11, 19, 30),
     endDateTime: new Date(2025, 9, 11, 23, 30)
   }

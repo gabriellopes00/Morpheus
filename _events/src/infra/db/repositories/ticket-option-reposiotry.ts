@@ -40,7 +40,6 @@ export class PgTicketOptionsRepository implements SaveRepository<TicketOption> {
         totalQuantity: t.totalQuantity
       })
     )
-    console.log(entities)
     await this.repository.save(entities)
   }
 }

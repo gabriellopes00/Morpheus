@@ -8,7 +8,6 @@ import { LocationEntity } from './entities/location-entity'
 import { TicketOptionEntity } from './entities/ticket-option-entity'
 import { CreateAccountMigration } from './migrations/1653147077419-create-account-migration'
 import { CreateCategoriesMigration } from './migrations/1657896118944-create-categories-migration'
-import { CreateSubjectsMigration } from './migrations/1657896596925-create-subjects-migrations'
 import { CreateEventsMigration } from './migrations/1657896600958-create-events-migrations'
 import { CreateLocationsMigration } from './migrations/1657896603908-create-locations-migrations'
 import { CreateTicketOptionsMigration } from './migrations/1657896606712-create-ticket-options-migrations'
@@ -49,7 +48,6 @@ export class TypeORMDataSource {
       migrations: [
         CreateAccountMigration,
         CreateCategoriesMigration,
-        CreateSubjectsMigration,
         CreateEventsMigration,
         CreateLocationsMigration,
         CreateTicketOptionsMigration,
