@@ -36,6 +36,7 @@
   "dependencies": {
     "amqplib": "^0.9.1",
     "argon2": "^0.28.7",
+    "axios": "^0.27.2",
     "dotenv": "^8.6.0",
     "express": "^4.18.1",
     "jsonwebtoken": "^8.5.1",
