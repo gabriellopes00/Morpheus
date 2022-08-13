@@ -7,7 +7,10 @@ import {
   CreateLocationCredentials,
   CreateLocationUseCase
 } from '../../usecases/events/create-location-usecase'
+import { FindEvent } from '../../usecases/events/find-event-usecase'
 import { FindEventsUseCase } from '../../usecases/events/find-events-usecase'
+import { FindNearbyEvents } from '../../usecases/events/find-nearby-events'
+import { UpdateEvent } from '../../usecases/events/update-event'
 import {
   CreateTicketOption,
   CreateTicketOptionCredentials
@@ -25,7 +28,10 @@ export class EventController {
     private readonly createEvent: CreateEventUseCase,
     private readonly createLocation: CreateLocationUseCase,
     private readonly createTicketOption: CreateTicketOption,
-    private readonly findEvents: FindEventsUseCase
+    private readonly findEvents: FindEventsUseCase,
+    private readonly findEvent: FindEvent,
+    private readonly updateEvent: UpdateEvent,
+    private readonly findNearbyEvents: FindNearbyEvents
   ) {
     const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
     methods.filter(m => m !== 'constructor').forEach(m => (this[m] = this[m].bind(this)))
@@ -62,6 +68,36 @@ export class EventController {
   public async findAll(req: EventRequest, res: Response): Promise<Response> {
     try {
       const result = await this.findEvents.execute()
+      return res.status(200).json({ result })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+  public async findById(req: EventRequest, res: Response): Promise<Response> {
+    try {
+      const result = await this.findEvent.execute({ id: req.params.id })
+      return res.status(200).json({ result })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+  public async findNearby(req: Request, res: Response): Promise<Response> {
+    try {
+      const result = await this.findNearbyEvents.execute({
+        latitude: Number(req.query.latitude),
+        longitude: Number(req.query.longitude)
+      })
+      return res.status(200).json({ result })
+    } catch (error) {
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
+  public async update(req: EventRequest, res: Response): Promise<Response> {
+    try {
+      const result = await this.updateEvent.execute({ id: req.params.id, ...req.body })
       return res.status(200).json({ result })
     } catch (error) {
       return res.status(500).json({ error: error.message })

@@ -59,12 +59,22 @@ export class Event extends Entity<EventData> {
     return this.data.name
   }
 
+  set name(name: string) {
+    this.data.name = name
+  }
+
   public get description(): string {
     return this.data.description
+  }
+  set description(description: string) {
+    this.data.description = description
   }
 
   public get coverUrl(): string {
     return this.data.coverUrl
+  }
+  set coverUrl(coverUrl: string) {
+    this.data.coverUrl = coverUrl
   }
 
   public get organizerAccountId(): string {
@@ -73,6 +83,9 @@ export class Event extends Entity<EventData> {
 
   public get agrGroup(): number {
     return this.data.ageGroup
+  }
+  set ageGroup(ageGroup: EventAgeGroup) {
+    this.data.ageGroup = ageGroup
   }
 
   public get status(): string {
