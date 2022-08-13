@@ -1,9 +1,11 @@
 import { TicketOption } from '@/modules/events/domain/ticket-option'
-import { SaveRepository } from '@/shared/repositories'
+import { FindRepository, SaveRepository } from '@/shared/repositories'
 import { DataSource, Repository } from 'typeorm'
 import { TicketOptionEntity } from '../entities/ticket-option-entity'
 
-export class PgTicketOptionsRepository implements SaveRepository<TicketOption> {
+export class PgTicketOptionsRepository
+  implements SaveRepository<TicketOption>, FindRepository<TicketOption>
+{
   private readonly repository: Repository<TicketOptionEntity>
 
   constructor(private readonly dataSource: DataSource) {
@@ -41,5 +43,10 @@ export class PgTicketOptionsRepository implements SaveRepository<TicketOption> {
       })
     )
     await this.repository.save(entities)
+  }
+
+  public async findAllBy(key: keyof TicketOption, value: any): Promise<TicketOption[]> {
+    const entities = await this.repository.find({ where: { [key]: value } })
+    return entities.map(e => e.map())
   }
 }

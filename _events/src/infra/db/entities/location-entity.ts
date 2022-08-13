@@ -43,6 +43,20 @@ export class LocationEntity implements LocationData {
   public updatedAt: Date
 
   public map(): Location {
-    return Object.assign(new Location(this, this.id), this)
+    return new Location(
+      {
+        eventId: this.eventId,
+        description: this.description,
+        street: this.street,
+        district: this.district,
+        state: this.state,
+        city: this.city,
+        number: this.number,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        postalCode: this.postalCode
+      },
+      this.id
+    )
   }
 }

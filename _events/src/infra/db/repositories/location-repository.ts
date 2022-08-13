@@ -1,9 +1,9 @@
 import { Location } from '@/modules/events/domain/location'
-import { SaveRepository } from '@/shared/repositories'
+import { FindRepository, SaveRepository } from '@/shared/repositories'
 import { DataSource, Repository } from 'typeorm'
 import { LocationEntity } from '../entities/location-entity'
 
-export class PgLocationsRepository implements SaveRepository<Location> {
+export class PgLocationsRepository implements SaveRepository<Location>, FindRepository<Location> {
   private readonly repository: Repository<LocationEntity>
 
   constructor(private readonly dataSource: DataSource) {
@@ -33,5 +33,10 @@ export class PgLocationsRepository implements SaveRepository<Location> {
   public async saveAll(ticket: Location[]): Promise<void> {
     const entities: LocationEntity[] = ticket.map(t => this.repository.create({ ...t }))
     await this.repository.save(entities)
+  }
+
+  public async findAllBy(key: keyof Location, value: any): Promise<Location[]> {
+    const entities = await this.repository.find({ where: { [key]: value } })
+    return entities.map(e => e.map())
   }
 }

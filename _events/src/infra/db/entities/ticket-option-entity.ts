@@ -31,6 +31,18 @@ export class TicketOptionEntity implements TicketOptionData {
   public eventId: string
 
   public map(): TicketOption {
-    return Object.assign(new TicketOption(this, this.id), this)
+    return new TicketOption(
+      {
+        eventId: this.eventId,
+        description: this.description,
+        maximumBuysQuantity: this.maximumBuysQuantity,
+        minimumBuysQuantity: this.minimumBuysQuantity,
+        price: this.price,
+        remainingQuantity: this.remainingQuantity,
+        totalQuantity: this.totalQuantity,
+        title: this.title
+      },
+      this.id
+    )
   }
 }

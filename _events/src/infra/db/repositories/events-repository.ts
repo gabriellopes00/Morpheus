@@ -1,6 +1,6 @@
 import { Event } from '@/modules/events/domain/event'
 import { FindRepository, SaveRepository } from '@/shared/repositories'
-import { DataSource, Repository } from 'typeorm'
+import { DataSource, In, Repository } from 'typeorm'
 import { EventEntity } from '../entities/event-entity'
 
 export class PgEventsRepository implements SaveRepository<Event>, FindRepository<Event> {
@@ -31,8 +31,9 @@ export class PgEventsRepository implements SaveRepository<Event>, FindRepository
   }
 
   public async findBy?(key: keyof Event, value: any): Promise<Event> {
-    const entity = await this.repository.findOne({ [key]: value })
+    const entity = await this.repository.findOneBy({ [key]: value })
     if (!entity) return null
+
     return entity.map()
   }
 
@@ -47,6 +48,11 @@ export class PgEventsRepository implements SaveRepository<Event>, FindRepository
 
   public async findAllBy(key: keyof Event, value: any): Promise<Event[]> {
     const entities = await this.repository.find({ where: { categoryId: value } })
+    return entities.map(e => e.map())
+  }
+
+  public async findManyById(ids: string[]): Promise<Event[]> {
+    const entities = await this.repository.find({ where: { id: In(ids) } })
     return entities.map(e => e.map())
   }
 }
