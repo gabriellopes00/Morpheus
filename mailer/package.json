@@ -16,7 +16,7 @@
     "@sentry/node": "^7.9.0",
     "@sentry/tracing": "^7.7.0",
     "amqplib": "^0.10.0",
-    "bull": "^4.8.2",
+    "bull": "^4.9.0",
     "dotenv": "^16.0.1",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
