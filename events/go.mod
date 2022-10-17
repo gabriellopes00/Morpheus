@@ -8,7 +8,7 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/lib/pq v1.10.7
 	github.com/satori/go.uuid v1.2.0
-	gorm.io/driver/postgres v1.3.10
+	gorm.io/driver/postgres v1.4.4
 	gorm.io/gorm v1.23.7
 )
 
