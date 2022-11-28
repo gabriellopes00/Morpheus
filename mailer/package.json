@@ -16,7 +16,7 @@
     "@sentry/node": "^7.9.0",
     "@sentry/tracing": "^7.15.0",
     "amqplib": "^0.10.0",
-    "bull": "^4.8.2",
+    "bull": "^4.10.2",
     "dotenv": "^16.0.1",
     "handlebars": "^4.7.7",
     "module-alias": "^2.2.2",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.2",
-    "@types/bull": "^3.15.8",
+    "@types/bull": "^4.10.0",
     "@types/handlebars": "^4.1.0",
     "@types/node": "^18.7.16",
     "@types/nodemailer": "^6.4.6",
